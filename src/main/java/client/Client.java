@@ -10,16 +10,38 @@ import java.net.Socket;
 
 @Log4j2
 public class Client {
-    private ClientConnection connection;
+    private Socket clientSocket;
     private PrintWriter outToServer;
     private BufferedReader inFromServer;
-    private final Socket socket;
+    private static int connectionAttempts = 0;
 
-    public Client() throws IOException {
-        this.connection = new ClientConnection();
-        this.socket = connection.getClientSocket();
-        this.outToServer = new PrintWriter(socket.getOutputStream(), true);
-        this.inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    private void startConnection(String ip, int port)  {
+        try {
+            clientSocket = new Socket(ip, port);
+            this.outToServer = new PrintWriter(clientSocket.getOutputStream(), true);
+            this.inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            log.info("Connection established with server at port {}", port);
+        } catch (IOException ex) {
+            log.error("Failed to establish connection with the server at port {}. Error: {}", port, ex.getMessage());
+            retryConnection();
+        }
+    }
+
+    private void retryConnection() {
+        if (connectionAttempts >= 2) {
+            log.error("Max reconnection attempts reached. Giving up");
+            close();
+            return;
+        }
+        try {
+            Thread.sleep(2000);
+            log.info("Attempting to reconnect to the server... (Attempt {})", connectionAttempts + 1);
+            connectionAttempts++;
+            startConnection();
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            log.warn("Reconnection attempt interrupted: {} ", ie.getMessage());
+        }
     }
 
     private void sendRequest(String message){
@@ -45,14 +67,14 @@ public class Client {
 
     public void close() {
         try {
+            if(clientSocket != null && !clientSocket.isClosed()){
+                clientSocket.close();
+            }
             if (outToServer != null) {
                 outToServer.close();
             }
             if (inFromServer != null) {
                 inFromServer.close();
-            }
-            if (socket != null && !socket.isClosed()) {
-                socket.close();
             }
         } catch (IOException ex) {
             log.error("Error occurred while closing resources: {}", ex.getMessage());
