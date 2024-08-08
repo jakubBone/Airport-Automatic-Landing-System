@@ -11,53 +11,62 @@ import java.net.Socket;
 @Log4j2
 public class Client {
     private Socket clientSocket;
-    private PrintWriter outToServer;
-    private BufferedReader inFromServer;
+    private PrintWriter out;
+    private BufferedReader in;
     private static int connectionAttempts = 0;
 
     private void startConnection(String ip, int port)  {
         try {
             clientSocket = new Socket(ip, port);
-            this.outToServer = new PrintWriter(clientSocket.getOutputStream(), true);
-            this.inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            this.out = new PrintWriter(clientSocket.getOutputStream(), true);
+            this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             log.info("Connection established with server at port {}", port);
         } catch (IOException ex) {
             log.error("Failed to establish connection with the server at port {}. Error: {}", port, ex.getMessage());
-            retryConnection();
+            retryConnection(ip, port);
         }
     }
 
-    private void retryConnection() {
+    private void retryConnection(String ip, int port) {
         if (connectionAttempts >= 2) {
             log.error("Max reconnection attempts reached. Giving up");
-            close();
+            stopConnection();
             return;
         }
         try {
             Thread.sleep(2000);
             log.info("Attempting to reconnect to the server... (Attempt {})", connectionAttempts + 1);
             connectionAttempts++;
-            startConnection();
+            startConnection(ip, port);
         } catch (InterruptedException ie) {
             Thread.currentThread().interrupt();
             log.warn("Reconnection attempt interrupted: {} ", ie.getMessage());
         }
     }
 
-    private void sendRequest(String message){
+    private void requestLanding() throws IOException{
+        startConnection("localhost", 5000);
+
+        sendRequest("The plane request for landing");
+
+        String response = readResponse();
+        System.out.println("Airport response: " + response);
+    }
+
+    private void sendRequest(String message)  {
         try {
-            if (outToServer != null) {
-                outToServer.println(message);
+            if (out != null) {
+                out.println(message);
             }
-        } catch (IOException ex) {
-            log.error("Connection to server is not established");
+        } catch (Exception ex) {
+            log.error("Connection to server is not established: {}", ex.getMessage());
         }
     }
 
     public String readResponse() {
         try {
-            if (inFromServer != null) {
-                return inFromServer.readLine();
+            if (in != null) {
+                return in.readLine();
             }
         } catch (IOException ex) {
             log.error("Error occurred while communicating with server: {}", ex.getMessage());
@@ -65,19 +74,24 @@ public class Client {
         return null;
     }
 
-    public void close() {
+    public void stopConnection() {
         try {
             if(clientSocket != null && !clientSocket.isClosed()){
                 clientSocket.close();
             }
-            if (outToServer != null) {
-                outToServer.close();
+            if (out != null) {
+                out.close();
             }
-            if (inFromServer != null) {
-                inFromServer.close();
+            if (in != null) {
+                in.close();
             }
         } catch (IOException ex) {
             log.error("Error occurred while closing resources: {}", ex.getMessage());
         }
     }
+    public static void main(String[] args) throws IOException {
+        Client client = new Client();
+        client.requestLanding();
+    }
+
 }
