@@ -1,23 +1,16 @@
-package server;
+package airport;
 
 import lombok.extern.log4j.Log4j2;
-import plane.PlaneHandler;
+import handler.PlaneHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Log4j2
 public class AirportServer  {
-    private static final int NUMBER_OF_THREADS = 100;
     private ServerSocket serverSocket;
-    private ExecutorService executor;
 
-    public AirportServer() {
-        this.executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-    }
     public void startServer(int port) throws IOException {
         try {
             serverSocket = new ServerSocket(port);
@@ -25,7 +18,8 @@ public class AirportServer  {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     if (clientSocket != null) {
-                        executor.submit(new PlaneHandler(clientSocket));
+                        PlaneHandler planeHandler = new PlaneHandler(clientSocket);
+                        planeHandler.handleClient();
                     }
                 } catch (Exception ex) {
                     log.error("Error occurred while accepting client connection: {}", ex.getMessage());
@@ -40,9 +34,6 @@ public class AirportServer  {
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();
-            }
-            if (executor != null && !executor.isShutdown()) {
-                executor.shutdown();
             }
         } catch (IOException ex) {
             log.error("Error occurred while closing server socket: {}", ex.getMessage());
