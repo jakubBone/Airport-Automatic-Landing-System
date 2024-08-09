@@ -7,10 +7,9 @@ import plane.Plane;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
 
 @Log4j2
-public class PlaneHandler implements Runnable {
+public class PlaneHandler  {
     private Socket socket;
     private Plane plane;
     private AirSpace airSpace;
@@ -18,13 +17,13 @@ public class PlaneHandler implements Runnable {
 
     public PlaneHandler(Socket socket) {
         this.socket = socket;
-        controller = new AirTrafficController();
+        this.airSpace = new AirSpace();
+        this.controller = new AirTrafficController();
     }
 
     public void handleClient() {
-        try (ObjectInputStream in = new ObjectInputStream(socket.getOutputStream());
-             ObjectInputStream out = new ObjectInputStream(socket.getInputStream())) {
-
+        try (ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
             plane = (Plane) in.readObject();
 
             log.info("Check number of planes in the airspace");
@@ -33,22 +32,26 @@ public class PlaneHandler implements Runnable {
             }
 
             plane.spawnPlaneAtRandomLocation();
-            log.info("Plane " + plane.getPlaneId() + "fly into airspace");
+            log.info("Plane " + plane.getPlaneId() + " entered into airspace");
 
-            while (true) {
-                log.info("Add plane to queue");
+            while (true) {;
                 airSpace.registerPlaneInAirSpace(plane);
 
                 log.info("Check runways availability");
                 controller.assignRunway(plane);
 
-                log.info("Remove the plane from queue");
+                log.info("Landing...");
+                log.info("Landing...");
+                log.info("Landing...");
 
+                log.info("Remove the plane from queue");
                 airSpace.removePlaneFromAirSpace(plane);
 
+                // Release runway
+                break;
             }
-        } catch (IOException ex){
-            log.error("Error occurred while handling client request: {}", ex.getMessage());
+        } catch (IOException | ClassNotFoundException ex){
+            log.error("Error occurred while handling {} request: {}", plane.getPlaneId(), ex.getMessage());
         }
     }
 }

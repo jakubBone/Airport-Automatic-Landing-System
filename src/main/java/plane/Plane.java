@@ -3,12 +3,13 @@ package plane;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
 @Setter
-public class Plane {
+public class Plane implements Serializable {
     private static final AtomicInteger idCounter = new AtomicInteger();
     private int planeId;
     private double fuelLevel;
@@ -30,7 +31,7 @@ public class Plane {
         double randomY = random.nextDouble();
         double randomAltitude = random.nextDouble();
 
-        Location randomLocation = new Location(randomX, randomY, randomAltitude)
+        Location randomLocation = new Location(randomX, randomY, randomAltitude);
         setCurrentLocation(randomLocation);
     }
 

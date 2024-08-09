@@ -10,5 +10,4 @@ public class Runway {
     public Runway(String id) {
         this.id = id;
     }
-
 }

@@ -30,7 +30,7 @@ public class AirportServer  {
         }
     }
 
-    public void stop() {
+    public void stopServer() {
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();

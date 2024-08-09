@@ -21,18 +21,18 @@ public class Client {
         this.port = port;
     }
 
-    private void startConnection()  {
+    protected void startConnection()  {
         try {
             socket = new Socket(ip, port);
-            out = new ObjectOutputStream(socket.getOutputStream();
-            in = new ObjectInputStream(socket.getInputStream()
-        } catch (IOException | ClassNotFoundException | InterruptedException ex) {
-            retryConnection(ip, port);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+        } catch (IOException ex) {
+            retryConnection();
             log.error("Failed to establish connection with the server at port {}. Error: {}", port, ex.getMessage());
         }
     }
 
-    private void retryConnection(String ip, int port) {
+    private void retryConnection() {
         if (connectionAttempts >= 2) {
             log.error("Max reconnection attempts reached. Giving up");
             stopConnection();
@@ -42,14 +42,14 @@ public class Client {
             Thread.sleep(2000);
             log.info("Attempting to reconnect to the server... (Attempt {})", connectionAttempts + 1);
             connectionAttempts++;
-            startConnection(ip, port);
+            startConnection();
         } catch (InterruptedException ie) {
             Thread.currentThread().interrupt();
             log.warn("Reconnection attempt interrupted: {} ", ie.getMessage());
         }
     }
 
-    public void stopConnection() {
+    protected void stopConnection() {
         try {
             if(socket != null && !socket.isClosed()){
                 socket.close();
