@@ -15,7 +15,6 @@ public class Plane {
     private double heading;
     private double speed;
     private Location currentLocation;
-    private boolean landed;
 
     public Plane() {
         this.planeId = generateID();
@@ -23,18 +22,6 @@ public class Plane {
 
     public static int generateID() {
         return idCounter.incrementAndGet();
-    }
-
-    public Location sendLocationData(){
-        return getCurrentLocation();
-    }
-
-    public void reduceFuel(){
-
-    }
-
-    public void updateLocation(){
-
     }
 
     public void spawnPlaneAtRandomLocation(){
@@ -45,5 +32,13 @@ public class Plane {
 
         Location randomLocation = new Location(randomX, randomY, randomAltitude)
         setCurrentLocation(randomLocation);
+    }
+
+    public void reduceFuel(){
+
+    }
+
+    public void updateLocation(){
+
     }
 }
