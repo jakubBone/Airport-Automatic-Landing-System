@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
@@ -15,7 +14,8 @@ public class Plane implements Serializable {
     private double fuelLevel;
     private double heading;
     private double speed;
-    private Location currentLocation;
+    private double direction;
+    private Location location;
 
     public Plane() {
         this.planeId = generateID();
@@ -25,14 +25,8 @@ public class Plane implements Serializable {
         return idCounter.incrementAndGet();
     }
 
-    public void spawnPlaneAtRandomLocation(){
-        Random random = new Random();
-        double randomX = random.nextDouble();
-        double randomY = random.nextDouble();
-        double randomAltitude = random.nextDouble();
-
-        Location randomLocation = new Location(randomX, randomY, randomAltitude);
-        setCurrentLocation(randomLocation);
+    public boolean isOutOfFuel() {
+        return fuelLevel <= 0;
     }
 
     public void reduceFuel(){
@@ -42,4 +36,6 @@ public class Plane implements Serializable {
     public void updateLocation(){
 
     }
+
+
 }

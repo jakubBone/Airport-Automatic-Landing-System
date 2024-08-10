@@ -1,6 +1,8 @@
 package client;
 
+import airport.Runway;
 import lombok.extern.log4j.Log4j2;
+import plane.Location;
 import plane.Plane;
 
 import java.io.*;
@@ -20,13 +22,14 @@ public class PlaneClient extends Client  {
             out.writeObject(plane);
 
             while(true){
-                //updatePlaneState();
-                Plane updatedPlane = (Plane) in.readObject();
-                processAirportInstruction(updatedPlane);
+                updatePlaneState();
 
                 if(plane.getFuelLevel() <= 0){
                     break;
                 }
+
+                Runway runway = (Location) in.readObject();
+                processAirportInstruction(plane, runway);
 
                 Thread.sleep(1000);
             }
@@ -40,12 +43,11 @@ public class PlaneClient extends Client  {
         plane.reduceFuel();
     }
 
-    public void processAirportInstruction(Plane updatedPlane){
-        // set the plane's state based on the airport's instructions
-        plane.setCurrentLocation(updatedPlane.getCurrentLocation());
-        plane.setHeading(updatedPlane.getHeading());
-        plane.setSpeed(updatedPlane.getSpeed());
+    public void processAirportInstruction(Plane plane, Runway runway){
+        // landing handling
     }
+
+
 
     public static void main(String[] args) throws IOException {
         PlaneClient client = new PlaneClient("localhost", 5000);

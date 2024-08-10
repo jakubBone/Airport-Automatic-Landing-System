@@ -1,25 +1,28 @@
 package airport;
 
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import plane.Location;
 import plane.Plane;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 @Log4j2
+@Getter
 public class AirTrafficController {
     public static Queue <Runway> availableRunways = new LinkedList<>();
     public AirTrafficController() {
         initRunways();
     }
     public void initRunways(){
-        Runway runway1 = new Runway("1");
-        Runway runway2 = new Runway("2");
+        Runway runway1 = new Runway("1", new Location(1, 0, 0));
+        Runway runway2 = new Runway("2", new Location(2, 0 , 0));
         availableRunways.add(runway1);
         availableRunways.add(runway2);
     }
 
-    public void assignRunway(Plane plane){
+    public Runway assignRunway(Plane plane){
         if (availableRunways.isEmpty()) {
             log.info("No empty runways available");
             waitForRunway(plane);
@@ -29,6 +32,7 @@ public class AirTrafficController {
         Runway assignedRunway = availableRunways.poll();
         log.info("Plane " + plane.getPlaneId() + " assigned to runway " + assignedRunway.getId());
 
+        return assignedRunway;
     }
 
     public void waitForRunway(Plane plane) {
