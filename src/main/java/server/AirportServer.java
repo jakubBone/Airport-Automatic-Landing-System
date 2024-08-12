@@ -14,15 +14,17 @@ public class AirportServer  {
     public void startServer(int port) throws IOException {
         try {
             serverSocket = new ServerSocket(port);
+            log.info("Server started");
             while (true) {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     if (clientSocket != null) {
+                        log.info("Server connected with client at port: {}", port);
                         PlaneHandler planeHandler = new PlaneHandler(clientSocket);
                         planeHandler.handleClient();
                     }
                 } catch (Exception ex) {
-                    log.error("Error occurred while accepting client connection: {}", ex.getMessage());
+                    log.error("Error occurred: {}", ex.getMessage());
                 }
             }
         } catch (IOException ex){

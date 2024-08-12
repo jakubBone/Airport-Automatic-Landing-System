@@ -27,34 +27,43 @@ public class PlaneHandler  {
              ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
 
             Plane incomingPlane = (Plane) in.readObject();
-
-            log.info("Check number of planes in the airspace");
             if (airSpace.isAirSpaceFull()) {
-                log.info("Airspace if full");
+                log.info("No capacity in the airspace");
                 return;
             }
-
             airSpace.registerPlaneInAirSpace(incomingPlane);
-            log.info("Plane [" + incomingPlane.getPlaneId() + "] entered into airspace");
+            log.info("Plane [" + incomingPlane.getId() + "] entered into airspace");
 
-            while (true) {;
+            while (true) {
+                Location currentLocation = (Location) in.readObject();
+                incomingPlane.setLocation(currentLocation);
+
                 log.info("Check runways availability");
-                Runway runway = controller.assignRunway(incomingPlane);
+                if(controller.isAnyRunwayAvailable()){
+                    log.info("Plane [" + incomingPlane.getId() + "] got approval for landing");
+                    out.writeObject("LAND");
 
-                out.writeObject(runway);
+                    Runway runway = controller.assignRunway();
+                    log.info("Plane [" + incomingPlane.getId() + "] assigned to runway [" + runway.getId());
 
-                log.info("Landing...");
-                log.info("Landing...");
-                log.info("Landing...");
+                    out.writeObject(runway);
 
-                log.info("Remove the plane from queue");
-                // airSpace.removePlaneFromAirSpace(incomingPlane);
+                    log.info("Landing...");
 
-                controller.releaseRunway(runway);
-                break;
+                    airSpace.removePlaneFromAirSpace(incomingPlane);
+                    log.info("Plane [" + incomingPlane.getId() + "] removed from the airspace");
+
+                    controller.releaseRunway(runway);
+                    log.info("Runway [" + runway.getId() + "] removed from the airspace");
+                    break;
+                } else {
+                    log.info("Plane [" + incomingPlane.getId() + "] is waiting for empty runway");
+                    out.writeObject("WAIT");
+                }
+                airSpace.updateAirspace();
             }
         } catch (IOException | ClassNotFoundException ex){
-            log.error("Error occurred while handling {} request: {}", requestedPlane.getPlaneId(), ex.getMessage());
+            log.error("Error occurred while handling client request:" + ex.getMessage());
         }
     }
 }
