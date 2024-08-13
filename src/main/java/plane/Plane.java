@@ -28,7 +28,7 @@ public class Plane implements Serializable {
         this.location = generatePlaneRandomLocation();
     }
 
-    public void circleAroundAirport(){
+    public void holdPattern(){
 
         location.setX(location.getX() + 1);
         location.setY(location.getY() + 1);
@@ -87,6 +87,6 @@ public class Plane implements Serializable {
     }
 
     public void reduceFuel(){
-        //fuelLevel--;
+        fuelLevel--;
     }
 }

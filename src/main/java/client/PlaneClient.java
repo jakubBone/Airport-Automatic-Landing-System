@@ -22,9 +22,10 @@ public class PlaneClient extends Client  {
             out.writeObject(plane);
 
             while(true){
-                plane.circleAroundAirport();
+                plane.holdPattern();
+                plane.reduceFuel();
 
-                if(plane.getFuelLevel() <= 0){
+                if(plane.isOutOfFuel()){
                     log.info("Plane [" + plane.getId() + "] is out of fuel");
                     break;
                 }
@@ -41,6 +42,9 @@ public class PlaneClient extends Client  {
                     log.info("Runway available. Plane [" + plane.getId() + "] is preparing for landing");
                     processLanding(assignedRunway);
                     break;
+                } else if("FULL".equals(instruction)){
+                    log.info("No capacity in the airspace. Find another airport");
+                    return;
                 }
 
                 Thread.sleep(1000);
@@ -54,11 +58,6 @@ public class PlaneClient extends Client  {
     public void processLanding(Runway runway){
         log.info("Plane [" + plane.getId() + "] is heading towards the runway");
         plane.directLanding(runway);
-    }
-
-    public void updatePlaneState(){
-        plane.circleAroundAirport();
-        plane.reduceFuel();
     }
 
     public static void main(String[] args) throws IOException {

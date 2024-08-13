@@ -27,16 +27,25 @@ public class PlaneHandler  {
              ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
 
             Plane incomingPlane = (Plane) in.readObject();
+
             if (airSpace.isAirSpaceFull()) {
                 log.info("No capacity in the airspace");
+                out.writeObject("FULL");
                 return;
             }
             airSpace.registerPlaneInAirSpace(incomingPlane);
             log.info("Plane [" + incomingPlane.getId() + "] entered into airspace");
 
             while (true) {
-                Location currentLocation = (Location) in.readObject();
-                incomingPlane.setLocation(currentLocation);
+                Location currentLocation = null;
+                try {
+                    currentLocation = (Location) in.readObject();
+                    incomingPlane.setLocation(currentLocation);
+                } catch (Exception Ex) {
+                    log.info("Plane [" + incomingPlane.getId() + "] disappeared from the radar");
+                    airSpace.removePlaneFromAirSpace(incomingPlane);
+                    return;
+                }
 
                 log.info("Check runways availability");
                 if(controller.isAnyRunwayAvailable()){
@@ -60,8 +69,6 @@ public class PlaneHandler  {
                     log.info("Plane [" + incomingPlane.getId() + "] is waiting for empty runway");
                     out.writeObject("WAIT");
                 }
-
-                //airSpace.updateAirspace();
             }
         } catch (IOException | ClassNotFoundException ex){
             log.error("Error occurred while handling client request:" + ex.getMessage());
