@@ -20,17 +20,20 @@ public class PlaneClient extends Client  {
             startConnection();
 
             out.writeObject(plane);
-            plane.generatePlaneRandomLocation();
 
             while(true){
-                updatePlaneState();
+                plane.circleAroundAirport();
 
                 if(plane.getFuelLevel() <= 0){
                     log.info("Plane [" + plane.getId() + "] is out of fuel");
                     break;
                 }
+
+                out.reset();
                 out.writeObject(plane.getLocation());
-                String instruction = (String) in.readObject(); // improve
+                out.flush();
+
+                String instruction = (String) in.readObject();
                 if ("WAIT".equals(instruction)) {
                     log.info("Plane [" + plane.getId() + "] is waiting for a available runway");
                 } else if ("LAND".equals(instruction)) {

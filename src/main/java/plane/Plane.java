@@ -17,6 +17,7 @@ public class Plane implements Serializable {
     private int id;
     private double fuelLevel;
     private double speed;
+    private double heading;
     private Location location;
     private boolean hasLanded;
 
@@ -24,10 +25,20 @@ public class Plane implements Serializable {
         this.id = generateID();
         this.fuelLevel = 10;
         this.speed = 100;
+        this.location = generatePlaneRandomLocation();
     }
 
     public void circleAroundAirport(){
-        double radius = 10000;
+
+        location.setX(location.getX() + 1);
+        location.setY(location.getY() + 1);
+
+        // Przykład prostego orbitowania na poziomie 2000m i 1000m od środka lotniska
+        //this.location.setX(this.location.getX() + Math.cos(this.heading) * 1000);
+        //this.location.setY(this.location.getY() + Math.sin(this.heading) * 1000);
+        //this.location.setAltitude(2000);
+
+        /*double radius = 10000;
 
         double angleChange = speed / radius;
         double currentAngle = Math.atan2(location.getY(), location.getX());
@@ -40,7 +51,7 @@ public class Plane implements Serializable {
 
         // Setting a new position
         location.setX(newX);
-        location.setY(newY);
+        location.setY(newY);*/
 
     }
 
@@ -62,15 +73,13 @@ public class Plane implements Serializable {
         return idCounter.incrementAndGet();
     }
 
-    public void generatePlaneRandomLocation(){
+    public Location generatePlaneRandomLocation(){
         Random random = new Random();
         double randomX = random.nextDouble();
         double randomY = random.nextDouble();
         double randomAltitude = 2000;
 
-        Location randomLocation = new Location(randomX, randomY, randomAltitude);
-
-        setLocation( randomLocation);
+        return  new Location(randomX, randomY, randomAltitude);
     }
 
     public boolean isOutOfFuel() {

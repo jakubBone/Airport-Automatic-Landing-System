@@ -60,7 +60,8 @@ public class PlaneHandler  {
                     log.info("Plane [" + incomingPlane.getId() + "] is waiting for empty runway");
                     out.writeObject("WAIT");
                 }
-                airSpace.updateAirspace();
+
+                //airSpace.updateAirspace();
             }
         } catch (IOException | ClassNotFoundException ex){
             log.error("Error occurred while handling client request:" + ex.getMessage());
