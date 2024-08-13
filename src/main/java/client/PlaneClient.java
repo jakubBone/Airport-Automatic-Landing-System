@@ -26,7 +26,7 @@ public class PlaneClient extends Client  {
                 plane.reduceFuel();
 
                 if(plane.isOutOfFuel()){
-                    log.info("Plane [" + plane.getId() + "] is out of fuel");
+                    log.info("Plane [{}] is out of fuel", plane.getId());
                     break;
                 }
 
@@ -36,14 +36,14 @@ public class PlaneClient extends Client  {
 
                 String instruction = (String) in.readObject();
                 if ("WAIT".equals(instruction)) {
-                    log.info("Plane [" + plane.getId() + "] is waiting for a available runway");
+                    log.info("Plane [{}}] is waiting for a available runway", plane.getId());
                 } else if ("LAND".equals(instruction)) {
                     Runway assignedRunway = (Runway) in.readObject();
-                    log.info("Runway available. Plane [" + plane.getId() + "] is preparing for landing");
+                    log.info("Runway available. Plane [{}] is preparing for landing", plane.getId());
                     processLanding(assignedRunway);
                     break;
                 } else if("FULL".equals(instruction)){
-                    log.info("No capacity in the airspace. Find another airport");
+                    log.info("No capacity in the airspace for plane [{}]. Find another airport", plane.getId());
                     return;
                 }
 
@@ -52,11 +52,11 @@ public class PlaneClient extends Client  {
         } catch (IOException | ClassNotFoundException | InterruptedException ex) {
             log.error("Failed to handle communication with plane [{}]: {}", plane.getId(), ex.getMessage());
         }
-        log.info("Plane [" + plane.getId() + "] exited communication");
+        log.info("Plane [{}] exited communication", plane.getId());
     }
 
     public void processLanding(Runway runway){
-        log.info("Plane [" + plane.getId() + "] is heading towards the runway");
+        log.info("Plane [{}}] is heading towards the runway", plane.getId());
         plane.directLanding(runway);
     }
 
