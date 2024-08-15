@@ -2,7 +2,6 @@ package airport;
 
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
-import plane.Plane;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -22,7 +21,7 @@ public class AirTrafficController {
         //availableRunways.add(runway2);
     }
 
-    public Runway assignRunway() {
+    public Runway getAvailableRunway() {
         return availableRunways.poll();
     }
 

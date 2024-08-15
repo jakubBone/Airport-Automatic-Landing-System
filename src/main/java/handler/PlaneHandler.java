@@ -38,14 +38,21 @@ public class PlaneHandler  {
             log.info("Plane [{}] entered into airspace", incomingPlane.getId());
 
             while (true) {
-                if (!isLocationUpdated(in, incomingPlane)) {
+                Location location = aquireCurrentLocation(in, incomingPlane);
+                if(location == null){
                     airSpace.removePlane(incomingPlane);
                     return;
                 }
+                incomingPlane.setLocation(location);
 
-                log.info("Check runways availability");
-                if(controller.isAnyRunwayAvailable()){
-                    assignRunwayAndLand(out, incomingPlane);
+                if(controller.isAnyRunwayAvailable()) {
+                    log.info("Plane [{}] got approval for landing", incomingPlane.getId());
+                    out.writeObject("LAND");
+
+                    Runway runway = controller.getAvailableRunway();
+                    log.info("Plane [{}] assigned to runway [{}]", incomingPlane.getId(), runway.getId());
+                    out.writeObject(runway);
+
                     break;
                 } else {
                     log.info("Plane [{}] is waiting for empty runway", incomingPlane.getId());
@@ -55,35 +62,24 @@ public class PlaneHandler  {
         } catch (IOException | ClassNotFoundException ex){
             log.error("Error occurred while handling client request:" + ex.getMessage());
         }
+        postLandingClearance();
     }
 
-    public boolean isLocationUpdated(ObjectInputStream in, Plane incomingPlane){
+    public Location aquireCurrentLocation(ObjectInputStream in, Plane incomingPlane){
         Location currentLocation = null;
         try {
             currentLocation = (Location) in.readObject();
-            incomingPlane.setLocation(currentLocation);
-            return true;
         } catch (Exception ex) {
             log.error("Plane [{}] disappeared from the radar. Error: {}", incomingPlane.getId(), ex.getMessage());
-            airSpace.removePlane(incomingPlane);
-            return false;
         }
+        return currentLocation;
     }
 
-    public void assignRunwayAndLand(ObjectOutputStream out, Plane incomingPlane) throws IOException {
-        log.info("Plane [{}] got approval for landing", incomingPlane.getId());
-        out.writeObject("LAND");
-
-        Runway runway = controller.assignRunway();
-        log.info("Plane [{}] assigned to runway [{}]", incomingPlane.getId(), runway.getId());
-
-        out.writeObject(runway);
-        log.info("Landing...");
-
+    public Runway postLandingClearance(Plane incomingPlane, Runway assignedRunway) throws IOException {
         airSpace.removePlane(incomingPlane);
         log.info("Plane [{}] removed from the airspace", incomingPlane.getId());
 
-        controller.releaseRunway(runway);
-        log.info("Runway [{}] released", runway.getId());
+        controller.releaseRunway(assignedRunway);
+        log.info("Runway [{}] released", assignedRunway.getId());
     }
 }
