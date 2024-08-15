@@ -1,6 +1,5 @@
 package plane;
 
-import airport.Runway;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -16,46 +15,27 @@ public class Plane implements Serializable {
     private static final AtomicInteger idCounter = new AtomicInteger();
     private int id;
     private double fuelLevel;
-    private double speed;
-    private double heading;
-    private Location location;
     private boolean hasLanded;
+    private Location location;
 
     public Plane() {
         this.id = generateID();
         this.fuelLevel = 10;
-        this.speed = 100;
-        this.location = generatePlaneRandomLocation();
+        this.location = new Location(10, 10, 10);
+        //this.location = generateRandomLocation();
     }
 
     public void holdPattern(){
-
-        location.setX(location.getX() + 1);
-        location.setY(location.getY() + 1);
-
-        // Przykład prostego orbitowania na poziomie 2000m i 1000m od środka lotniska
-        //this.location.setX(this.location.getX() + Math.cos(this.heading) * 1000);
-        //this.location.setY(this.location.getY() + Math.sin(this.heading) * 1000);
-        //this.location.setAltitude(2000);
-
-        /*double radius = 10000;
-
-        double angleChange = speed / radius;
-        double currentAngle = Math.atan2(location.getY(), location.getX());
-
-        // Angle actualization
-        currentAngle += angleChange;
-
-        double newX = radius * Math.cos(currentAngle);
-        double newY = radius * Math.sin(currentAngle);
-
-        // Setting a new position
-        location.setX(newX);
-        location.setY(newY);*/
-
+        move(1, 1, 1); // example movement
     }
 
-    public void directLanding(Runway runway){
+    public void move(int deltaX, int deltaY, int deltaAltitude){
+        this.location.setX(location.getX() + deltaX);
+        this.location.setY(location.getY() + deltaY);
+        this.location.setAltitude(location.getAltitude() + deltaAltitude);
+    }
+
+    /*public void directLanding(Runway runway){
         double deltaX = runway.getLocation().getX() - location.getX();
         double deltaY = runway.getLocation().getY() - location.getY();
 
@@ -67,19 +47,19 @@ public class Plane implements Serializable {
             hasLanded = true;
             log.info("Plane [" + getId() + "] has landed");
         }
-    }
+    }*/
 
     public static int generateID() {
         return idCounter.incrementAndGet();
     }
 
-    public Location generatePlaneRandomLocation(){
+    public Location generateRandomLocation(){
         Random random = new Random();
-        double randomX = random.nextDouble();
-        double randomY = random.nextDouble();
-        double randomAltitude = 2000;
+        int randomX = random.nextInt();
+        int randomY = random.nextInt();
+        int randomAltitude = 2000;
 
-        return  new Location(randomX, randomY, randomAltitude);
+        return new Location(randomX, randomY, randomAltitude);
     }
 
     public boolean isOutOfFuel() {

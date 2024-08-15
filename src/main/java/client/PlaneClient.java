@@ -22,7 +22,7 @@ public class PlaneClient extends Client  {
             out.writeObject(plane);
 
             while(true){
-                plane.holdPattern();
+                plane.move(1, 1, 1);
                 plane.reduceFuel();
 
                 if(plane.isOutOfFuel()){
@@ -57,7 +57,7 @@ public class PlaneClient extends Client  {
 
     public void processLanding(Runway runway){
         log.info("Plane [{}}] is heading towards the runway", plane.getId());
-        plane.directLanding(runway);
+        //plane.directLanding(runway);
     }
 
     public static void main(String[] args) throws IOException {

@@ -8,10 +8,10 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class Location implements Serializable {
-    double x;
-    double y;
-    double altitude;
-    public Location(double x, double y, double altitude) {
+    int x;
+    int y;
+    int altitude;
+    public Location(int x, int y, int altitude) {
         this.x = x;
         this.y = y;
         this.altitude = altitude;

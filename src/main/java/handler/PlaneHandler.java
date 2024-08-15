@@ -3,6 +3,7 @@ package handler;
 import airport.AirSpace;
 import airport.AirTrafficController;
 import airport.Runway;
+
 import lombok.extern.log4j.Log4j2;
 import plane.Location;
 import plane.Plane;
@@ -27,19 +28,18 @@ public class PlaneHandler  {
              ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
 
             Plane incomingPlane = (Plane) in.readObject();
-
-            if (airSpace.isAirSpaceFull()) {
+            if (airSpace.isSpaceFull()) {
                 log.info("No capacity in the airspace");
                 out.writeObject("FULL");
                 return;
             }
 
-            airSpace.registerPlaneInAirSpace(incomingPlane);
+            airSpace.registerPlane(incomingPlane);
             log.info("Plane [{}] entered into airspace", incomingPlane.getId());
 
             while (true) {
-                if (!isPlaneLocationUpdated(in, incomingPlane)) {
-                    airSpace.removePlaneFromAirSpace(incomingPlane);
+                if (!isLocationUpdated(in, incomingPlane)) {
+                    airSpace.removePlane(incomingPlane);
                     return;
                 }
 
@@ -57,7 +57,7 @@ public class PlaneHandler  {
         }
     }
 
-    public boolean isPlaneLocationUpdated(ObjectInputStream in, Plane incomingPlane){
+    public boolean isLocationUpdated(ObjectInputStream in, Plane incomingPlane){
         Location currentLocation = null;
         try {
             currentLocation = (Location) in.readObject();
@@ -65,7 +65,7 @@ public class PlaneHandler  {
             return true;
         } catch (Exception ex) {
             log.error("Plane [{}] disappeared from the radar. Error: {}", incomingPlane.getId(), ex.getMessage());
-            airSpace.removePlaneFromAirSpace(incomingPlane);
+            airSpace.removePlane(incomingPlane);
             return false;
         }
     }
@@ -80,7 +80,7 @@ public class PlaneHandler  {
         out.writeObject(runway);
         log.info("Landing...");
 
-        airSpace.removePlaneFromAirSpace(incomingPlane);
+        airSpace.removePlane(incomingPlane);
         log.info("Plane [{}] removed from the airspace", incomingPlane.getId());
 
         controller.releaseRunway(runway);
