@@ -40,7 +40,7 @@ public class PlaneHandler  {
             while (true) {
                 Location location = aquireCurrentLocation(in, incomingPlane);
                 if(location == null){
-                    airSpace.removePlane(incomingPlane);
+                    airSpace.removePlaneFromSpace(incomingPlane);
                     return;
                 }
                 incomingPlane.setLocation(location);
@@ -53,16 +53,18 @@ public class PlaneHandler  {
                     log.info("Plane [{}] assigned to runway [{}]", incomingPlane.getId(), runway.getId());
                     out.writeObject(runway);
 
+                    postLandingClearance(incomingPlane, runway);
                     break;
                 } else {
                     log.info("Plane [{}] is waiting for empty runway", incomingPlane.getId());
                     out.writeObject("WAIT");
                 }
             }
+
         } catch (IOException | ClassNotFoundException ex){
             log.error("Error occurred while handling client request:" + ex.getMessage());
         }
-        postLandingClearance();
+
     }
 
     public Location aquireCurrentLocation(ObjectInputStream in, Plane incomingPlane){
@@ -76,7 +78,7 @@ public class PlaneHandler  {
     }
 
     public void postLandingClearance(Plane incomingPlane, Runway assignedRunway) throws IOException {
-        airSpace.removePlane(incomingPlane);
+        airSpace.removePlaneFromSpace(incomingPlane);
         log.info("Plane [{}] removed from the airspace", incomingPlane.getId());
 
         controller.releaseRunway(assignedRunway);

@@ -22,7 +22,7 @@ public class PlaneClient extends Client  {
             out.writeObject(plane);
 
             while(true){
-                plane.move(1, 1, 1);
+                plane.holdPattern();
                 plane.reduceFuel();
 
                 if(plane.isOutOfFuel()){

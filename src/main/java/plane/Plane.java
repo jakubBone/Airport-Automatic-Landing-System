@@ -1,5 +1,7 @@
 package plane;
 
+import airport.AirSpace;
+import airport.WayPoint;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -13,41 +15,34 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Setter
 public class Plane implements Serializable {
     private static final AtomicInteger idCounter = new AtomicInteger();
+    private int currentWayPoint = 0;
     private int id;
     private double fuelLevel;
     private boolean hasLanded;
     private Location location;
+    private AirSpace airSpace;
 
     public Plane() {
         this.id = generateID();
         this.fuelLevel = 10;
         this.location = new Location(10, 10, 10);
+        this.airSpace = new AirSpace();
         //this.location = generateRandomLocation();
     }
 
     public void holdPattern(){
-        move(1, 1, 1); // example movement
-    }
-
-    public void move(int deltaX, int deltaY, int deltaAltitude){
-        this.location.setX(location.getX() + deltaX);
-        this.location.setY(location.getY() + deltaY);
-        this.location.setAltitude(location.getAltitude() + deltaAltitude);
-    }
-
-    /*public void directLanding(Runway runway){
-        double deltaX = runway.getLocation().getX() - location.getX();
-        double deltaY = runway.getLocation().getY() - location.getY();
-
-        double distanceToRunway = deltaX * deltaX + deltaY * deltaY;
-
-        if(distanceToRunway <= 10) {
-            log.info("Plane [" + getId() + "] prepared for landing");
-            log.info("Plane [" + getId() + "] is landing...");
-            hasLanded = true;
-            log.info("Plane [" + getId() + "] has landed");
+        if (currentWayPoint >= airSpace.getWayPoints().size()) {
+            currentWayPoint = 0; // return to 1st waypoint
         }
-    }*/
+
+        WayPoint nextWayPoint = airSpace.getWayPoints().get(currentWayPoint);
+        this.location.setX(nextWayPoint.getX());
+        this.location.setY(nextWayPoint.getY());
+        this.location.setAltitude(this.location.getAltitude() - 100);
+        currentWayPoint++;
+
+        fuelLevel -= 10;
+    }
 
     public static int generateID() {
         return idCounter.incrementAndGet();
@@ -64,9 +59,5 @@ public class Plane implements Serializable {
 
     public boolean isOutOfFuel() {
         return fuelLevel <= 0;
-    }
-
-    public void reduceFuel(){
-        fuelLevel--;
     }
 }
