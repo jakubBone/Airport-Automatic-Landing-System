@@ -18,12 +18,11 @@ public class PlaneClient extends Client  {
     private void startCommunication() {
         try {
             startConnection();
-
             out.writeObject(plane);
 
             while(true){
                 plane.holdPattern();
-                plane.reduceFuel();
+                System.out.println("Current waypoint: " + plane.getCurrentWaypoint());
 
                 if(plane.isOutOfFuel()){
                     log.info("Plane [{}] is out of fuel", plane.getId());

@@ -1,13 +1,13 @@
 package plane;
 
-import airport.AirSpace;
-import airport.WayPoint;
+import waypoint.WayPointGenerator;
+import waypoint.Waypoint;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.Serializable;
-import java.util.Random;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Log4j2
@@ -15,46 +15,38 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Setter
 public class Plane implements Serializable {
     private static final AtomicInteger idCounter = new AtomicInteger();
-    private int currentWayPoint = 0;
+    private int currentWaypoint = 0;
     private int id;
     private double fuelLevel;
     private boolean hasLanded;
     private Location location;
-    private AirSpace airSpace;
 
     public Plane() {
         this.id = generateID();
-        this.fuelLevel = 10;
+        this.fuelLevel = 1000;
         this.location = new Location(10, 10, 10);
-        this.airSpace = new AirSpace();
-        //this.location = generateRandomLocation();
+        this.location = generateRandomLocation();
     }
 
     public void holdPattern(){
-        if (currentWayPoint >= airSpace.getWayPoints().size()) {
-            currentWayPoint = 0; // return to 1st waypoint
+        List<Waypoint> waypoints = WayPointGenerator.generateWaypoints();
+
+        if (currentWaypoint == waypoints.size() -1) {
+            currentWaypoint = 0; // return to 1st waypoint
         }
-
-        WayPoint nextWayPoint = airSpace.getWayPoints().get(currentWayPoint);
-        this.location.setX(nextWayPoint.getX());
-        this.location.setY(nextWayPoint.getY());
-        this.location.setAltitude(this.location.getAltitude() - 100);
-        currentWayPoint++;
-
+        Waypoint nextWaypoint = waypoints.get(currentWaypoint + 1);
+        location.setX(nextWaypoint.getX());
+        location.setY(nextWaypoint.getY());
+        currentWaypoint++;
         fuelLevel -= 10;
-    }
 
+    }
     public static int generateID() {
         return idCounter.incrementAndGet();
     }
 
     public Location generateRandomLocation(){
-        Random random = new Random();
-        int randomX = random.nextInt();
-        int randomY = random.nextInt();
-        int randomAltitude = 2000;
-
-        return new Location(randomX, randomY, randomAltitude);
+        return new Location(0, 499, 199);
     }
 
     public boolean isOutOfFuel() {
