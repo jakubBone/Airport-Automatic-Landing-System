@@ -1,4 +1,4 @@
-package plane;
+package location;
 
 import lombok.Getter;
 import lombok.Setter;

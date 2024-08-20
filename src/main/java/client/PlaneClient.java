@@ -8,7 +8,6 @@ import java.io.*;
 
 @Log4j2
 public class PlaneClient extends Client  {
-
     private Plane plane;
     public PlaneClient(String ip, int port) {
         super(ip, port);
@@ -22,7 +21,7 @@ public class PlaneClient extends Client  {
 
             while(true){
                 plane.holdPattern();
-                System.out.println("Current waypoint: " + plane.getCurrentWaypoint());
+                System.out.println("Current waypoint: " + plane.getCurrentWaypointIndex());
 
                 if(plane.isOutOfFuel()){
                     log.info("Plane [{}] is out of fuel", plane.getId());
@@ -30,10 +29,13 @@ public class PlaneClient extends Client  {
                 }
 
                 out.reset();
+
                 out.writeObject(plane.getLocation());
+
                 out.flush();
 
                 String instruction = (String) in.readObject();
+
                 if ("WAIT".equals(instruction)) {
                     log.info("Plane [{}}] is waiting for a available runway", plane.getId());
                 } else if ("LAND".equals(instruction)) {
@@ -56,7 +58,6 @@ public class PlaneClient extends Client  {
 
     public void processLanding(Runway runway){
         log.info("Plane [{}}] is heading towards the runway", plane.getId());
-        //plane.directLanding(runway);
     }
 
     public static void main(String[] args) throws IOException {

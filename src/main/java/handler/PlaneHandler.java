@@ -5,7 +5,7 @@ import airport.AirTrafficController;
 import airport.Runway;
 
 import lombok.extern.log4j.Log4j2;
-import plane.Location;
+import location.Location;
 import plane.Plane;
 
 import java.io.*;
@@ -43,6 +43,7 @@ public class PlaneHandler  {
                     airSpace.removePlaneFromSpace(incomingPlane);
                     return;
                 }
+
                 incomingPlane.setLocation(location);
 
                 if(controller.isAnyRunwayAvailable()) {
