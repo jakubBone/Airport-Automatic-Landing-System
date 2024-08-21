@@ -31,21 +31,35 @@ public class Plane implements Serializable {
     }
 
     public void holdPattern(){
-        if(currentWaypointIndex == 0){
+        Waypoint nextWaypoint;
+
+        if(currentWaypointIndex + 1 >= waypoints.size()){
+            nextWaypoint = waypoints.get(0);
+        } else {
+            nextWaypoint = waypoints.get(currentWaypointIndex + 1);
+        }
+
+        moveToNextWaypoint(nextWaypoint);
+
+        if(hasReachedWaypoint(nextWaypoint)){
             currentWaypointIndex++;
-            return;
-        }
 
-        if (currentWaypointIndex == waypoints.size()) {
-            currentWaypointIndex = 0; // return to 1st waypoint
+            if(currentWaypointIndex >= waypoints.size()){
+                currentWaypointIndex = 0;
+            }
         }
-
-        Waypoint nextWaypoint = waypoints.get(currentWaypointIndex);
-        location.setX(nextWaypoint.getX());
-        location.setY(nextWaypoint.getY());
-        currentWaypointIndex++;
         fuelLevel -= 10;
     }
+
+    public void moveToNextWaypoint(Waypoint nextWaypoint) {
+        location.setX(nextWaypoint.getX());
+        location.setY(nextWaypoint.getY());
+    }
+
+    public boolean hasReachedWaypoint(Waypoint nextWaypoint){
+        return location.getX() == nextWaypoint.getX() && location.getY() == nextWaypoint.getY();
+    }
+
 
     public static int generateID() {
         return idCounter.incrementAndGet();
@@ -55,19 +69,10 @@ public class Plane implements Serializable {
         Random random = new Random();
         Waypoint initialWaypoint = waypoints.get(random.nextInt(waypoints.size()));
         setCurrentWaypointIndex(initialWaypoint);
-        int altitude = 200 + random.nextInt(499); // Altitude between 200 and 500 meters
+        int altitude = 2000 + random.nextInt(5000); // Altitude between 2000 and 5000 meters
 
         int x = initialWaypoint.getX();
         int y = initialWaypoint.getY();
-
-        // Only add 500 if the coordinate is negative
-        if (x < 0) {
-            x += 500;
-        }
-
-        if (y < 0) {
-            y += 500;
-        }
 
         return new Location(x, y, altitude);
     }
