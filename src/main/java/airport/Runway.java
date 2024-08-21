@@ -10,9 +10,19 @@ import java.io.Serializable;
 @Getter
 public class Runway implements Serializable {
     private String id;
-    private Location location;
-    public Runway(String id, Location location) {
+    private Location startPoint;
+    private Location endPoint;
+    private Corridor corridor;
+    public Runway(String id, Location startPoint, Location endPoint,  Corridor corridor) {
+        this.id = id;
+        this.startPoint = startPoint;
+        this.endPoint = endPoint;
+        this.corridor = corridor;
+    }
+
+    /*public Runway(String id, Location location, Corridor corridor) {
         this.id = id;
         this.location = location;
-    }
+        this.corridor = corridor;
+    }*/
 }

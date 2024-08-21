@@ -1,5 +1,6 @@
 package airport;
 
+import location.Location;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
@@ -14,11 +15,15 @@ public class AirTrafficController {
     public AirTrafficController() {
         initRunways();
     }
+
     public void initRunways(){
-        //Runway runway1 = new Runway("1", new Location(1, 0, 0));
-        //Runway runway2 = new Runway("2", new Location(2, 0 , 0));
-        //availableRunways.add(runway1);
-        //availableRunways.add(runway2);
+        createRunwayWithCorridor("R-1", new Location(-5000, 2000, 2000),new Location(1000, 2000, 0), new Location(1000, 2000, 0), new Location(5000, 2000, 0));
+        createRunwayWithCorridor("R-2", new Location(-5000, -2000, 2000),new Location(1000, -2000, 0), new Location(1000, -2000, 0), new Location(5000, -2000, 0));
+    }
+    public void createRunwayWithCorridor(String id, Location startCorridor, Location endCorridor, Location startRunway, Location endRunway){
+        Corridor corridor = new Corridor(startCorridor, endCorridor);
+        Runway runway = new Runway(id, startRunway, endRunway, corridor);
+        availableRunways.add(runway);
     }
 
     public Runway getAvailableRunway() {

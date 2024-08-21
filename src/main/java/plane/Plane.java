@@ -60,7 +60,6 @@ public class Plane implements Serializable {
         return location.getX() == nextWaypoint.getX() && location.getY() == nextWaypoint.getY();
     }
 
-
     public static int generateID() {
         return idCounter.incrementAndGet();
     }

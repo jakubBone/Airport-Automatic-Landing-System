@@ -19,16 +19,30 @@ public class Waypoint implements Serializable {
     public static List<Waypoint> generateWaypoints() {
         List<Waypoint> waypoints = new ArrayList<>();
 
-        waypoints.add(new Waypoint(5000, 0)); // E
-        waypoints.add(new Waypoint(3535, 3535)); // NE
-        waypoints.add(new Waypoint(0, 5000)); // N
-        waypoints.add(new Waypoint(-3535, 3535)); // NW
-        waypoints.add(new Waypoint(-5000, 0)); // W
-        waypoints.add(new Waypoint(-3535, -3535)); // SW
-        waypoints.add(new Waypoint(0, -5000)); // S
-        waypoints.add(new Waypoint(3535, -3535)); // SE
+        // There are 500 waypoints on each side of the square, every 10 km
+
+        // Waypoints for the top side of the square (from left to right)
+        for (int x = -5000; x <= 5000; x += 100) {
+            waypoints.add(new Waypoint(x, 5000)); // Top side (y = 5000)
+        }
+
+        // Waypoints for the right side of the square (from top to bottom)
+        for (int y = 5000; y >= -5000; y -= 100) {
+            waypoints.add(new Waypoint(5000, y)); // Right side (y = 5000)
+        }
+
+        // Waypoints for the bottom side of the square (from right to left)
+        for (int x = 5000; x >= -5000; x -= 100) {
+            waypoints.add(new Waypoint(x, -5000)); // Bottom side (y = -5000)
+        }
+
+        // Waypoints for the left side of the square (from bottom to top)
+        for (int y = -5000; y <= 5000; y += 100) {
+            waypoints.add(new Waypoint(-5000, y)); // Left side (y = -5000)
+        }
 
         return waypoints;
+
     }
 
 }

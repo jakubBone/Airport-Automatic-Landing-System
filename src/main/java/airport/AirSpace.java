@@ -10,12 +10,12 @@ import java.util.Map;
 @Getter
 public class AirSpace {
     private static final int MAX_CAPACITY = 100;
-    private ArrayList<Plane> planesInSpace;
-    private Map<String,Plane> hashSpace;
+    private ArrayList<Plane> planes;
+    private Map<String,Plane> space;
 
     public AirSpace() {
-        this.planesInSpace = new ArrayList<>();
-        this.hashSpace = new HashMap<>();
+        this.planes = new ArrayList<>();
+        this.space = new HashMap<>();
     }
 
     public String generateKay(int x, int y, int altitude){
@@ -29,15 +29,15 @@ public class AirSpace {
 
         String key = generateKay(x, y, altitude);
 
-        planesInSpace.add(plane);
-        hashSpace.put(key, plane);
+        planes.add(plane);
+        space.put(key, plane);
     }
 
     public boolean isSpaceFull(){
-        return planesInSpace.size() >= MAX_CAPACITY;
+        return planes.size() >= MAX_CAPACITY;
     }
 
     public void removePlaneFromSpace(Plane plane) {
-        planesInSpace.remove(plane);
+        planes.remove(plane);
     }
 }
