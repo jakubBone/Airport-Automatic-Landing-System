@@ -68,6 +68,8 @@ public class PlaneHandler  {
 
     }
 
+
+
     public Location aquireCurrentLocation(ObjectInputStream in, Plane incomingPlane){
         Location currentLocation = null;
         try {

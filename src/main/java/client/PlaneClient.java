@@ -47,7 +47,6 @@ public class PlaneClient extends Client  {
                     log.info("No capacity in the airspace for plane [{}]. Find another airport", plane.getId());
                     return;
                 }
-
                 Thread.sleep(1000);
             }
         } catch (IOException | ClassNotFoundException | InterruptedException ex) {
@@ -57,8 +56,23 @@ public class PlaneClient extends Client  {
     }
 
     public void processLanding(Runway runway){
-
-        log.info("Plane [{}}] is heading towards the runway", plane.getId());
+        while(plane.hasLanded()){
+            plane.directTowardsCorridor(runway);
+            int newAltitude = plane.getLocation().getAltitude() - 100;
+            if(newAltitude < 0){
+                newAltitude = 0;
+            }
+            plane.getLocation().setAltitude(newAltitude);
+            log.info("Plane [{}] is descending. Current altitude: [{}]", plane.getId(), newAltitude);
+            try{
+                Thread.sleep(1000);
+            } catch (InterruptedException ex){
+                Thread.currentThread().interrupt();
+                log.error("Landing process interrupted for plane [{}]", plane.getId());
+            }
+        }
+        log.info("Plane [{}}] has successfully landed on runway [{}]", plane.getId(), runway.getId());
+        }
     }
 
     public static void main(String[] args) throws IOException {

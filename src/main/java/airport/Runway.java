@@ -20,9 +20,4 @@ public class Runway implements Serializable {
         this.corridor = corridor;
     }
 
-    /*public Runway(String id, Location location, Corridor corridor) {
-        this.id = id;
-        this.location = location;
-        this.corridor = corridor;
-    }*/
 }

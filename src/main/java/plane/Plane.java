@@ -1,5 +1,6 @@
 package plane;
 
+import airport.Runway;
 import location.Location;
 import location.Waypoint;
 import lombok.Getter;
@@ -51,12 +52,47 @@ public class Plane implements Serializable {
         fuelLevel -= 10;
     }
 
+    public void directTowardsCorridor(Runway runway){
+        Waypoint nextWaypoint;
+
+        int lastWaypointX = runway.getCorridor().getStartLocation().getX();
+        int lastWaypointY = runway.getCorridor().getStartLocation().getY();
+
+        Waypoint lastWaypoint = new Waypoint(lastWaypointX, lastWaypointY)
+
+        if(currentWaypointIndex + 1 >= waypoints.size()){
+            nextWaypoint = waypoints.get(0);
+        } else {
+            nextWaypoint = waypoints.get(currentWaypointIndex + 1);
+        }
+
+        moveToNextWaypoint(nextWaypoint);
+
+        if(hasReachedWaypoint(nextWaypoint)){
+            currentWaypointIndex++;
+
+            if(isWaypointCorridor(nextWaypoint)){
+                return;
+            }
+
+            if(currentWaypointIndex >= waypoints.size()){
+                currentWaypointIndex = 0;
+            }
+        }
+        fuelLevel -= 10;
+    }
+
     public void moveToNextWaypoint(Waypoint nextWaypoint) {
         location.setX(nextWaypoint.getX());
         location.setY(nextWaypoint.getY());
     }
 
+
     public boolean hasReachedWaypoint(Waypoint nextWaypoint){
+        return location.getX() == nextWaypoint.getX() && location.getY() == nextWaypoint.getY();
+    }
+
+    public boolean isWaypointCorridor(Waypoint nextWaypoint){
         return location.getX() == nextWaypoint.getX() && location.getY() == nextWaypoint.getY();
     }
 
@@ -80,5 +116,9 @@ public class Plane implements Serializable {
     }
     public boolean isOutOfFuel() {
         return fuelLevel <= 0;
+    }
+
+    public boolean hasLanded(){
+        return location.getAltitude() == 0;
     }
 }

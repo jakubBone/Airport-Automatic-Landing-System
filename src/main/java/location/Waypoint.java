@@ -42,7 +42,5 @@ public class Waypoint implements Serializable {
         }
 
         return waypoints;
-
     }
-
 }
