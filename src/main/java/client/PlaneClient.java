@@ -55,7 +55,7 @@ public class PlaneClient extends Client  {
         log.info("Plane [{}] exited communication", plane.getId());
     }
 
-    public void processLanding(Runway runway){
+    public void processLanding(Runway runway) throws IOException{
         while(plane.hasLanded()){
             plane.directTowardsCorridor(runway);
             int newAltitude = plane.getLocation().getAltitude() - 100;
@@ -70,9 +70,10 @@ public class PlaneClient extends Client  {
                 Thread.currentThread().interrupt();
                 log.error("Landing process interrupted for plane [{}]", plane.getId());
             }
+            out.writeObject(plane);
+            // or send plane object for getting hasLanded by PlaneHandler
         }
         log.info("Plane [{}}] has successfully landed on runway [{}]", plane.getId(), runway.getId());
-        }
     }
 
     public static void main(String[] args) throws IOException {

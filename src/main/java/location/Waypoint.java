@@ -15,7 +15,6 @@ public class Waypoint implements Serializable {
         this.x = x;
         this.y = y;
     }
-
     public static List<Waypoint> generateWaypoints() {
         List<Waypoint> waypoints = new ArrayList<>();
 

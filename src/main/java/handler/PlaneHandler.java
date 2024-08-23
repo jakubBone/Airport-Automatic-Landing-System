@@ -54,6 +54,8 @@ public class PlaneHandler  {
                     log.info("Plane [{}] assigned to runway [{}]", incomingPlane.getId(), runway.getId());
                     out.writeObject(runway);
 
+                    executeLanding(in, incomingPlane);
+                    log.info("Plane [{}] has landed on  runway [{}]", incomingPlane.getId(), runway.getId());
                     postLandingClearance(incomingPlane, runway);
                     break;
                 } else {
@@ -68,7 +70,15 @@ public class PlaneHandler  {
 
     }
 
-
+    public void executeLanding(ObjectInputStream in, Plane incomingPlane){
+        while(incomingPlane.hasLanded()){
+            Location location = aquireCurrentLocation(in, incomingPlane);
+            incomingPlane.setLocation(location);
+            if(location == null){
+                return;
+            }
+        }
+    }
 
     public Location aquireCurrentLocation(ObjectInputStream in, Plane incomingPlane){
         Location currentLocation = null;

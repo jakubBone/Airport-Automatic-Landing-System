@@ -33,7 +33,7 @@ public class Plane implements Serializable {
 
     public void holdPattern(){
         Waypoint nextWaypoint;
-
+        System.out.println(currentWaypointIndex);
         if(currentWaypointIndex + 1 >= waypoints.size()){
             nextWaypoint = waypoints.get(0);
         } else {
@@ -55,11 +55,6 @@ public class Plane implements Serializable {
     public void directTowardsCorridor(Runway runway){
         Waypoint nextWaypoint;
 
-        int lastWaypointX = runway.getCorridor().getStartLocation().getX();
-        int lastWaypointY = runway.getCorridor().getStartLocation().getY();
-
-        Waypoint lastWaypoint = new Waypoint(lastWaypointX, lastWaypointY)
-
         if(currentWaypointIndex + 1 >= waypoints.size()){
             nextWaypoint = waypoints.get(0);
         } else {
@@ -71,7 +66,7 @@ public class Plane implements Serializable {
         if(hasReachedWaypoint(nextWaypoint)){
             currentWaypointIndex++;
 
-            if(isWaypointCorridor(nextWaypoint)){
+            if(isReachedWaypointCorridor(runway)){
                 return;
             }
 
@@ -87,12 +82,13 @@ public class Plane implements Serializable {
         location.setY(nextWaypoint.getY());
     }
 
-
-    public boolean hasReachedWaypoint(Waypoint nextWaypoint){
-        return location.getX() == nextWaypoint.getX() && location.getY() == nextWaypoint.getY();
+    public boolean isReachedWaypointCorridor(Runway runway){
+        int lastWaypointX = runway.getCorridor().getStartLocation().getX();
+        int lastWaypointY = runway.getCorridor().getStartLocation().getY();
+        return location.getX() == lastWaypointX && location.getY() == lastWaypointY;
     }
 
-    public boolean isWaypointCorridor(Waypoint nextWaypoint){
+    public boolean hasReachedWaypoint(Waypoint nextWaypoint){
         return location.getX() == nextWaypoint.getX() && location.getY() == nextWaypoint.getY();
     }
 
@@ -111,6 +107,7 @@ public class Plane implements Serializable {
 
         return new Location(x, y, altitude);
     }
+
     public void setCurrentWaypointIndex(Waypoint initialWaypoint) {
         currentWaypointIndex = waypoints.indexOf(initialWaypoint);
     }
