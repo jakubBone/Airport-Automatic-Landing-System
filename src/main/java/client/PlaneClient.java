@@ -21,7 +21,6 @@ public class PlaneClient extends Client  {
 
             while(true){
                 plane.holdPattern();
-                System.out.println("Current waypoint: " + plane.getCurrentWaypointIndex());
 
                 if(plane.isOutOfFuel()){
                     log.info("Plane [{}] is out of fuel", plane.getId());
@@ -58,6 +57,42 @@ public class PlaneClient extends Client  {
     public void processLanding(Runway runway) throws IOException{
         while(plane.hasLanded()){
             plane.directTowardsCorridor(runway);
+            plane.decreaseAltitude();
+            log.info("Plane [{}] is descending. Current altitude: [{}]", plane.getId(), plane.getLocation().getAltitude());
+
+            try{
+                Thread.sleep(1000);
+            } catch (InterruptedException ex){
+                Thread.currentThread().interrupt();
+                log.error("Landing process interrupted for plane [{}]", plane.getId());
+            }
+
+            out.writeObject(plane);
+            // or send plane object for getting hasLanded by PlaneHandler
+        }
+        log.info("Plane [{}}] has successfully landed on runway [{}]", plane.getId(), runway.getId());
+    }
+
+    /*public void decreaseAltitude(Runway runway) throws IOException{
+        while(plane.hasLanded()){
+            plane.directTowardsCorridor(runway);
+
+            log.info("Plane [{}] is descending. Current altitude: [{}]", plane.getId(), newAltitude);
+            try{
+                Thread.sleep(1000);
+            } catch (InterruptedException ex){
+                Thread.currentThread().interrupt();
+                log.error("Landing process interrupted for plane [{}]", plane.getId());
+            }
+            out.writeObject(plane);
+            // or send plane object for getting hasLanded by PlaneHandler
+        }
+        log.info("Plane [{}}] has successfully landed on runway [{}]", plane.getId(), runway.getId());
+    }*/
+
+    /*public void processLanding(Runway runway) throws IOException{
+        while(plane.hasLanded()){
+            plane.directTowardsCorridor(runway);
             int newAltitude = plane.getLocation().getAltitude() - 100;
             if(newAltitude < 0){
                 newAltitude = 0;
@@ -74,7 +109,7 @@ public class PlaneClient extends Client  {
             // or send plane object for getting hasLanded by PlaneHandler
         }
         log.info("Plane [{}}] has successfully landed on runway [{}]", plane.getId(), runway.getId());
-    }
+    }*/
 
     public static void main(String[] args) throws IOException {
         PlaneClient client = new PlaneClient("localhost", 5000);

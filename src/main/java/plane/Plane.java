@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
@@ -31,64 +32,35 @@ public class Plane implements Serializable {
         this.location = setInitialLocation();
     }
 
-    public void holdPattern(){
-        Waypoint nextWaypoint;
-        System.out.println(currentWaypointIndex);
-        if(currentWaypointIndex + 1 >= waypoints.size()){
-            nextWaypoint = waypoints.get(0);
-        } else {
-            nextWaypoint = waypoints.get(currentWaypointIndex + 1);
-        }
-
-        moveToNextWaypoint(nextWaypoint);
+    public void holdPattern() {
+        System.out.println("Current waypoint: " + currentWaypointIndex);
+        Waypoint nextWaypoint = waypoints.get((currentWaypointIndex + 1) % waypoints.size());
+        System.out.println("Next waypoint: " + nextWaypoint.getX() + " / " + nextWaypoint.getY());
+        moveTowards(nextWaypoint);
 
         if(hasReachedWaypoint(nextWaypoint)){
-            currentWaypointIndex++;
+            currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.size();
+        }
 
-            if(currentWaypointIndex >= waypoints.size()){
-                currentWaypointIndex = 0;
-            }
+        fuelLevel -= 10;
+    }
+
+    public void directTowardsCorridor(Runway runway) {
+        holdPattern();
+        Waypoint corridorWaypoint = runway.getCorridor().getWaypoint();
+
+        if(hasReachedWaypoint(corridorWaypoint)){
+            return;
         }
         fuelLevel -= 10;
     }
 
-    public void directTowardsCorridor(Runway runway){
-        Waypoint nextWaypoint;
-
-        if(currentWaypointIndex + 1 >= waypoints.size()){
-            nextWaypoint = waypoints.get(0);
-        } else {
-            nextWaypoint = waypoints.get(currentWaypointIndex + 1);
-        }
-
-        moveToNextWaypoint(nextWaypoint);
-
-        if(hasReachedWaypoint(nextWaypoint)){
-            currentWaypointIndex++;
-
-            if(isReachedWaypointCorridor(runway)){
-                return;
-            }
-
-            if(currentWaypointIndex >= waypoints.size()){
-                currentWaypointIndex = 0;
-            }
-        }
-        fuelLevel -= 10;
-    }
-
-    public void moveToNextWaypoint(Waypoint nextWaypoint) {
+    public void moveTowards(Waypoint nextWaypoint) {
         location.setX(nextWaypoint.getX());
         location.setY(nextWaypoint.getY());
     }
 
-    public boolean isReachedWaypointCorridor(Runway runway){
-        int lastWaypointX = runway.getCorridor().getStartLocation().getX();
-        int lastWaypointY = runway.getCorridor().getStartLocation().getY();
-        return location.getX() == lastWaypointX && location.getY() == lastWaypointY;
-    }
-
-    public boolean hasReachedWaypoint(Waypoint nextWaypoint){
+    public boolean hasReachedWaypoint(Waypoint nextWaypoint) {
         return location.getX() == nextWaypoint.getX() && location.getY() == nextWaypoint.getY();
     }
 
@@ -96,7 +68,7 @@ public class Plane implements Serializable {
         return idCounter.incrementAndGet();
     }
 
-    public Location setInitialLocation(){
+    public Location setInitialLocation() {
         Random random = new Random();
         Waypoint initialWaypoint = waypoints.get(random.nextInt(waypoints.size()));
         setCurrentWaypointIndex(initialWaypoint);
@@ -111,11 +83,26 @@ public class Plane implements Serializable {
     public void setCurrentWaypointIndex(Waypoint initialWaypoint) {
         currentWaypointIndex = waypoints.indexOf(initialWaypoint);
     }
+
+    public void decreaseAltitude() throws IOException {
+        int newAltitude = getLocation().getAltitude() - 100;
+        if (newAltitude < 0) {
+            newAltitude = 0;
+        }
+        getLocation().setAltitude(newAltitude);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            log.error("Landing process interrupted for plane [{}]", getId());
+        }
+    }
+
     public boolean isOutOfFuel() {
         return fuelLevel <= 0;
     }
 
-    public boolean hasLanded(){
+    public boolean hasLanded() {
         return location.getAltitude() == 0;
     }
 }
