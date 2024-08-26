@@ -18,7 +18,7 @@ public class Corridor implements Serializable {
     }
     public Waypoint getWaypoint(){
         int corridorWaypointX = startLocation.getX();
-        int corridorWaypointY = startLocation.getX();
+        int corridorWaypointY = startLocation.getY();
         return new Waypoint(corridorWaypointX, corridorWaypointY);
     }
 }

@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
@@ -24,12 +23,23 @@ public class Plane implements Serializable {
     private boolean hasLanded;
     private Location location;
     private List<Waypoint> waypoints;
+    private boolean hasReachedCorridor;
 
     public Plane() {
         this.id = generateID();
         this.fuelLevel = 1000;
         this.waypoints = Waypoint.generateWaypoints();
         this.location = setInitialLocation();
+    }
+
+    public void directTowardsCorridor(Runway runway) {
+        holdPattern();
+        Waypoint corridorWaypoint = runway.getCorridor().getWaypoint();
+
+        if(hasReachedWaypoint(corridorWaypoint)){
+            hasReachedCorridor = true;
+            return;
+        }
     }
 
     public void holdPattern() {
@@ -41,19 +51,10 @@ public class Plane implements Serializable {
         if(hasReachedWaypoint(nextWaypoint)){
             currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.size();
         }
-
         fuelLevel -= 10;
     }
 
-    public void directTowardsCorridor(Runway runway) {
-        holdPattern();
-        Waypoint corridorWaypoint = runway.getCorridor().getWaypoint();
 
-        if(hasReachedWaypoint(corridorWaypoint)){
-            return;
-        }
-        fuelLevel -= 10;
-    }
 
     public void moveTowards(Waypoint nextWaypoint) {
         location.setX(nextWaypoint.getX());
@@ -105,4 +106,5 @@ public class Plane implements Serializable {
     public boolean hasLanded() {
         return location.getAltitude() == 0;
     }
+
 }

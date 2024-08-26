@@ -64,11 +64,10 @@ public class PlaneClient extends Client  {
     }
 
     public void land(Runway runway) throws IOException  {
-        while(!plane.hasLanded()){
+        while(!plane.isHasReachedCorridor()){
             plane.directTowardsCorridor(runway);
             plane.decreaseAltitude();
             log.info("Plane [{}] is descending. Current altitude: [{}]", plane.getId(), plane.getLocation().getAltitude());
-
             try{
                 Thread.sleep(1000);
             } catch (InterruptedException ex){

@@ -83,10 +83,7 @@ public class PlaneHandler  {
     public Location aquireCurrentLocation(ObjectInputStream in, Plane incomingPlane){
         Location currentLocation = null;
         try {
-            System.out.println("3");
             currentLocation = (Location) in.readObject();
-
-
         } catch (Exception ex) {
             log.error("Plane [{}] disappeared from the radar. Error: {}", incomingPlane.getId(), ex.getMessage());
         }
