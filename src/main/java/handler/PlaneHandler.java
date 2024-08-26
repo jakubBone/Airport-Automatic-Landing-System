@@ -71,7 +71,7 @@ public class PlaneHandler  {
     }
 
     public void executeLanding(ObjectInputStream in, Plane incomingPlane){
-        while(incomingPlane.hasLanded()){
+        while(!incomingPlane.hasLanded()){
             Location location = aquireCurrentLocation(in, incomingPlane);
             incomingPlane.setLocation(location);
             if(location == null){
@@ -83,7 +83,10 @@ public class PlaneHandler  {
     public Location aquireCurrentLocation(ObjectInputStream in, Plane incomingPlane){
         Location currentLocation = null;
         try {
+            System.out.println("3");
             currentLocation = (Location) in.readObject();
+
+
         } catch (Exception ex) {
             log.error("Plane [{}] disappeared from the radar. Error: {}", incomingPlane.getId(), ex.getMessage());
         }

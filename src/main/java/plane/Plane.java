@@ -84,7 +84,7 @@ public class Plane implements Serializable {
         currentWaypointIndex = waypoints.indexOf(initialWaypoint);
     }
 
-    public void decreaseAltitude() throws IOException {
+    public void decreaseAltitude() {
         int newAltitude = getLocation().getAltitude() - 100;
         if (newAltitude < 0) {
             newAltitude = 0;
