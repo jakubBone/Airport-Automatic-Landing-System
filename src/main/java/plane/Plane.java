@@ -38,7 +38,6 @@ public class Plane implements Serializable {
 
         if(hasReachedWaypoint(corridorWaypoint)){
             hasReachedCorridor = true;
-            return;
         }
     }
 
@@ -53,8 +52,6 @@ public class Plane implements Serializable {
         }
         fuelLevel -= 10;
     }
-
-
 
     public void moveTowards(Waypoint nextWaypoint) {
         location.setX(nextWaypoint.getX());
