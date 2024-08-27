@@ -15,7 +15,7 @@ public class Waypoint implements Serializable {
         this.x = x;
         this.y = y;
     }
-    public static List<Waypoint> generateWaypoints() {
+    public static List<Waypoint> getCircleWaypoints() {
         List<Waypoint> waypoints = new ArrayList<>();
 
         // There are 10 waypoints on each side of the square, every 1000 meters
@@ -41,9 +41,21 @@ public class Waypoint implements Serializable {
             waypoints.add(new Waypoint(-5000, y)); // Left side (y = -5000)
         }
 
-        for (Waypoint waypoint: waypoints){
-            System.out.println(waypoint);
+        return waypoints;
+    }
+
+    public static List<Waypoint> getLandingWaypoints(int corridorY) {
+        List<Waypoint> waypoints = new ArrayList<>();
+
+        // There are 7 corridor waypoints directing to runway, every 1000 meters
+        for (int x = -4000; x <= 1000; x += 1000) {
+            waypoints.add(new Waypoint(x, corridorY));
         }
+
+        for (Waypoint waypoint: waypoints){
+            System.out.println(waypoint.getX());
+        }
+
         return waypoints;
     }
 }

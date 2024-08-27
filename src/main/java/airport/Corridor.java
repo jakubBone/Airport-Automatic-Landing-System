@@ -1,24 +1,20 @@
 package airport;
 
-import location.Location;
 import location.Waypoint;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Getter
 public class Corridor implements Serializable {
-    private Location startLocation;
-    private Location endLocation;
+    private String id;
     private Waypoint waypoint;
-    public Corridor(Location startLocation, Location endLocation) {
-        this.startLocation = startLocation;
-        this.endLocation = endLocation;
-        this.waypoint = getWaypoint();
-    }
-    public Waypoint getWaypoint(){
-        int corridorWaypointX = startLocation.getX();
-        int corridorWaypointY = startLocation.getY();
-        return new Waypoint(corridorWaypointX, corridorWaypointY);
+    private List<Waypoint> landingWay;
+
+    public Corridor(String id, Waypoint waypoint) {
+        this.id = id;
+        this.waypoint = waypoint;
+        this.landingWay = Waypoint.getLandingWaypoints(waypoint.getY());
     }
 }

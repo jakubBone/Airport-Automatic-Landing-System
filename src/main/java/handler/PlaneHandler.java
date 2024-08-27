@@ -72,7 +72,7 @@ public class PlaneHandler  {
 
 
     public void updatePosition(ObjectInputStream in, Plane incomingPlane){
-        while(!incomingPlane.hasLanded()){
+        while(!incomingPlane.isLanded()){
             Location location = aquireCurrentLocation(in, incomingPlane);
             incomingPlane.setLocation(location);
             if(location == null){

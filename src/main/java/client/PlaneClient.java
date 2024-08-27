@@ -21,10 +21,10 @@ public class PlaneClient extends Client  {
             startConnection();
             out.writeObject(plane);
 
-            while(!isProcessCompleted){
+            while (!isProcessCompleted) {
                 plane.holdPattern();
 
-                if(plane.isOutOfFuel()){
+                if (plane.isOutOfFuel()) {
                     log.info("Plane [{}] is out of fuel", plane.getId());
                     break;
                 }
@@ -35,7 +35,6 @@ public class PlaneClient extends Client  {
 
                 String instruction = (String) in.readObject();
                 processAirportInstruction(instruction);
-
                 Thread.sleep(1000);
             }
         } catch (IOException | ClassNotFoundException | InterruptedException ex) {
@@ -44,41 +43,37 @@ public class PlaneClient extends Client  {
         log.info("Plane [{}] exited communication", plane.getId());
     }
 
-
-    public void processAirportInstruction(String instruction) throws IOException, ClassNotFoundException {
+    private void processAirportInstruction(String instruction) throws IOException, ClassNotFoundException {
         switch (instruction) {
             case "WAIT":
-                log.info("Plane [{}}] is waiting for a available runway", plane.getId());
+                log.info("Plane [{}] is waiting for an available runway", plane.getId());
                 break;
             case "LAND":
-                Runway assignedRunway = (Runway) in.readObject();
                 log.info("Runway available. Plane [{}] is preparing for landing", plane.getId());
-                land(assignedRunway);
+                processLanding();
                 isProcessCompleted = true;
                 break;
             case "FULL":
+                log.info("Plane [{}] is waiting for an available runway", plane.getId());
                 isProcessCompleted = true;
-                log.info("Plane [{}}] is waiting for a available runway", plane.getId());
                 break;
         }
     }
 
-    public void land(Runway runway) throws IOException  {
-        while(!plane.isHasReachedCorridor()){
-            plane.directTowardsCorridor(runway);
-            plane.decreaseAltitude();
-            log.info("Plane [{}] is descending. Current altitude: [{}]", plane.getId(), plane.getLocation().getAltitude());
-            try{
+    private void processLanding() throws IOException, ClassNotFoundException {
+        Runway assignedRunway = (Runway) in.readObject();
+        while (!plane.isLanded()) {
+            plane.proceedToLand(assignedRunway);
+            try {
                 Thread.sleep(1000);
-            } catch (InterruptedException ex){
+            } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
                 log.error("Landing process interrupted for plane [{}]", plane.getId());
             }
             out.writeObject(plane.getLocation());
         }
-        log.info("Plane [{}}] has successfully landed on runway [{}]", plane.getId(), runway.getId());
+        log.info("Plane [{}] has successfully landed on runway [{}]", plane.getId(), assignedRunway.getId());
     }
-
 
     public static void main(String[] args) throws IOException {
         PlaneClient client = new PlaneClient("localhost", 5000);

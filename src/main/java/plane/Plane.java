@@ -12,45 +12,79 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static plane.Plane.FlightPhase.*;
+
 @Log4j2
 @Getter
 @Setter
 public class Plane implements Serializable {
+
+    public enum FlightPhase {
+        HOLDING_PATTERN,
+        LANDING
+    }
+    private FlightPhase currentPhase;
     private static final AtomicInteger idCounter = new AtomicInteger();
     private int currentWaypointIndex;
     private int id;
     private double fuelLevel;
-    private boolean hasLanded;
+    private boolean landed;
     private Location location;
-    private List<Waypoint> waypoints;
-    private boolean hasReachedCorridor;
 
     public Plane() {
         this.id = generateID();
         this.fuelLevel = 1000;
-        this.waypoints = Waypoint.generateWaypoints();
         this.location = setInitialLocation();
-    }
-
-    public void directTowardsCorridor(Runway runway) {
-        holdPattern();
-        Waypoint corridorWaypoint = runway.getCorridor().getWaypoint();
-
-        if(hasReachedWaypoint(corridorWaypoint)){
-            hasReachedCorridor = true;
-        }
+        this.currentPhase = HOLDING_PATTERN;
     }
 
     public void holdPattern() {
-        System.out.println("Current waypoint: " + currentWaypointIndex);
-        Waypoint nextWaypoint = waypoints.get((currentWaypointIndex + 1) % waypoints.size());
-        System.out.println("Next waypoint: " + nextWaypoint.getX() + " / " + nextWaypoint.getY());
+        if (currentPhase == HOLDING_PATTERN) {
+            moveToNextWaypoint(Waypoint.getCircleWaypoints());
+        }
+        decreaseAltitude();
+        fuelLevel -= 10;
+    }
+
+    public void proceedToLand(Runway runway) {
+        switch (currentPhase) {
+            case HOLDING_PATTERN:
+                moveToNextWaypoint(Waypoint.getCircleWaypoints());
+                if (hasReachedWaypoint(runway.getCorridor().getWaypoint())) {
+                    currentPhase = LANDING;
+                    currentWaypointIndex = 0;
+                    log.info("Plane [{}] is switching to LANDING phase", id);
+                }
+                break;
+            case LANDING:
+                List<Waypoint> landingWaypoints = runway.getCorridor().getLandingWay();
+                moveToNextWaypoint(landingWaypoints);
+                if (hasReachedWaypoint(runway.getWaypoint())) {
+                    landed = true;
+                }
+                break;
+        }
+        decreaseAltitude();
+        fuelLevel--;
+    }
+
+
+    private void moveToNextWaypoint(List<Waypoint> waypoints) {
+        if (currentWaypointIndex >= waypoints.size()) {
+            if (currentPhase == FlightPhase.HOLDING_PATTERN) {
+                currentWaypointIndex = 0;
+            } else {
+                return;
+            }
+        }
+
+        Waypoint nextWaypoint = waypoints.get(currentWaypointIndex);
+        log.info("Current waypoint {}: [{}, {}]", currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
         moveTowards(nextWaypoint);
 
-        if(hasReachedWaypoint(nextWaypoint)){
-            currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.size();
+        if (hasReachedWaypoint(nextWaypoint)) {
+            currentWaypointIndex++;
         }
-        fuelLevel -= 10;
     }
 
     public void moveTowards(Waypoint nextWaypoint) {
@@ -68,26 +102,24 @@ public class Plane implements Serializable {
 
     public Location setInitialLocation() {
         Random random = new Random();
-        Waypoint initialWaypoint = waypoints.get(random.nextInt(waypoints.size()));
-        setCurrentWaypointIndex(initialWaypoint);
-        int altitude = 2000 + random.nextInt(5000); // Altitude between 2000 and 5000 meters
+        List<Waypoint> circleWaypoints = Waypoint.getCircleWaypoints();
+        currentWaypointIndex = random.nextInt(circleWaypoints.size());
+        Waypoint initialWaypoint = circleWaypoints.get(currentWaypointIndex);
 
-        int x = initialWaypoint.getX();
-        int y = initialWaypoint.getY();
-
-        return new Location(x, y, altitude);
-    }
-
-    public void setCurrentWaypointIndex(Waypoint initialWaypoint) {
-        currentWaypointIndex = waypoints.indexOf(initialWaypoint);
+        return new Location(
+                initialWaypoint.getX(),
+                initialWaypoint.getY(),
+                2000 + random.nextInt(3001) // Altitude between 2000 and 5000 meters
+        );
     }
 
     public void decreaseAltitude() {
         int newAltitude = getLocation().getAltitude() - 100;
         if (newAltitude < 0) {
-            newAltitude = 0;
+            getLocation().setAltitude(0);
+        } else {
+            getLocation().setAltitude(newAltitude);
         }
-        getLocation().setAltitude(newAltitude);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
@@ -99,9 +131,4 @@ public class Plane implements Serializable {
     public boolean isOutOfFuel() {
         return fuelLevel <= 0;
     }
-
-    public boolean hasLanded() {
-        return location.getAltitude() == 0;
-    }
-
 }
