@@ -30,19 +30,31 @@ public class Plane implements Serializable {
     private double fuelLevel;
     private boolean landed;
     private Location location;
+    private int interval;
 
     public Plane() {
         this.id = generateID();
         this.fuelLevel = 1000;
         this.location = setInitialLocation();
         this.currentPhase = HOLDING_PATTERN;
+        this.interval = getAltitudeDecreaseInterval();
+    }
+
+    public int getAltitudeDecreaseInterval(){
+        int corridorWaypointIndex = 37;
+        int stepsToLandingAltitude = corridorWaypointIndex - currentWaypointIndex; // 6 index to różnica to 31
+        int currentAltitude = location.getAltitude(); // 5000
+        int landingAltitude = 2000;
+
+        int altitudeDiff = currentAltitude - landingAltitude; // 3000
+        return altitudeDiff / stepsToLandingAltitude; // 96
     }
 
     public void holdPattern() {
         if (currentPhase == HOLDING_PATTERN) {
             moveToNextWaypoint(Waypoint.getCircleWaypoints());
         }
-        decreaseAltitude();
+        //decreaseAltitude();
         fuelLevel -= 10;
     }
 
@@ -64,7 +76,7 @@ public class Plane implements Serializable {
                 }
                 break;
         }
-        decreaseAltitude();
+        //decreaseAltitude();
         fuelLevel--;
     }
 
@@ -80,11 +92,13 @@ public class Plane implements Serializable {
 
         Waypoint nextWaypoint = waypoints.get(currentWaypointIndex);
         log.info("Current waypoint {}: [{}, {}]", currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
+        log.info("Plane altitude {}: {}",id, location.getAltitude());
         moveTowards(nextWaypoint);
 
         if (hasReachedWaypoint(nextWaypoint)) {
             currentWaypointIndex++;
         }
+        decreaseAltitude();
     }
 
     public void moveTowards(Waypoint nextWaypoint) {
@@ -113,8 +127,24 @@ public class Plane implements Serializable {
         );
     }
 
-    public void decreaseAltitude() {
+    /*public void decreaseAltitude() {
         int newAltitude = getLocation().getAltitude() - 100;
+        if (newAltitude < 0) {
+            getLocation().setAltitude(0);
+        } else {
+            getLocation().setAltitude(newAltitude);
+        }
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            log.error("Landing process interrupted for plane [{}]", getId());
+        }
+    }*/
+
+    public void decreaseAltitude() {
+        // wysokośc o jaką ma sie zmniejszyć to np 96
+        int newAltitude = location.getAltitude() - interval;
         if (newAltitude < 0) {
             getLocation().setAltitude(0);
         } else {
