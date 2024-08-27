@@ -30,24 +30,12 @@ public class Plane implements Serializable {
     private double fuelLevel;
     private boolean landed;
     private Location location;
-    private int interval;
 
     public Plane() {
         this.id = generateID();
         this.fuelLevel = 1000;
         this.location = setInitialLocation();
         this.currentPhase = HOLDING_PATTERN;
-        this.interval = getAltitudeDecreaseInterval();
-    }
-
-    public int getAltitudeDecreaseInterval(){
-        int corridorWaypointIndex = 37;
-        int stepsToLandingAltitude = corridorWaypointIndex - currentWaypointIndex; // 6 index to różnica to 31
-        int currentAltitude = location.getAltitude(); // 5000
-        int landingAltitude = 2000;
-
-        int altitudeDiff = currentAltitude - landingAltitude; // 3000
-        return altitudeDiff / stepsToLandingAltitude; // 96
     }
 
     public void holdPattern() {
@@ -127,24 +115,15 @@ public class Plane implements Serializable {
         );
     }
 
-    /*public void decreaseAltitude() {
-        int newAltitude = getLocation().getAltitude() - 100;
-        if (newAltitude < 0) {
-            getLocation().setAltitude(0);
-        } else {
-            getLocation().setAltitude(newAltitude);
-        }
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            log.error("Landing process interrupted for plane [{}]", getId());
-        }
-    }*/
-
     public void decreaseAltitude() {
-        // wysokośc o jaką ma sie zmniejszyć to np 96
-        int newAltitude = location.getAltitude() - interval;
+        int newAltitude;
+
+        if(location.getAltitude() > 2000){
+            newAltitude = location.getAltitude() - calcCircleAltitudeDecrease();
+        } else {
+            newAltitude = location.getAltitude() - 334;
+        }
+
         if (newAltitude < 0) {
             getLocation().setAltitude(0);
         } else {
@@ -156,6 +135,16 @@ public class Plane implements Serializable {
             Thread.currentThread().interrupt();
             log.error("Landing process interrupted for plane [{}]", getId());
         }
+    }
+
+    public int calcCircleAltitudeDecrease(){
+        int corridorWaypointIndex = 38;
+        int stepsToLandingAltitude = corridorWaypointIndex - currentWaypointIndex;
+        int currentAltitude = location.getAltitude();
+        int landingAltitude = 2000;
+
+        int altitudeDiff = currentAltitude - landingAltitude;
+        return altitudeDiff / stepsToLandingAltitude;
     }
 
     public boolean isOutOfFuel() {
