@@ -43,7 +43,7 @@ public class PlaneHandler  {
                 incomingPlane.setLocation(location);
 
                 if(controller.isAnyRunwayAvailable()) {
-                    startLandingProcedure(incomingPlane, in, out);
+                    executeLandingProcedure(incomingPlane, in, out);
                     break;
                 } else {
                     log.info("Plane [{}] is waiting for empty runway", incomingPlane.getId());
@@ -57,7 +57,7 @@ public class PlaneHandler  {
 
     }
 
-    public void startLandingProcedure(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException{
+    public void executeLandingProcedure(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException{
         log.info("Plane [{}] got approval for landing", plane.getId());
         out.writeObject("LAND");
 
@@ -65,26 +65,33 @@ public class PlaneHandler  {
         log.info("Plane [{}] assigned to runway [{}]", plane.getId(), runway.getId());
         out.writeObject(runway);
 
-        updatePosition(in, plane);
+        monitorLandingPosition(in, plane);
         log.info("Plane [{}] has landed on  runway [{}]", plane.getId(), runway.getId());
-        postLandingClearance(plane, runway);
+        completeLandingProcedure(plane, runway);
     }
 
 
-    public void updatePosition(ObjectInputStream in, Plane incomingPlane){
-        while(!incomingPlane.isLanded()){
+    public void monitorLandingPosition(ObjectInputStream in, Plane incomingPlane){
+        while(true){
             Location location = aquireCurrentLocation(in, incomingPlane);
-            incomingPlane.setLocation(location);
+
             if(location == null){
+                if(incomingPlane.isLanded()){
+                    log.info("Plane [{}] removed from radar after landing", incomingPlane.getId());
+                } else {
+                    log.error("Plane [{}] disappeared from the radar", incomingPlane.getId());
+                }
                 return;
             }
+            incomingPlane.setLocation(location);
         }
     }
+
     public Location aquireCurrentLocation(ObjectInputStream in, Plane incomingPlane){
         try {
             return (Location) in.readObject();
         } catch (Exception ex) {
-            log.error("Plane [{}] disappeared from the radar. Error: {}", incomingPlane.getId(), ex.getMessage());
+            log.error("Error reading location for Plane [{}]: {}", incomingPlane.getId(), ex.getMessage());
             return null;
         }
     }
@@ -101,7 +108,7 @@ public class PlaneHandler  {
         return true;
     }
 
-    public void postLandingClearance(Plane incomingPlane, Runway assignedRunway) throws IOException {
+    public void completeLandingProcedure(Plane incomingPlane, Runway assignedRunway) throws IOException {
         airSpace.removePlaneFromSpace(incomingPlane);
         log.info("Plane [{}] removed from the airspace", incomingPlane.getId());
 

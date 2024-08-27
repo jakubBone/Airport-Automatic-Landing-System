@@ -63,6 +63,7 @@ public class PlaneClient extends Client  {
     private void processLanding() throws IOException, ClassNotFoundException {
         Runway assignedRunway = (Runway) in.readObject();
         while (!plane.isLanded()) {
+            out.writeObject(plane.getLocation());
             plane.proceedToLand(assignedRunway);
             try {
                 Thread.sleep(1000);
@@ -70,7 +71,6 @@ public class PlaneClient extends Client  {
                 Thread.currentThread().interrupt();
                 log.error("Landing process interrupted for plane [{}]", plane.getId());
             }
-            out.writeObject(plane.getLocation());
         }
         log.info("Plane [{}] has successfully landed on runway [{}]", plane.getId(), assignedRunway.getId());
     }

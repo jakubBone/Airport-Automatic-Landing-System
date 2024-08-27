@@ -21,41 +21,35 @@ public class Waypoint implements Serializable {
         // There are 10 waypoints on each side of the square, every 1000 meters
         // Every side length is 5000 meters
 
-        //Waypoints for the top side of the square (from left to right)
+        //Waypoints for the top side of the square
         for (int x = -5000; x <= 4000; x += 1000) {
             waypoints.add(new Waypoint(x, 5000)); // Top side (y = 5000)
         }
 
-        // Waypoints for the right side of the square (from top to bottom)
+        // Waypoints for the right side of the square
         for (int y = 5000; y >= -4000; y -= 1000) {
             waypoints.add(new Waypoint(5000, y)); // Right side (y = 5000)
         }
 
-        // Waypoints for the bottom side of the square (from right to left)
+        // Waypoints for the bottom side of the square
         for (int x = 5000; x >= -4000; x -= 1000) {
             waypoints.add(new Waypoint(x, -5000)); // Bottom side (y = -5000)
         }
 
-        // Waypoints for the left side of the square (from bottom to top)
+        // Waypoints for the left side of the square
         for (int y = -5000; y <= 4000; y += 1000) {
             waypoints.add(new Waypoint(-5000, y)); // Left side (y = -5000)
         }
-
         return waypoints;
     }
 
     public static List<Waypoint> getLandingWaypoints(int corridorY) {
         List<Waypoint> waypoints = new ArrayList<>();
 
-        // There are 7 corridor waypoints directing to runway, every 1000 meters
+        // There are 7 waypoints directing throughout corridor to runway, every 1000 meters
         for (int x = -4000; x <= 1000; x += 1000) {
             waypoints.add(new Waypoint(x, corridorY));
         }
-
-        for (Waypoint waypoint: waypoints){
-            System.out.println(waypoint.getX());
-        }
-
         return waypoints;
     }
 }
