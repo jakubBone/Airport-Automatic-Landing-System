@@ -15,7 +15,7 @@ public class Waypoint implements Serializable {
         this.x = x;
         this.y = y;
     }
-    public static List<Waypoint> getCircleWaypoints() {
+    public static List<Waypoint> setCircleWaypoints() {
         List<Waypoint> waypoints = new ArrayList<>();
 
         // There are 10 waypoints on each side of the square, every 1000 meters

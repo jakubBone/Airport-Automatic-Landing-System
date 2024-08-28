@@ -25,31 +25,34 @@ public class Plane implements Serializable {
     }
     private FlightPhase currentPhase;
     private static final AtomicInteger idCounter = new AtomicInteger();
+    private List<Waypoint> circleWaypoints;
     private int currentWaypointIndex;
     private int id;
     private double fuelLevel;
     private boolean landed;
     private Location location;
 
+
     public Plane() {
         this.id = generateID();
         this.fuelLevel = 1000;
-        this.location = setInitialLocation();
         this.currentPhase = HOLDING_PATTERN;
+        this.circleWaypoints = Waypoint.setCircleWaypoints();
+        this.location = setInitialLocation();
     }
 
     public void holdPattern() {
         if (currentPhase == HOLDING_PATTERN) {
-            moveToNextWaypoint(Waypoint.getCircleWaypoints());
+            moveToNextWaypoint(circleWaypoints);
         }
-        //decreaseAltitude();
         fuelLevel -= 10;
+        log.info("Plane [{}] fuel level after holding pattern: {}", id, fuelLevel);
     }
 
     public void proceedToLand(Runway runway) {
         switch (currentPhase) {
             case HOLDING_PATTERN:
-                moveToNextWaypoint(Waypoint.getCircleWaypoints());
+                moveToNextWaypoint(circleWaypoints);
                 if (hasReachedWaypoint(runway.getCorridor().getWaypoint())) {
                     currentPhase = LANDING;
                     currentWaypointIndex = 0;
@@ -64,8 +67,8 @@ public class Plane implements Serializable {
                 }
                 break;
         }
-        //decreaseAltitude();
         fuelLevel--;
+        log.info("Plane [{}] fuel level after landing attempt: {}", id, fuelLevel);
     }
 
 
@@ -79,8 +82,7 @@ public class Plane implements Serializable {
         }
 
         Waypoint nextWaypoint = waypoints.get(currentWaypointIndex);
-        log.info("Current waypoint {}: [{}, {}]", currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
-        log.info("Plane altitude {}: {}",id, location.getAltitude());
+        log.info("Plane [{}] moving to waypoint {}: [{}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
         moveTowards(nextWaypoint);
 
         if (hasReachedWaypoint(nextWaypoint)) {
@@ -92,10 +94,13 @@ public class Plane implements Serializable {
     public void moveTowards(Waypoint nextWaypoint) {
         location.setX(nextWaypoint.getX());
         location.setY(nextWaypoint.getY());
+        log.debug("Plane [{}] coordinates updated to [{}, {}]", id, location.getX(), location.getY());
     }
 
     public boolean hasReachedWaypoint(Waypoint nextWaypoint) {
-        return location.getX() == nextWaypoint.getX() && location.getY() == nextWaypoint.getY();
+        boolean reached = location.getX() == nextWaypoint.getX() && location.getY() == nextWaypoint.getY();
+        log.debug("Plane [{}] checking if reached waypoint: {} Result: {}", id, nextWaypoint, reached);
+        return reached;
     }
 
     public static int generateID() {
@@ -104,7 +109,6 @@ public class Plane implements Serializable {
 
     public Location setInitialLocation() {
         Random random = new Random();
-        List<Waypoint> circleWaypoints = Waypoint.getCircleWaypoints();
         currentWaypointIndex = random.nextInt(circleWaypoints.size());
         Waypoint initialWaypoint = circleWaypoints.get(currentWaypointIndex);
 
@@ -121,30 +125,33 @@ public class Plane implements Serializable {
         if(location.getAltitude() > 2000){
             newAltitude = location.getAltitude() - calcCircleAltitudeDecrease();
         } else {
-            newAltitude = location.getAltitude() - 334;
+            int defaultDecrease = 334;
+            newAltitude = Math.max(location.getAltitude() - defaultDecrease, 0);
         }
 
-        if (newAltitude < 0) {
-            getLocation().setAltitude(0);
-        } else {
-            getLocation().setAltitude(newAltitude);
-        }
+        getLocation().setAltitude(newAltitude);
+        log.info("Plane [{}] altitude decreased to {}", id, newAltitude);
+
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            log.error("Landing process interrupted for plane [{}]", getId());
+            log.error("Landing process interrupted for Plane [{}]", getId());
         }
     }
 
     public int calcCircleAltitudeDecrease(){
-        int corridorWaypointIndex = 38;
-        int stepsToLandingAltitude = corridorWaypointIndex - currentWaypointIndex;
+        int corridorWaypointIndex = circleWaypoints.size() - 1;
+        int stepsToCorridorAltitude = corridorWaypointIndex - currentWaypointIndex;
         int currentAltitude = location.getAltitude();
-        int landingAltitude = 2000;
+        int corridorAltitude = 2000;
 
-        int altitudeDiff = currentAltitude - landingAltitude;
-        return altitudeDiff / stepsToLandingAltitude;
+        /*if (currentWaypointIndex >= corridorWaypointIndex){
+            return 0;
+        }*/
+
+        int altitudeDiff = currentAltitude - corridorAltitude;
+        return altitudeDiff / stepsToCorridorAltitude;
     }
 
     public boolean isOutOfFuel() {
