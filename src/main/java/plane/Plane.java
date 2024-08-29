@@ -28,16 +28,17 @@ public class Plane implements Serializable {
     private List<Waypoint> circleWaypoints;
     private int currentWaypointIndex;
     private int id;
+    private double fuelConsumptionPerHour;
     private double fuelLevel;
     private boolean landed;
     private Location location;
 
-
     public Plane() {
         this.id = generateID();
-        this.fuelLevel = 1000;
+        this.fuelConsumptionPerHour = 2000;
+        this.fuelLevel = calcFuelForThreeHours();
         this.currentPhase = HOLDING_PATTERN;
-        this.circleWaypoints = Waypoint.setCircleWaypoints();
+        this.circleWaypoints = Waypoint.generateCircleWaypoints();
         this.location = setInitialLocation();
     }
 
@@ -45,8 +46,7 @@ public class Plane implements Serializable {
         if (currentPhase == HOLDING_PATTERN) {
             moveToNextWaypoint(circleWaypoints);
         }
-        fuelLevel -= 10;
-        log.info("Plane [{}] fuel level after holding pattern: {}", id, fuelLevel);
+        burnFuel();
     }
 
     public void proceedToLand(Runway runway) {
@@ -67,8 +67,7 @@ public class Plane implements Serializable {
                 }
                 break;
         }
-        fuelLevel--;
-        log.info("Plane [{}] fuel level after landing attempt: {}", id, fuelLevel);
+        burnFuel();
     }
 
 
@@ -146,12 +145,18 @@ public class Plane implements Serializable {
         int currentAltitude = location.getAltitude();
         int corridorAltitude = 2000;
 
-        /*if (currentWaypointIndex >= corridorWaypointIndex){
-            return 0;
-        }*/
-
         int altitudeDiff = currentAltitude - corridorAltitude;
         return altitudeDiff / stepsToCorridorAltitude;
+    }
+
+    public void burnFuel() {
+        double fuelConsumptionPerSec = fuelConsumptionPerHour / 3600;
+        fuelLevel -= fuelConsumptionPerSec;
+        log.info("Plane [{}] fuel level after burning: {}", id, String.format("%.2f", fuelLevel));
+    }
+
+    public double calcFuelForThreeHours() {
+        return (fuelConsumptionPerHour * 3);
     }
 
     public boolean isOutOfFuel() {
