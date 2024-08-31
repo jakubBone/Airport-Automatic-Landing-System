@@ -15,7 +15,28 @@ public class Waypoint implements Serializable {
         this.x = x;
         this.y = y;
     }
-    public static List<Waypoint> generateCircleWaypoints() {
+    public static List<Waypoint> generateCircleWaypoints(Location location) {
+        List<Waypoint> waypoints = new ArrayList<>();
+        int minCoord = -5000;
+        int maxCoord = 5000;
+
+        // example location (4500, 4800)
+
+        int size = maxCoord - location.getY() * 2; // 4600
+        int waypointLength = size / 10; // 46
+
+        (4500, 4800)
+
+        // Top side
+        for (int x = location.getX(); x <= minCoord + location.getY(); x += waypointLength) {
+            waypoints.add(new Waypoint(x, location.getY()));
+        }
+
+        return waypoints;
+    }
+
+
+    /*public static List<Waypoint> generateCircleWaypoints() {
         List<Waypoint> waypoints = new ArrayList<>();
 
         // 10 waypoints on each side, every 1000 meters
@@ -41,7 +62,7 @@ public class Waypoint implements Serializable {
             waypoints.add(new Waypoint(-5000, y));
         }
         return waypoints;
-    }
+    }*/
 
     public static List<Waypoint> getLandingWaypoints(int corridorY) {
         List<Waypoint> waypoints = new ArrayList<>();

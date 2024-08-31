@@ -38,8 +38,10 @@ public class Plane implements Serializable {
         this.fuelConsumptionPerHour = 2000;
         this.fuelLevel = calcFuelForThreeHours();
         this.currentPhase = HOLDING_PATTERN;
-        this.circleWaypoints = Waypoint.generateCircleWaypoints();
-        this.location = setInitialLocation();
+        //this.circleWaypoints = Waypoint.generateCircleWaypoints();
+        this.location = getRandomLocation();
+        this.circleWaypoints = Waypoint.generateCircleWaypoints(location);
+
     }
 
     public void holdPattern() {
@@ -107,6 +109,69 @@ public class Plane implements Serializable {
     }
 
     public Location setInitialLocation() {
+        // Zakres współrzędnych kwadratu
+        int minCoord = -5000;
+        int maxCoord = 5000;
+
+        // Szerokość pasów przylegających do krawędzi
+        int borderWidth = 500;
+
+        Random random = new Random();
+        Location initLocation =
+
+
+
+        currentWaypointIndex = random.nextInt(circleWaypoints.size());
+        Waypoint initialWaypoint = circleWaypoints.get(currentWaypointIndex);
+
+        return new Location(
+                initialWaypoint.getX(),
+                initialWaypoint.getY(),
+                2000 + random.nextInt(3001) // Altitude between 2000 and 5000 meters
+        );
+    }public Location getRandomLocation() {
+        // Zakres współrzędnych kwadratu
+        int minCoord = -5000;
+        int maxCoord = 5000;
+
+        // Szerokość pasów przylegających do krawędzi
+        int bufferWidth = 500;
+
+        Random random = new Random();
+        int side = random.nextInt(4);
+
+        int x = 0;
+        int y = 0;
+
+        switch (side){
+            case 0:// left
+                x = minCoord + random.nextInt(bufferWidth + 1);
+                y = random.nextInt(maxCoord - maxCoord + 1);
+                break;
+            case 1:// right
+                x = maxCoord - random(bufferWidth + 1);
+                y = random.nextInt(maxCoord - minCoord + 1);
+                break;
+            case 2:// top
+                y = maxCoord - random.nextInt(bufferWidth + 1);
+                x = random.nextInt(maxCoord - minCoord + 1);
+                break;
+            case 3:// bottom
+                y = minCoord - random.nextInt(bufferWidth + 1);
+                x = random.nextInt(maxCoord - minCoord +1);
+                break;
+        }
+
+        int minAltitude = 2000;
+        int maxAltitude = 5000;
+
+
+        int altitude = random.nextInt(maxAltitude - minAltitude + 1) + minAltitude;
+
+        return new Location(x, y, altitude)
+    }
+
+    /*public Location setInitialLocation() {
         Random random = new Random();
         currentWaypointIndex = random.nextInt(circleWaypoints.size());
         Waypoint initialWaypoint = circleWaypoints.get(currentWaypointIndex);
@@ -116,7 +181,7 @@ public class Plane implements Serializable {
                 initialWaypoint.getY(),
                 2000 + random.nextInt(3001) // Altitude between 2000 and 5000 meters
         );
-    }
+    }*/
 
     public void decreaseAltitude() {
         int newAltitude;
