@@ -2,7 +2,7 @@ package plane;
 
 import airport.Runway;
 import location.Location;
-import location.Waypoint;
+import location.WaypointGenerator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -25,7 +25,7 @@ public class Plane implements Serializable {
     }
     private FlightPhase currentPhase;
     private static final AtomicInteger idCounter = new AtomicInteger();
-    private List<Waypoint> circleWaypoints;
+    private List<Location> circleWaypoints;
     private int currentWaypointIndex;
     private int id;
     private double fuelConsumptionPerHour;
@@ -40,7 +40,7 @@ public class Plane implements Serializable {
         this.currentPhase = HOLDING_PATTERN;
         //this.circleWaypoints = Waypoint.generateCircleWaypoints();
         this.location = getRandomLocation();
-        this.circleWaypoints = Waypoint.generateCircleWaypoints(location);
+        this.circleWaypoints = WaypointGenerator.generateCircleWaypoints(location);
     }
 
     public void holdPattern() {
@@ -61,7 +61,7 @@ public class Plane implements Serializable {
                 }
                 break;
             case LANDING:
-                List<Waypoint> landingWaypoints = runway.getCorridor().getLandingWay();
+                List<WaypointGenerator> landingWaypoints = runway.getCorridor().getLandingWay();
                 moveToNextWaypoint(landingWaypoints);
                 if (hasReachedWaypoint(runway.getWaypoint())) {
                     landed = true;
@@ -72,7 +72,7 @@ public class Plane implements Serializable {
     }
 
 
-    private void moveToNextWaypoint(List<Waypoint> waypoints) {
+    private void moveToNextWaypoint(List<WaypointGenerator> waypoints) {
         if (currentWaypointIndex >= waypoints.size()) {
             if (currentPhase == FlightPhase.HOLDING_PATTERN) {
                 currentWaypointIndex = 0;
@@ -81,7 +81,7 @@ public class Plane implements Serializable {
             }
         }
 
-        Waypoint nextWaypoint = waypoints.get(currentWaypointIndex);
+        WaypointGenerator nextWaypoint = waypoints.get(currentWaypointIndex);
         log.info("Plane [{}] moving to waypoint {}: [{}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
         moveTowards(nextWaypoint);
 
@@ -91,13 +91,13 @@ public class Plane implements Serializable {
         decreaseAltitude();
     }
 
-    public void moveTowards(Waypoint nextWaypoint) {
+    public void moveTowards(WaypointGenerator nextWaypoint) {
         location.setX(nextWaypoint.getX());
         location.setY(nextWaypoint.getY());
         log.debug("Plane [{}] coordinates updated to [{}, {}]", id, location.getX(), location.getY());
     }
 
-    public boolean hasReachedWaypoint(Waypoint nextWaypoint) {
+    public boolean hasReachedWaypoint(WaypointGenerator nextWaypoint) {
         boolean reached = location.getX() == nextWaypoint.getX() && location.getY() == nextWaypoint.getY();
         log.debug("Plane [{}] checking if reached waypoint: {} Result: {}", id, nextWaypoint, reached);
         return reached;
@@ -132,8 +132,8 @@ public class Plane implements Serializable {
 
     public Location getRandomLocation() {
         // Zakres współrzędnych kwadratu
-        int minCoord = -5000;
-        int maxCoord = 5000;
+        int minCoo = -5000;
+        int maxCoo = 5000;
 
         // Szerokość pasów przylegających do krawędzi
         int bufferWidth = 500;
@@ -146,20 +146,20 @@ public class Plane implements Serializable {
 
         switch (side){
             case 0:// left
-                x = minCoord + random.nextInt(bufferWidth + 1);
-                y = minCoord + random.nextInt(maxCoord - minCoord + 1);
+                x = minCoo + random.nextInt(bufferWidth + 1);
+                y = minCoo + random.nextInt(maxCoo - minCoo + 1);
                 break;
             case 1:// right
-                x = maxCoord - random.nextInt(bufferWidth + 1);
-                y = minCoord + random.nextInt(maxCoord - minCoord + 1);
+                x = maxCoo - random.nextInt(bufferWidth + 1);
+                y = minCoo + random.nextInt(maxCoo - minCoo + 1);
                 break;
             case 2:// top
-                y = maxCoord - random.nextInt(bufferWidth + 1);
-                x = minCoord + random.nextInt(maxCoord - minCoord + 1);
+                y = maxCoo - random.nextInt(bufferWidth + 1);
+                x = minCoo + random.nextInt(maxCoo - minCoo + 1);
                 break;
             case 3:// bottom
-                y = minCoord + random.nextInt(bufferWidth + 1);
-                x = minCoord + random.nextInt(maxCoord - minCoord + 1);
+                y = minCoo + random.nextInt(bufferWidth + 1);
+                x = minCoo + random.nextInt(maxCoo - minCoo + 1);
                 break;
         }
 

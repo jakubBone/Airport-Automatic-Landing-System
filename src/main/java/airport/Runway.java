@@ -1,9 +1,8 @@
 package airport;
 
-import location.Waypoint;
+import location.WaypointGenerator;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
-import location.Location;
 
 import java.io.Serializable;
 
@@ -11,10 +10,10 @@ import java.io.Serializable;
 @Getter
 public class Runway implements Serializable {
     private String id;
-    private Waypoint waypoint;
+    private WaypointGenerator waypoint;
     private Corridor corridor;
 
-    public Runway(String id, Waypoint waypoint, Corridor corridor) {
+    public Runway(String id, WaypointGenerator waypoint, Corridor corridor) {
         this.id = id;
         this.waypoint = waypoint;
         this.corridor = corridor;

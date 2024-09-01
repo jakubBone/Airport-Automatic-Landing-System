@@ -1,6 +1,7 @@
 package airport;
 
-import location.Waypoint;
+import location.Location;
+import location.WaypointGenerator;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -9,12 +10,12 @@ import java.util.List;
 @Getter
 public class Corridor implements Serializable {
     private String id;
-    private Waypoint waypoint;
-    private List<Waypoint> landingWay;
+    private WaypointGenerator waypoint;
+    private List<Location> landingWay;
 
-    public Corridor(String id, Waypoint waypoint) {
+    public Corridor(String id, Location waypoint) {
         this.id = id;
         this.waypoint = waypoint;
-        this.landingWay = Waypoint.getLandingWaypoints(waypoint.getY());
+        this.landingWay = WaypointGenerator.getLandingWaypoints(waypoint.getY());
     }
 }
