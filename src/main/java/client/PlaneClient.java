@@ -20,6 +20,7 @@ public class PlaneClient extends Client  {
     private void startCommunication() {
         try {
             startConnection();
+
             out.writeObject(plane);
 
             while (!isProcessCompleted) {

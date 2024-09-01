@@ -17,19 +17,29 @@ public class Waypoint implements Serializable {
     }
     public static List<Waypoint> generateCircleWaypoints(Location location) {
         List<Waypoint> waypoints = new ArrayList<>();
-        int minCoord = -5000;
-        int maxCoord = 5000;
+        int airportSide = 5000;
+        int side = Math.abs(airportSide - location.getY() * 2);
+        int waypointDistance = side / 10;
 
-        // example location (4500, 4800)
-
-        int size = maxCoord - location.getY() * 2; // 4600
-        int waypointLength = size / 10; // 46
-
-        (4500, 4800)
 
         // Top side
-        for (int x = location.getX(); x <= minCoord + location.getY(); x += waypointLength) {
+        for (int x = -side; x <= side - waypointDistance; x += waypointDistance) {
             waypoints.add(new Waypoint(x, location.getY()));
+        }
+
+        // Right side
+        for (int y = side; y >= - side + waypointDistance; y -= waypointDistance) {
+            waypoints.add(new Waypoint(location.getX(), location.getY()));
+        }
+
+        // Bottom side
+        for (int x = side; x >= - side + waypointDistance; x -= waypointDistance) {
+            waypoints.add(new Waypoint(x, location.getY()));
+        }
+
+        // Bottom side
+        for (int y = - side; y <= side - waypointDistance; y -= waypointDistance) {
+            waypoints.add(new Waypoint(location.getX(), y));
         }
 
         return waypoints;
