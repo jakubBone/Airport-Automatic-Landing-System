@@ -38,9 +38,8 @@ public class Plane implements Serializable {
         this.fuelConsumptionPerHour = 2000;
         this.fuelLevel = calcFuelForThreeHours();
         this.currentPhase = HOLDING_PATTERN;
-        //this.circleWaypoints = Waypoint.generateCircleWaypoints();
-        this.location = getRandomLocation();
-        this.circleWaypoints = WaypointGenerator.generateCircleWaypoints(location);
+        this.circleWaypoints = WaypointGenerator.generateCircleWaypoints();
+        this.location = setInitialLocation();
     }
 
     public void holdPattern() {
@@ -51,19 +50,22 @@ public class Plane implements Serializable {
     }
 
     public void proceedToLand(Runway runway) {
+        Location corridorEntryPoint = runway.getCorridor().getCorridorEntryPoint();
+        Location touchdownPoint = runway.getTouchdownPoint();
+        List<Location> landingPath = runway.getCorridor().getLandingPath();
+
         switch (currentPhase) {
             case HOLDING_PATTERN:
                 moveToNextWaypoint(circleWaypoints);
-                if (hasReachedWaypoint(runway.getCorridor().getWaypoint())) {
+                if (hasReachedWaypoint(corridorEntryPoint)) {
                     currentPhase = LANDING;
                     currentWaypointIndex = 0;
                     log.info("Plane [{}] is switching to LANDING phase", id);
                 }
                 break;
             case LANDING:
-                List<WaypointGenerator> landingWaypoints = runway.getCorridor().getLandingWay();
-                moveToNextWaypoint(landingWaypoints);
-                if (hasReachedWaypoint(runway.getWaypoint())) {
+                moveToNextWaypoint(landingPath);
+                if (hasReachedWaypoint(touchdownPoint)) {
                     landed = true;
                 }
                 break;
@@ -71,17 +73,8 @@ public class Plane implements Serializable {
         burnFuel();
     }
 
-
-    private void moveToNextWaypoint(List<WaypointGenerator> waypoints) {
-        if (currentWaypointIndex >= waypoints.size()) {
-            if (currentPhase == FlightPhase.HOLDING_PATTERN) {
-                currentWaypointIndex = 0;
-            } else {
-                return;
-            }
-        }
-
-        WaypointGenerator nextWaypoint = waypoints.get(currentWaypointIndex);
+    private void moveToNextWaypoint(List<Location> waypoints) {
+        Location nextWaypoint = waypoints.get(currentWaypointIndex);
         log.info("Plane [{}] moving to waypoint {}: [{}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
         moveTowards(nextWaypoint);
 
@@ -91,13 +84,12 @@ public class Plane implements Serializable {
         decreaseAltitude();
     }
 
-    public void moveTowards(WaypointGenerator nextWaypoint) {
+    public void moveTowards(Location nextWaypoint) {
         location.setX(nextWaypoint.getX());
         location.setY(nextWaypoint.getY());
         log.debug("Plane [{}] coordinates updated to [{}, {}]", id, location.getX(), location.getY());
     }
-
-    public boolean hasReachedWaypoint(WaypointGenerator nextWaypoint) {
+    public boolean hasReachedWaypoint(Location nextWaypoint) {
         boolean reached = location.getX() == nextWaypoint.getX() && location.getY() == nextWaypoint.getY();
         log.debug("Plane [{}] checking if reached waypoint: {} Result: {}", id, nextWaypoint, reached);
         return reached;
@@ -107,83 +99,17 @@ public class Plane implements Serializable {
         return idCounter.incrementAndGet();
     }
 
-    /*public Location setInitialLocation() {
-        // Zakres współrzędnych kwadratu
-        int minCoord = -5000;
-        int maxCoord = 5000;
-
-        // Szerokość pasów przylegających do krawędzi
-        int borderWidth = 500;
-
+    public Location setInitialLocation() {
         Random random = new Random();
-        Location initLocation =
-
-
-
         currentWaypointIndex = random.nextInt(circleWaypoints.size());
-        Waypoint initialWaypoint = circleWaypoints.get(currentWaypointIndex);
+        Location initialWaypoint = circleWaypoints.get(currentWaypointIndex);
 
         return new Location(
                 initialWaypoint.getX(),
                 initialWaypoint.getY(),
                 2000 + random.nextInt(3001) // Altitude between 2000 and 5000 meters
         );
-    }*/
-
-    public Location getRandomLocation() {
-        // Zakres współrzędnych kwadratu
-        int minCoo = -5000;
-        int maxCoo = 5000;
-
-        // Szerokość pasów przylegających do krawędzi
-        int bufferWidth = 500;
-
-        Random random = new Random();
-        int side = random.nextInt(4);
-
-        int x = 0;
-        int y = 0;
-
-        switch (side){
-            case 0:// left
-                x = minCoo + random.nextInt(bufferWidth + 1);
-                y = minCoo + random.nextInt(maxCoo - minCoo + 1);
-                break;
-            case 1:// right
-                x = maxCoo - random.nextInt(bufferWidth + 1);
-                y = minCoo + random.nextInt(maxCoo - minCoo + 1);
-                break;
-            case 2:// top
-                y = maxCoo - random.nextInt(bufferWidth + 1);
-                x = minCoo + random.nextInt(maxCoo - minCoo + 1);
-                break;
-            case 3:// bottom
-                y = minCoo + random.nextInt(bufferWidth + 1);
-                x = minCoo + random.nextInt(maxCoo - minCoo + 1);
-                break;
-        }
-
-        int minAltitude = 2000;
-        int maxAltitude = 5000;
-
-
-        int altitude = random.nextInt(maxAltitude - minAltitude + 1) + minAltitude;
-        log.info("Plane [{}] initial localization: {} / {} / {}", id, x, y, altitude);
-
-        return new Location(x, y, altitude);
     }
-
-    /*public Location setInitialLocation() {
-        Random random = new Random();
-        currentWaypointIndex = random.nextInt(circleWaypoints.size());
-        Waypoint initialWaypoint = circleWaypoints.get(currentWaypointIndex);
-
-        return new Location(
-                initialWaypoint.getX(),
-                initialWaypoint.getY(),
-                2000 + random.nextInt(3001) // Altitude between 2000 and 5000 meters
-        );
-    }*/
 
     public void decreaseAltitude() {
         int newAltitude;

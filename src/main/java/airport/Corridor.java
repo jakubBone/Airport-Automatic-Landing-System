@@ -10,12 +10,12 @@ import java.util.List;
 @Getter
 public class Corridor implements Serializable {
     private String id;
-    private WaypointGenerator waypoint;
-    private List<Location> landingWay;
+    private Location corridorEntryPoint;
+    private List<Location> landingPath;
 
-    public Corridor(String id, Location waypoint) {
+    public Corridor(String id, Location entryPoint) {
         this.id = id;
-        this.waypoint = waypoint;
-        this.landingWay = WaypointGenerator.getLandingWaypoints(waypoint.getY());
+        this.corridorEntryPoint = entryPoint;
+        this.landingPath = WaypointGenerator.getLandingWaypoints(corridorEntryPoint);
     }
 }
