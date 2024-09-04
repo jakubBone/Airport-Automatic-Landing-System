@@ -5,15 +5,19 @@ import lombok.extern.log4j.Log4j2;
 import plane.Plane;
 
 import java.io.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Log4j2
 public class PlaneClient extends Client  {
     private Plane plane;
     private boolean isProcessCompleted;
+    private Lock lock;
 
     public PlaneClient(String ip, int port) {
         super(ip, port);
         this.plane = new Plane();
+        lock = new ReentrantLock();
         log.info("PlaneClient created for Plane [{}] at IP: {}, Port: {}", plane.getId(), ip, port);
     }
 
@@ -34,7 +38,6 @@ public class PlaneClient extends Client  {
                 out.reset();
                 out.writeObject(plane.getLocation());
                 out.flush();
-
                 String instruction = (String) in.readObject();
                 log.info("Received instruction [{}] for Plane [{}]", instruction, plane.getId());
                 processAirportInstruction(instruction);
@@ -84,7 +87,12 @@ public class PlaneClient extends Client  {
     }
 
     public static void main(String[] args) throws IOException {
-        PlaneClient client = new PlaneClient("localhost", 5000);
-        client.startCommunication();
+        for (int i = 0; i < 2; i++) {
+            new Thread(() -> {
+                PlaneClient client = new PlaneClient("localhost", 5000);
+                client.startCommunication();
+            }).start();
+        }
+
     }
 }

@@ -10,17 +10,21 @@ import plane.Plane;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Log4j2
 public class PlaneHandler  {
     private Socket socket;
     private AirSpace airSpace;
     private AirTrafficController controller;
+    private Lock lock;
 
     public PlaneHandler(Socket socket) {
         this.socket = socket;
         this.airSpace = new AirSpace();
         this.controller = new AirTrafficController();
+        this.lock = new ReentrantLock();;
     }
 
     public void handleClient() {

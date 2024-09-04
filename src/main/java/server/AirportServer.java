@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+
 @Log4j2
 public class AirportServer  {
     private ServerSocket serverSocket;
@@ -19,9 +20,11 @@ public class AirportServer  {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     if (clientSocket != null) {
-                        log.info("Server connected with client at port: {}", port);
-                        PlaneHandler planeHandler = new PlaneHandler(clientSocket);
-                        planeHandler.handleClient();
+                        new Thread(() -> {
+                            log.info("Server connected with client at port: {}", port);
+                            PlaneHandler planeHandler = new PlaneHandler(clientSocket);
+                            planeHandler.handleClient();
+                        }).start();
                     }
                 } catch (Exception ex) {
                     log.error("Error occurred: {}", ex.getMessage());

@@ -8,13 +8,17 @@ import lombok.extern.log4j.Log4j2;
 import java.util.LinkedList;
 
 import java.util.Queue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Log4j2
 @Getter
 public class AirTrafficController {
     public Queue <Runway> availableRunways = new LinkedList<>();
+    private Lock lock;
 
     public AirTrafficController() {
+        this.lock = new ReentrantLock();;
         initRunways();
     }
 
@@ -29,14 +33,31 @@ public class AirTrafficController {
     }
 
     public Runway getAvailableRunway() {
-        return availableRunways.poll();
+        lock.lock();
+        try {
+            return availableRunways.poll();
+        } finally {
+            lock.unlock();
+        }
     }
 
     public boolean isAnyRunwayAvailable(){
-        return !availableRunways.isEmpty();
+        lock.lock();
+        try {
+            return !availableRunways.isEmpty();
+        } finally {
+            lock.lock();
+        }
+
     }
 
     public void releaseRunway(Runway runway) {
-        availableRunways.add(runway);
+        lock.lock();
+        try {
+            availableRunways.add(runway);
+        } finally {
+            lock.unlock();
+        }
+
     }
 }
