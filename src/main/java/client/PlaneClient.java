@@ -40,7 +40,7 @@ public class PlaneClient extends Client  {
                 out.flush();
 
                 String instruction = (String) in.readObject();
-                log.info("Received instruction [{}] for Plane [{}]", instruction, plane.getId());
+                //log.info("Received instruction [{}] for Plane [{}]", instruction, plane.getId());
                 processAirportInstruction(instruction);
                 Thread.sleep(1000);
             }
@@ -55,15 +55,16 @@ public class PlaneClient extends Client  {
     private void processAirportInstruction(String instruction) throws IOException, ClassNotFoundException {
         switch (instruction) {
             case "WAIT":
-                log.info("Plane [{}] instructed to wait for an available runway", plane.getId());
+                log.info("Plane [{}] instructed to [{}] for an available runway", plane.getId(), instruction);
                 break;
             case "LAND":
-                log.info("Runway available. Plane [{}] instructed to land", plane.getId());
+                log.info("Plane [{}] instructed to [{}] on an available runway", plane.getId(), instruction);
                 processLanding();
                 isProcessCompleted = true;
                 break;
             case "FULL":
-                log.info("Airspace is full. Plane [{}] cannot land. Search for an alternative airport.", plane.getId());                isProcessCompleted = true;
+                log.info("Airspace is [{}]. Plane [{}] cannot land. Search for an alternative airport.", instruction, plane.getId());                isProcessCompleted = true;
+                isProcessCompleted = true;
                 break;
             default:
                 log.warn("Plane [{}] received an unknown instruction: [{}]", plane.getId(), instruction);
@@ -88,7 +89,7 @@ public class PlaneClient extends Client  {
     }
 
     public static void main(String[] args) throws IOException {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 50; i++) {
             new Thread(() -> {
                 PlaneClient client = new PlaneClient("localhost", 5000);
                 client.startCommunication();

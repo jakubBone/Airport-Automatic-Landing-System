@@ -55,53 +55,12 @@ public class PlaneHandler extends Thread {
                     log.info("Plane [{}] is waiting for empty runway", incomingPlane.getId());
                     out.writeObject("WAIT");
                 }
-                /*if(controller.isAnyRunwayAvailable()) {
-                    executeLandingProcedure(incomingPlane, in, out);
-                    break;
-                } else {
-                    log.info("Plane [{}] is waiting for empty runway", incomingPlane.getId());
-                    out.writeObject("WAIT");
-                }*/
             }
 
         } catch (IOException | ClassNotFoundException ex){
             log.error("Error occurred while handling client request:" + ex.getMessage());
         }
     }
-
-    /*public void handleClient() {
-        try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
-             ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
-
-            Plane incomingPlane = (Plane) in.readObject();
-
-            if (!isPlaneRegistrationSuccessful(incomingPlane, out)) {
-                return;
-            }
-
-            while (true) {
-                Location location = aquireCurrentLocation(in, incomingPlane);
-                if(location == null){
-                    airSpace.removePlaneFromSpace(incomingPlane);
-                    return;
-                }
-
-                incomingPlane.setLocation(location);
-
-                if(controller.isAnyRunwayAvailable()) {
-                    executeLandingProcedure(incomingPlane, in, out);
-                    break;
-                } else {
-                    log.info("Plane [{}] is waiting for empty runway", incomingPlane.getId());
-                    out.writeObject("WAIT");
-                }
-            }
-
-        } catch (IOException | ClassNotFoundException ex){
-            log.error("Error occurred while handling client request:" + ex.getMessage());
-        }
-
-    }*/
 
     public void executeLandingProcedure(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException{
         log.info("Plane [{}] got approval for landing", plane.getId());
@@ -160,6 +119,5 @@ public class PlaneHandler extends Thread {
         controller.releaseRunway(assignedRunway);
         log.info("Runway [{}] released", assignedRunway.getId());
     }
-
 
 }

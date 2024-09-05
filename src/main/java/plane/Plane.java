@@ -64,6 +64,7 @@ public class Plane implements Serializable {
                 }
                 break;
             case LANDING:
+                log.info("Plane [{}] is LANDING on runway [{}]", getId(), runway.getId());
                 moveToNextWaypoint(landingPath);
                 if (hasReachedWaypoint(touchdownPoint)) {
                     landed = true;
@@ -81,7 +82,7 @@ public class Plane implements Serializable {
         }
 
         Location nextWaypoint = waypoints.get(currentWaypointIndex);
-        log.info("Plane [{}] moving to waypoint {}: [{}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
+        log.info("Plane [{}] is moving to waypoint {}: [{}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
         moveTowards(nextWaypoint);
 
         if (hasReachedWaypoint(nextWaypoint)) {
@@ -89,16 +90,15 @@ public class Plane implements Serializable {
         }
 
         decreaseAltitude();
+        log.info("Plane [{}] current altitude: {}", id, location.getAltitude());
     }
 
     public void moveTowards(Location nextWaypoint) {
         location.setX(nextWaypoint.getX());
         location.setY(nextWaypoint.getY());
-        log.debug("Plane [{}] coordinates updated to [{}, {}]", id, location.getX(), location.getY());
     }
     public boolean hasReachedWaypoint(Location nextWaypoint) {
         boolean reached = location.getX() == nextWaypoint.getX() && location.getY() == nextWaypoint.getY();
-        log.debug("Plane [{}] checking if reached waypoint: {} Result: {}", id, nextWaypoint, reached);
         return reached;
     }
 
@@ -119,6 +119,30 @@ public class Plane implements Serializable {
     }
 
     public void decreaseAltitude() {
+        if(currentPhase == HOLDING_PATTERN && location.getAltitude()<= 2000){
+            return;
+        }
+
+        int newAltitude;
+
+        if(location.getAltitude() > 2000){
+            newAltitude = location.getAltitude() - calcCircleAltitudeDecrease();
+        } else {
+            int defaultDecrease = 334;
+            newAltitude = Math.max(location.getAltitude() - defaultDecrease, 0);
+        }
+
+        getLocation().setAltitude(newAltitude);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            log.error("Landing process interrupted for Plane [{}]", getId());
+        }
+    }
+    /*public void decreaseAltitude() {
+
         int newAltitude;
 
         if(location.getAltitude() > 2000){
@@ -137,7 +161,7 @@ public class Plane implements Serializable {
             Thread.currentThread().interrupt();
             log.error("Landing process interrupted for Plane [{}]", getId());
         }
-    }
+    }*/
 
     public int calcCircleAltitudeDecrease(){
         int corridorWaypointIndex = circleWaypoints.size() - 1;
@@ -146,13 +170,13 @@ public class Plane implements Serializable {
         int corridorAltitude = 2000;
 
         int altitudeDiff = currentAltitude - corridorAltitude;
-        return altitudeDiff / stepsToCorridorAltitude;
+        return  altitudeDiff / stepsToCorridorAltitude;
     }
 
     public void burnFuel() {
         double fuelConsumptionPerSec = fuelConsumptionPerHour / 3600;
         fuelLevel -= fuelConsumptionPerSec;
-        log.info("Plane [{}] fuel level after burning: {}", id, String.format("%.2f", fuelLevel));
+        //log.info("Plane [{}] fuel level after burning: {}", id, String.format("%.2f", fuelLevel));
     }
 
     public double calcFuelForThreeHours() {
