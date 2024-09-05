@@ -1,5 +1,7 @@
 package server;
 
+import airport.AirSpace;
+import airport.AirTrafficController;
 import lombok.extern.log4j.Log4j2;
 import handler.PlaneHandler;
 
@@ -11,6 +13,13 @@ import java.net.Socket;
 @Log4j2
 public class AirportServer  {
     private ServerSocket serverSocket;
+    private AirSpace airSpace;
+    private AirTrafficController controller;
+
+    public AirportServer() {
+        this.airSpace = new AirSpace();
+        this.controller = new AirTrafficController();
+    }
 
     public void startServer(int port) throws IOException {
         try {
@@ -20,11 +29,8 @@ public class AirportServer  {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     if (clientSocket != null) {
-                        new Thread(() -> {
-                            log.info("Server connected with client at port: {}", port);
-                            PlaneHandler planeHandler = new PlaneHandler(clientSocket);
-                            planeHandler.handleClient();
-                        }).start();
+                        log.info("Server connected with client at port: {}", port);
+                        new PlaneHandler(clientSocket, airSpace, controller).start();
                     }
                 } catch (Exception ex) {
                     log.error("Error occurred: {}", ex.getMessage());

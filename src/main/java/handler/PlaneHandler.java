@@ -14,22 +14,64 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Log4j2
-public class PlaneHandler  {
-    private Socket socket;
+public class PlaneHandler extends Thread {
+    private Socket clientSocket;
     private AirSpace airSpace;
     private AirTrafficController controller;
+
     private Lock lock;
 
-    public PlaneHandler(Socket socket) {
-        this.socket = socket;
-        this.airSpace = new AirSpace();
-        this.controller = new AirTrafficController();
+    public PlaneHandler(Socket clientSocket, AirSpace airSpace, AirTrafficController controller) {
+        this.clientSocket = clientSocket;
+        this.airSpace = airSpace;
+        this.controller = controller;
         this.lock = new ReentrantLock();;
     }
 
-    public void handleClient() {
-        try (ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
+    @Override
+    public void run() {
+        try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+             ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
+
+            Plane incomingPlane = (Plane) in.readObject();
+
+            if (!isPlaneRegistrationSuccessful(incomingPlane, out)) {
+                return;
+            }
+
+            while (true) {
+                Location location = aquireCurrentLocation(in, incomingPlane);
+                if(location == null){
+                    airSpace.removePlaneFromSpace(incomingPlane);
+                    return;
+                }
+
+                incomingPlane.setLocation(location);
+                if(controller.isAnyRunwayAvailable()) {
+                    Runway runway = controller.getAvailableRunway();
+                    executeLandingProcedure(incomingPlane, runway, in, out);
+                    break;
+                } else {
+                    log.info("Plane [{}] is waiting for empty runway", incomingPlane.getId());
+                    out.writeObject("WAIT");
+                }
+                /*if(controller.isAnyRunwayAvailable()) {
+                    executeLandingProcedure(incomingPlane, in, out);
+                    break;
+                } else {
+                    log.info("Plane [{}] is waiting for empty runway", incomingPlane.getId());
+                    out.writeObject("WAIT");
+                }*/
+            }
+
+        } catch (IOException | ClassNotFoundException ex){
+            log.error("Error occurred while handling client request:" + ex.getMessage());
+        }
+    }
+
+    /*public void handleClient() {
+        try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+             ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
 
             Plane incomingPlane = (Plane) in.readObject();
 
@@ -59,13 +101,12 @@ public class PlaneHandler  {
             log.error("Error occurred while handling client request:" + ex.getMessage());
         }
 
-    }
+    }*/
 
-    public void executeLandingProcedure(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException{
+    public void executeLandingProcedure(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException{
         log.info("Plane [{}] got approval for landing", plane.getId());
         out.writeObject("LAND");
 
-        Runway runway = controller.getAvailableRunway();
         log.info("Plane [{}] assigned to runway [{}]", plane.getId(), runway.getId());
         out.writeObject(runway);
 
@@ -119,4 +160,6 @@ public class PlaneHandler  {
         controller.releaseRunway(assignedRunway);
         log.info("Runway [{}] released", assignedRunway.getId());
     }
+
+
 }
