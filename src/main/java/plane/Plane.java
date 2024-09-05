@@ -74,6 +74,12 @@ public class Plane implements Serializable {
     }
 
     private void moveToNextWaypoint(List<Location> waypoints) {
+        if (currentWaypointIndex >= waypoints.size()) {
+            if (currentPhase == FlightPhase.HOLDING_PATTERN) {
+                currentWaypointIndex = 0;
+            }
+        }
+
         Location nextWaypoint = waypoints.get(currentWaypointIndex);
         log.info("Plane [{}] moving to waypoint {}: [{}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
         moveTowards(nextWaypoint);
@@ -81,6 +87,7 @@ public class Plane implements Serializable {
         if (hasReachedWaypoint(nextWaypoint)) {
             currentWaypointIndex++;
         }
+
         decreaseAltitude();
     }
 

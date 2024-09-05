@@ -38,6 +38,7 @@ public class PlaneClient extends Client  {
                 out.reset();
                 out.writeObject(plane.getLocation());
                 out.flush();
+
                 String instruction = (String) in.readObject();
                 log.info("Received instruction [{}] for Plane [{}]", instruction, plane.getId());
                 processAirportInstruction(instruction);
