@@ -141,27 +141,6 @@ public class Plane implements Serializable {
             log.error("Landing process interrupted for Plane [{}]", getId());
         }
     }
-    /*public void decreaseAltitude() {
-
-        int newAltitude;
-
-        if(location.getAltitude() > 2000){
-            newAltitude = location.getAltitude() - calcCircleAltitudeDecrease();
-        } else {
-            int defaultDecrease = 334;
-            newAltitude = Math.max(location.getAltitude() - defaultDecrease, 0);
-        }
-
-        getLocation().setAltitude(newAltitude);
-        log.info("Plane [{}] altitude decreased to {}", id, newAltitude);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            log.error("Landing process interrupted for Plane [{}]", getId());
-        }
-    }*/
 
     public int calcCircleAltitudeDecrease(){
         int corridorWaypointIndex = circleWaypoints.size() - 1;
@@ -176,7 +155,6 @@ public class Plane implements Serializable {
     public void burnFuel() {
         double fuelConsumptionPerSec = fuelConsumptionPerHour / 3600;
         fuelLevel -= fuelConsumptionPerSec;
-        //log.info("Plane [{}] fuel level after burning: {}", id, String.format("%.2f", fuelLevel));
     }
 
     public double calcFuelForThreeHours() {

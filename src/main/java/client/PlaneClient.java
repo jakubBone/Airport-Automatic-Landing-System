@@ -89,7 +89,7 @@ public class PlaneClient extends Client  {
     }
 
     public static void main(String[] args) throws IOException {
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 3; i++) {
             new Thread(() -> {
                 PlaneClient client = new PlaneClient("localhost", 5000);
                 client.startCommunication();

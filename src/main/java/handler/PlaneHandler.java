@@ -18,7 +18,6 @@ public class PlaneHandler extends Thread {
     private Socket clientSocket;
     private AirSpace airSpace;
     private AirTrafficController controller;
-
     private Lock lock;
 
     public PlaneHandler(Socket clientSocket, AirSpace airSpace, AirTrafficController controller) {
@@ -47,7 +46,9 @@ public class PlaneHandler extends Thread {
                 }
 
                 incomingPlane.setLocation(location);
-                if(controller.isAnyRunwayAvailable()) {
+
+                // added ifPlaneLowest(altitude)
+                if(controller.isAnyRunwayAvailable() && airSpace.isPlaneLowest(incomingPlane)) {
                     Runway runway = controller.getAvailableRunway();
                     executeLandingProcedure(incomingPlane, runway, in, out);
                     break;
