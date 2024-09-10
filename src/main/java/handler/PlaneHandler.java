@@ -47,8 +47,7 @@ public class PlaneHandler extends Thread {
 
                 incomingPlane.setLocation(location);
 
-                // added ifPlaneLowest(altitude)
-                if(controller.isAnyRunwayAvailable() && airSpace.isPlaneLowest(incomingPlane)) {
+                if(controller.isAnyRunwayAvailable()) {
                     Runway runway = controller.getAvailableRunway();
                     executeLandingProcedure(incomingPlane, runway, in, out);
                     break;
@@ -56,6 +55,7 @@ public class PlaneHandler extends Thread {
                     log.info("Plane [{}] is waiting for empty runway", incomingPlane.getId());
                     out.writeObject("WAIT");
                 }
+
             }
 
         } catch (IOException | ClassNotFoundException ex){
