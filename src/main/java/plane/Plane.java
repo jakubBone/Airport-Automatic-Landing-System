@@ -21,42 +21,47 @@ public class Plane implements Serializable {
 
     public enum FlightPhase {
         HOLDING_PATTERN,
+        WAITING,
         LANDING
     }
     private FlightPhase currentPhase;
     private static final AtomicInteger idCounter = new AtomicInteger();
-    private List<Location> circleWaypoints;
     private int currentWaypointIndex;
     private int id;
     private double fuelConsumptionPerHour;
     private double fuelLevel;
     private boolean landed;
     private Location location;
+    /*private List <Location> waypoints;
+    private int currentAltitudeLevel;
+    private int currentWaypointIndex = 0;
 
     public Plane() {
         this.id = generateID();
         this.fuelConsumptionPerHour = 2000;
         this.fuelLevel = calcFuelForThreeHours();
         this.currentPhase = HOLDING_PATTERN;
-        this.circleWaypoints = WaypointGenerator.generateCircleWaypoints();
+        this.waypoints = WaypointGenerator.getCircleWaypoints();
         this.location = setInitialLocation();
     }
 
     public void holdPattern() {
         if (currentPhase == HOLDING_PATTERN) {
-            moveToNextWaypoint(circleWaypoints);
+            moveToNextWaypoint(waypoints);
+        } else{
+
         }
         burnFuel();
     }
 
     public void proceedToLand(Runway runway) {
-        Location corridorEntryPoint = runway.getCorridor().getCorridorEntryPoint();
+        Location corridorEntryPoint = runway.getCorridor().getEntryWayoint();
         Location touchdownPoint = runway.getTouchdownPoint();
         List<Location> landingPath = runway.getCorridor().getLandingPath();
 
         switch (currentPhase) {
             case HOLDING_PATTERN:
-                moveToNextWaypoint(circleWaypoints);
+                moveToNextWaypoint(waypoints);
                 if (hasReachedWaypoint(corridorEntryPoint)) {
                     currentPhase = LANDING;
                     currentWaypointIndex = 0;
@@ -75,12 +80,21 @@ public class Plane implements Serializable {
     }
 
     private void moveToNextWaypoint(List<Location> waypoints) {
-        if (currentWaypointIndex >= waypoints.size()) {
-            if (currentPhase == FlightPhase.HOLDING_PATTERN) {
-                currentWaypointIndex = 0;
-            }
-        }
 
+        switch(currentPhase){
+            case FlightPhase.HOLDING_PATTERN:
+                if(currentWaypointIndex >= waypoints.size()) {
+                    currentPhase == WAITING;
+                    currentWaypointIndex = 0;
+                }
+                break;
+            case FlightPhase.WAITING:
+                if (hasReachedWaypoint(corridorEntryPoint)) {
+                    currentPhase = LANDING;
+                    currentWaypointIndex = 0;
+                    log.info("Plane [{}] is switching to LANDING phase", id);
+                }
+        }
         Location nextWaypoint = waypoints.get(currentWaypointIndex);
         log.info("Plane [{}] is moving to waypoint {}: [{}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
         moveTowards(nextWaypoint);
@@ -108,8 +122,13 @@ public class Plane implements Serializable {
 
     public Location setInitialLocation() {
         Random random = new Random();
-        currentWaypointIndex = random.nextInt(circleWaypoints.size());
-        Location initialWaypoint = circleWaypoints.get(currentWaypointIndex);
+
+        List <Location> waypointsWithoutCorridors = waypoints;
+        waypointsWithoutCorridors.remove(WaypointGenerator.CORRIDOR_C1_WAYPOINT);
+        waypointsWithoutCorridors.remove(WaypointGenerator.CORRIDOR_C2_WAYPOINT);
+
+        currentWaypointIndex = random.nextInt(waypointsWithoutCorridors.size());
+        Location initialWaypoint = waypointsWithoutCorridors.get(currentWaypointIndex);
 
         return new Location(
                 initialWaypoint.getX(),
@@ -163,5 +182,6 @@ public class Plane implements Serializable {
 
     public boolean isOutOfFuel() {
         return fuelLevel <= 0;
-    }
+    }*/
+
 }

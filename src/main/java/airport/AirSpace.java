@@ -34,8 +34,6 @@ public class AirSpace {
         space.put(key, plane);
     }
 
-
-
     public boolean isSpaceFull(){
         return planes.size() >= MAX_CAPACITY;
     }

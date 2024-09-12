@@ -56,6 +56,16 @@ public class PlaneHandler extends Thread {
                     out.writeObject("WAIT");
                 }
 
+
+                /*if(controller.isAnyRunwayAvailable()) {
+                    Runway runway = controller.getAvailableRunway();
+                    executeLandingProcedure(incomingPlane, runway, in, out);
+                    break;
+                } else {
+                    log.info("Plane [{}] is waiting for empty runway", incomingPlane.getId());
+                    out.writeObject("WAIT");
+                }*/
+
             }
 
         } catch (IOException | ClassNotFoundException ex){
