@@ -17,7 +17,7 @@ public class WaypointGenerator implements Serializable {
     public  static final Location CORRIDOR_C2_WAYPOINT = new Location(-5000, -2000, 2000);
 
 
-    public static List<Location> getCircleWaypoints() {
+    public static List<Location> getDescentWaypoints() {
         List<Location> waypoints = new ArrayList<>();
 
         // Waypoints between 5000 and 2000 meters
@@ -46,7 +46,7 @@ public class WaypointGenerator implements Serializable {
         return waypoints;
     }
 
-    public static List<Location> getWaitingWaypoints() {
+    public static List<Location> getHoldingPatternWaypoints() {
         List<Location> waypoints = new ArrayList<>();
 
         // Waypoints on 2000m level

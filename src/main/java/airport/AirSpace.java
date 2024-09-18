@@ -1,44 +1,21 @@
 package airport;
 
+import location.Location;
 import lombok.Getter;
-import plane.Plane;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 @Getter
 public class AirSpace {
-    private static final int MAX_CAPACITY = 100;
-    private ArrayList<Plane> planes;
-    private Map<String,Plane> space;
+    public static final int MAX_CAPACITY = 100;
+    private Runway runway1;
+    private Runway runway2;
 
     public AirSpace() {
-        this.planes = new ArrayList<>();
-        this.space = new HashMap<>();
+        this.runway1 = createRunwayWithCorridor("R-1", "C-1", new Location(1000, 2000, 0), new Location(-5000, 2000, 2000));
+        this.runway2 = createRunwayWithCorridor("R-2", "C-2", new Location(1000, -2000, 0), new Location(-5000, -2000, 2000));
     }
-
-    public String generateKey(int x, int y, int altitude){
-        return x + ":" + y + ":" + altitude;
-    }
-
-    public void registerPlane(Plane plane){
-        int x = plane.getLocation().getX();
-        int y = plane.getLocation().getY();
-        int altitude = plane.getLocation().getAltitude();
-
-        String key = generateKey(x, y, altitude);
-
-        planes.add(plane);
-
-        space.put(key, plane);
-    }
-
-    public boolean isSpaceFull(){
-        return planes.size() >= MAX_CAPACITY;
-    }
-
-    public void removePlaneFromSpace(Plane plane) {
-        planes.remove(plane);
+    public Runway createRunwayWithCorridor(String runwayId, String corridorId, Location touchdownPoint, Location corridorEntryPoint){
+        Corridor corridor = new Corridor(corridorId, corridorEntryPoint);
+        return new Runway(runwayId, touchdownPoint, corridor);
     }
 }

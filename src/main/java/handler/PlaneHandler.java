@@ -16,14 +16,12 @@ import java.util.concurrent.locks.ReentrantLock;
 @Log4j2
 public class PlaneHandler extends Thread {
     private Socket clientSocket;
-    private AirSpace airSpace;
     private AirTrafficController controller;
     private Lock lock;
 
-    public PlaneHandler(Socket clientSocket, AirSpace airSpace, AirTrafficController controller) {
+    public PlaneHandler(Socket clientSocket) {
         this.clientSocket = clientSocket;
-        this.airSpace = airSpace;
-        this.controller = controller;
+        this.controller = new AirTrafficController();
         this.lock = new ReentrantLock();;
     }
 
@@ -41,7 +39,7 @@ public class PlaneHandler extends Thread {
             while (true) {
                 Location location = aquireCurrentLocation(in, incomingPlane);
                 if(location == null){
-                    airSpace.removePlaneFromSpace(incomingPlane);
+                    controller.removePlaneFromSpace(incomingPlane);
                     return;
                 }
 
@@ -112,19 +110,19 @@ public class PlaneHandler extends Thread {
     }
 
     private boolean isPlaneRegistrationSuccessful(Plane incomingPlane, ObjectOutputStream out) throws IOException {
-        if (airSpace.isSpaceFull()) {
+        if (controller.isSpaceFull()) {
             log.info("No capacity in the airspace");
             out.writeObject("FULL");
             return false;
         }
 
-        airSpace.registerPlane(incomingPlane);
+        controller.registerPlane(incomingPlane);
         log.info("Plane [{}] entered into airspace", incomingPlane.getId());
         return true;
     }
 
     public void completeLandingProcedure(Plane incomingPlane, Runway assignedRunway) throws IOException {
-        airSpace.removePlaneFromSpace(incomingPlane);
+        controller.removePlaneFromSpace(incomingPlane);
         log.info("Plane [{}] removed from the airspace", incomingPlane.getId());
 
         controller.releaseRunway(assignedRunway);

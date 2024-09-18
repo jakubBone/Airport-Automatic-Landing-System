@@ -28,7 +28,7 @@ public class PlaneClient extends Client  {
             out.writeObject(plane);
 
             while (!isProcessCompleted) {
-                plane.holdPattern();
+                plane.maintainFlightPath();
 
                 if (plane.isOutOfFuel()) {
                     log.info("Plane [{}] is out of fuel, exiting communication loop", plane.getId());
@@ -40,7 +40,6 @@ public class PlaneClient extends Client  {
                 out.flush();
 
                 String instruction = (String) in.readObject();
-                //log.info("Received instruction [{}] for Plane [{}]", instruction, plane.getId());
                 processAirportInstruction(instruction);
                 Thread.sleep(1000);
             }

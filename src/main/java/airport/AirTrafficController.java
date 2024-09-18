@@ -1,11 +1,13 @@
 package airport;
 
-import location.Location;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import plane.Plane;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -14,21 +16,26 @@ import java.util.concurrent.locks.ReentrantLock;
 @Getter
 public class AirTrafficController {
     public Queue <Runway> availableRunways = new LinkedList<>();
+    private List<Plane> planes;
+    private AirSpace space;
     private Lock lock;
 
     public AirTrafficController() {
+        this.planes = new ArrayList<>
+        this.space = new AirSpace();
         this.lock = new ReentrantLock();
-        initRunways();
+        initAvailableRunways();
+    }
+    public void registerPlane(Plane plane) {
+        planes.add(plane);
+    }
+    public boolean isSpaceFull(){
+        return planes.size() >= AirSpace.MAX_CAPACITY;
     }
 
-    public void initRunways(){
-        createRunwayWithCorridor("R-1", "C-1", new Location(1000, 2000, 0), new Location(-5000, 2000, 2000));
-        createRunwayWithCorridor("R-2", "C-2", new Location(1000, -2000, 0), new Location(-5000, -2000, 2000));
-    }
-    public void createRunwayWithCorridor(String runwayId, String corridorId, Location touchdownPoint, Location corridorEntryPoint){
-        Corridor corridor = new Corridor(corridorId, corridorEntryPoint);
-        Runway runway = new Runway(runwayId, touchdownPoint, corridor);
-        availableRunways.add(runway);
+    public void initAvailableRunways(){
+        availableRunways.add(space.getRunway1());
+        availableRunways.add(space.getRunway2());
     }
 
     public Runway getAvailableRunway() {
@@ -56,5 +63,9 @@ public class AirTrafficController {
         } finally {
             lock.unlock();
         }
+    }
+
+    public void removePlaneFromSpace(Plane plane) {
+        planes.remove(plane);
     }
 }

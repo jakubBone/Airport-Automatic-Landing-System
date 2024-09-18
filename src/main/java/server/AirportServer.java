@@ -13,13 +13,6 @@ import java.net.Socket;
 @Log4j2
 public class AirportServer  {
     private ServerSocket serverSocket;
-    private AirSpace airSpace;
-    private AirTrafficController controller;
-
-    public AirportServer() {
-        this.airSpace = new AirSpace();
-        this.controller = new AirTrafficController();
-    }
 
     public void startServer(int port) throws IOException {
         try {
@@ -30,7 +23,7 @@ public class AirportServer  {
                     Socket clientSocket = serverSocket.accept();
                     if (clientSocket != null) {
                         log.info("Server connected with client at port: {}", port);
-                        new PlaneHandler(clientSocket, airSpace, controller).start();
+                        new PlaneHandler(clientSocket).start();
                     }
                 } catch (Exception ex) {
                     log.error("Error occurred: {}", ex.getMessage());

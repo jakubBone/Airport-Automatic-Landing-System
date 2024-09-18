@@ -20,38 +20,59 @@ import static plane.Plane.FlightPhase.*;
 public class Plane implements Serializable {
 
     public enum FlightPhase {
-        HOLDING_PATTERN,
-        WAITING,
+        DESCENDING,
+        HOLDING,
         LANDING
     }
-    private FlightPhase currentPhase;
+    private FlightPhase flightPhase;
     private static final AtomicInteger idCounter = new AtomicInteger();
-    private int currentWaypointIndex;
     private int id;
     private double fuelConsumptionPerHour;
     private double fuelLevel;
     private boolean landed;
     private Location location;
-    /*private List <Location> waypoints;
+    private List <Location> waypoints;
     private int currentAltitudeLevel;
-    private int currentWaypointIndex = 0;
+    private int currentWaypointIndex;
 
     public Plane() {
         this.id = generateID();
         this.fuelConsumptionPerHour = 2000;
         this.fuelLevel = calcFuelForThreeHours();
-        this.currentPhase = HOLDING_PATTERN;
-        this.waypoints = WaypointGenerator.getCircleWaypoints();
+        this.flightPhase = DESCENDING;
+        this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.location = setInitialLocation();
+        this.currentWaypointIndex = 0;
     }
 
-    public void holdPattern() {
-        if (currentPhase == HOLDING_PATTERN) {
-            moveToNextWaypoint(waypoints);
-        } else{
-
+    public void maintainFlightPath() {
+        Location nextWaypoint = waypoints.get(currentWaypointIndex);
+        Location corridorEntryPoint = runway.getCorridor().getEntryWayoint();
+        Location touchdownPoint = runway.getTouchdownPoint();
+        List<Location> landingPath = runway.getCorridor().getLandingPath();
+        switch (flightPhase) {
+            case DESCENDING:
+                holdDescent(nextWaypoint);
+                break;
+            case HOLDING:
+                holdPattern(nextWaypoint);
         }
+
+        if (hasReachedWaypoint(nextWaypoint)) {
+            currentWaypointIndex++;
+        }
+
         burnFuel();
+    }
+
+    public void holdPattern(){
+
+    }
+
+    public void holdDescent(){
+        Location nextWaypoint = waypoints.get(currentWaypointIndex);
+        moveToNextWaypoint(waypoints);
+        moveTowards(nextWaypoint);
     }
 
     public void proceedToLand(Runway runway) {
@@ -59,11 +80,11 @@ public class Plane implements Serializable {
         Location touchdownPoint = runway.getTouchdownPoint();
         List<Location> landingPath = runway.getCorridor().getLandingPath();
 
-        switch (currentPhase) {
-            case HOLDING_PATTERN:
+        switch (flightPhase) {
+            case DESCENDING:
                 moveToNextWaypoint(waypoints);
                 if (hasReachedWaypoint(corridorEntryPoint)) {
-                    currentPhase = LANDING;
+                    flightPhase = LANDING;
                     currentWaypointIndex = 0;
                     log.info("Plane [{}] is switching to LANDING phase", id);
                 }
@@ -80,17 +101,16 @@ public class Plane implements Serializable {
     }
 
     private void moveToNextWaypoint(List<Location> waypoints) {
-
-        switch(currentPhase){
-            case FlightPhase.HOLDING_PATTERN:
+        switch(flightPhase){
+            case FlightPhase.DESCENDING:
                 if(currentWaypointIndex >= waypoints.size()) {
-                    currentPhase == WAITING;
+                    flightPhase == HOLDING;
                     currentWaypointIndex = 0;
                 }
                 break;
-            case FlightPhase.WAITING:
+            case FlightPhase.HOLDING:
                 if (hasReachedWaypoint(corridorEntryPoint)) {
-                    currentPhase = LANDING;
+                    flightPhase = LANDING;
                     currentWaypointIndex = 0;
                     log.info("Plane [{}] is switching to LANDING phase", id);
                 }
@@ -138,7 +158,7 @@ public class Plane implements Serializable {
     }
 
     public void decreaseAltitude() {
-        if(currentPhase == HOLDING_PATTERN && location.getAltitude()<= 2000){
+        if(flightPhase == DESCENDING && location.getAltitude()<= 2000){
             return;
         }
 
@@ -182,6 +202,6 @@ public class Plane implements Serializable {
 
     public boolean isOutOfFuel() {
         return fuelLevel <= 0;
-    }*/
+    }
 
 }
