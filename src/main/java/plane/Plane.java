@@ -22,7 +22,6 @@ public class Plane implements Serializable {
     public enum FlightPhase {
         DESCENDING,
         HOLDING,
-        LANDING
     }
     private FlightPhase flightPhase;
     private static final AtomicInteger idCounter = new AtomicInteger();
@@ -32,7 +31,6 @@ public class Plane implements Serializable {
     private boolean landed;
     private Location location;
     private List <Location> waypoints;
-    private int currentAltitudeLevel;
     private int currentWaypointIndex;
 
     public Plane() {
@@ -45,79 +43,25 @@ public class Plane implements Serializable {
         this.currentWaypointIndex = 0;
     }
 
-    public void maintainFlightPath() {
-        Location nextWaypoint = waypoints.get(currentWaypointIndex);
-        Location corridorEntryPoint = runway.getCorridor().getEntryWayoint();
-        Location touchdownPoint = runway.getTouchdownPoint();
-        List<Location> landingPath = runway.getCorridor().getLandingPath();
-        switch (flightPhase) {
+    public void maintainFlight() {
+        switch(flightPhase) {
             case DESCENDING:
-                holdDescent(nextWaypoint);
+                if (currentWaypointIndex >= waypoints.size()) {
+                    flightPhase = HOLDING;
+                    waypoints = WaypointGenerator.getHoldingPatternWaypoints()
+                    currentWaypointIndex = 0;
+                }
                 break;
             case HOLDING:
-                holdPattern(nextWaypoint);
+                if (currentWaypointIndex >= waypoints.size()) {
+                    currentWaypointIndex = 0;
+                }
+                break;
         }
 
-        if (hasReachedWaypoint(nextWaypoint)) {
-            currentWaypointIndex++;
-        }
-
-        burnFuel();
-    }
-
-    public void holdPattern(){
-
-    }
-
-    public void holdDescent(){
         Location nextWaypoint = waypoints.get(currentWaypointIndex);
-        moveToNextWaypoint(waypoints);
         moveTowards(nextWaypoint);
-    }
-
-    public void proceedToLand(Runway runway) {
-        Location corridorEntryPoint = runway.getCorridor().getEntryWayoint();
-        Location touchdownPoint = runway.getTouchdownPoint();
-        List<Location> landingPath = runway.getCorridor().getLandingPath();
-
-        switch (flightPhase) {
-            case DESCENDING:
-                moveToNextWaypoint(waypoints);
-                if (hasReachedWaypoint(corridorEntryPoint)) {
-                    flightPhase = LANDING;
-                    currentWaypointIndex = 0;
-                    log.info("Plane [{}] is switching to LANDING phase", id);
-                }
-                break;
-            case LANDING:
-                log.info("Plane [{}] is LANDING on runway [{}]", getId(), runway.getId());
-                moveToNextWaypoint(landingPath);
-                if (hasReachedWaypoint(touchdownPoint)) {
-                    landed = true;
-                }
-                break;
-        }
-        burnFuel();
-    }
-
-    private void moveToNextWaypoint(List<Location> waypoints) {
-        switch(flightPhase){
-            case FlightPhase.DESCENDING:
-                if(currentWaypointIndex >= waypoints.size()) {
-                    flightPhase == HOLDING;
-                    currentWaypointIndex = 0;
-                }
-                break;
-            case FlightPhase.HOLDING:
-                if (hasReachedWaypoint(corridorEntryPoint)) {
-                    flightPhase = LANDING;
-                    currentWaypointIndex = 0;
-                    log.info("Plane [{}] is switching to LANDING phase", id);
-                }
-        }
-        Location nextWaypoint = waypoints.get(currentWaypointIndex);
         log.info("Plane [{}] is moving to waypoint {}: [{}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
-        moveTowards(nextWaypoint);
 
         if (hasReachedWaypoint(nextWaypoint)) {
             currentWaypointIndex++;
@@ -125,15 +69,40 @@ public class Plane implements Serializable {
 
         decreaseAltitude();
         log.info("Plane [{}] current altitude: {}", id, location.getAltitude());
+        burnFuel();
+
     }
+
+
+    public void land(Runway runway) {
+        Location touchdownPoint = runway.getTouchdownPoint();
+        waypoints = runway.getCorridor().getLandingPath();
+        log.info("Plane [{}] is LANDING on runway [{}]", getId(), runway.getId());
+
+        Location nextWaypoint = waypoints.get(currentWaypointIndex);
+        moveTowards(nextWaypoint);
+
+        log.info("Plane [{}] is moving to waypoint {}: [{}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
+
+        if (hasReachedWaypoint(nextWaypoint)) {
+            currentWaypointIndex++;
+        }
+
+        if (hasReachedWaypoint(touchdownPoint)) {
+            landed = true;
+        }
+
+        burnFuel();
+    }
+
 
     public void moveTowards(Location nextWaypoint) {
         location.setX(nextWaypoint.getX());
         location.setY(nextWaypoint.getY());
     }
-    public boolean hasReachedWaypoint(Location nextWaypoint) {
-        boolean reached = location.getX() == nextWaypoint.getX() && location.getY() == nextWaypoint.getY();
-        return reached;
+
+    public boolean hasReachedWaypoint(Location waypoint) {
+        return waypoint.equals(location);
     }
 
     public static int generateID() {
@@ -182,7 +151,7 @@ public class Plane implements Serializable {
     }
 
     public int calcCircleAltitudeDecrease(){
-        int corridorWaypointIndex = circleWaypoints.size() - 1;
+        int corridorWaypointIndex = waypoints.size() - 1;
         int stepsToCorridorAltitude = corridorWaypointIndex - currentWaypointIndex;
         int currentAltitude = location.getAltitude();
         int corridorAltitude = 2000;

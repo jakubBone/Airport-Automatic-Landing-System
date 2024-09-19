@@ -1,28 +1,35 @@
 package handler;
 
-import airport.AirSpace;
 import airport.AirTrafficController;
+import airport.Airport;
 import airport.Runway;
-
-import lombok.extern.log4j.Log4j2;
 import location.Location;
+import lombok.extern.log4j.Log4j2;
 import plane.Plane;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+
+import static handler.PlaneHandler.Instruction.*;
 
 @Log4j2
 public class PlaneHandler extends Thread {
-    private Socket clientSocket;
-    private AirTrafficController controller;
-    private Lock lock;
+
+    public enum Instruction {
+        DESCENT,
+        HOLD_PATTERN,
+        LAND,
+        FULL
+    }
+
+    private final Socket clientSocket;
+    private final AirTrafficController controller;
+    private final Airport airport;
 
     public PlaneHandler(Socket clientSocket) {
         this.clientSocket = clientSocket;
         this.controller = new AirTrafficController();
-        this.lock = new ReentrantLock();;
+        this.airport = new Airport();
     }
 
     @Override
@@ -30,103 +37,126 @@ public class PlaneHandler extends Thread {
         try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
              ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
 
-            Plane incomingPlane = (Plane) in.readObject();
+            Plane plane = (Plane) in.readObject();
 
-            if (!isPlaneRegistrationSuccessful(incomingPlane, out)) {
+            if (!registerPlane(plane, out)){
                 return;
             }
 
-            while (true) {
-                Location location = aquireCurrentLocation(in, incomingPlane);
-                if(location == null){
-                    controller.removePlaneFromSpace(incomingPlane);
-                    return;
-                }
+            handlePlaneMovement(plane, in, out);
 
-                incomingPlane.setLocation(location);
-
-                if(controller.isAnyRunwayAvailable()) {
-                    Runway runway = controller.getAvailableRunway();
-                    executeLandingProcedure(incomingPlane, runway, in, out);
-                    break;
-                } else {
-                    log.info("Plane [{}] is waiting for empty runway", incomingPlane.getId());
-                    out.writeObject("WAIT");
-                }
-
-
-                /*if(controller.isAnyRunwayAvailable()) {
-                    Runway runway = controller.getAvailableRunway();
-                    executeLandingProcedure(incomingPlane, runway, in, out);
-                    break;
-                } else {
-                    log.info("Plane [{}] is waiting for empty runway", incomingPlane.getId());
-                    out.writeObject("WAIT");
-                }*/
-
-            }
-
-        } catch (IOException | ClassNotFoundException ex){
-            log.error("Error occurred while handling client request:" + ex.getMessage());
+        } catch (IOException | ClassNotFoundException ex) {
+            log.error("Error occurred while handling client request: {}", ex.getMessage());
         }
     }
 
-    public void executeLandingProcedure(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException{
-        log.info("Plane [{}] got approval for landing", plane.getId());
-        out.writeObject("LAND");
-
-        log.info("Plane [{}] assigned to runway [{}]", plane.getId(), runway.getId());
-        out.writeObject(runway);
-
-        monitorLandingPosition(in, plane);
-        log.info("Plane [{}] has landed on  runway [{}]", plane.getId(), runway.getId());
-        completeLandingProcedure(plane, runway);
-    }
-
-
-    public void monitorLandingPosition(ObjectInputStream in, Plane incomingPlane){
-        while(true){
-            Location location = aquireCurrentLocation(in, incomingPlane);
-
-            if(location == null){
-                if(incomingPlane.isLanded()){
-                    log.info("Plane [{}] removed from radar after landing", incomingPlane.getId());
-                } else {
-                    log.error("Plane [{}] disappeared from the radar", incomingPlane.getId());
-                }
-                return;
-            }
-            incomingPlane.setLocation(location);
-        }
-    }
-
-    public Location aquireCurrentLocation(ObjectInputStream in, Plane incomingPlane){
-        try {
-            return (Location) in.readObject();
-        } catch (Exception ex) {
-            log.error("Error reading location for Plane [{}]: {}", incomingPlane.getId(), ex.getMessage());
-            return null;
-        }
-    }
-
-    private boolean isPlaneRegistrationSuccessful(Plane incomingPlane, ObjectOutputStream out) throws IOException {
+    private boolean registerPlane(Plane plane, ObjectOutputStream out) throws IOException {
         if (controller.isSpaceFull()) {
-            log.info("No capacity in the airspace");
-            out.writeObject("FULL");
+            out.writeObject(FULL);
+            log.info("No capacity in airspace for Plane [{}]", plane.getId());
             return false;
         }
-
-        controller.registerPlane(incomingPlane);
-        log.info("Plane [{}] entered into airspace", incomingPlane.getId());
+        controller.registerPlane(plane);
+        log.info("Plane [{}] registered in airspace", plane.getId());
         return true;
     }
 
-    public void completeLandingProcedure(Plane incomingPlane, Runway assignedRunway) throws IOException {
-        controller.removePlaneFromSpace(incomingPlane);
-        log.info("Plane [{}] removed from the airspace", incomingPlane.getId());
+    private void handlePlaneMovement(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException {
 
-        controller.releaseRunway(assignedRunway);
-        log.info("Runway [{}] released", assignedRunway.getId());
+        while (true) {
+            // Getting actual position
+            Location location = acquireLocation(in, plane);
+            if (location == null) {
+                controller.removePlaneFromSpace(plane);
+                return;
+            }
+            plane.setLocation(location);
+
+            // Check if plane reached a corridor
+            if (isAtCorridorWaypoint(plane)) {
+                if (controller.isAnyRunwayAvailable()) {
+                    Runway runway = controller.getAvailableRunway();
+                    //plane.setLandingPhase(runway); // Przejdź do lądowania
+                    out.writeObject(LAND);         // Wyślij komendę lądowania
+                    out.writeObject(runway);       // Wyślij informacje o pasie startowym
+                    break;                         // Kończymy pętlę - samolot ląduje
+                } else {
+                    out.writeObject(HOLD_PATTERN);
+                }
+            } else {
+                out.writeObject(DESCENT);
+            }
+        }
+    }
+    /* private void handlePlaneMovement(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException {
+
+        while (true) {
+            // Getting actual position
+            Location location = acquireLocation(in, plane);
+            if (location == null) {
+                controller.removePlaneFromSpace(plane);
+                return;
+            }
+            plane.setLocation(location);
+
+            // Check if plane reached a corridor
+            if (isAtCorridorWaypoint(plane)) {
+                if (controller.isAnyRunwayAvailable()) {
+                    handleLanding(plane, in, out);
+                    break;
+                } else {
+                    out.writeObject(HOLD_PATTERN);
+                }
+            } else {
+                out.writeObject(DESCENT);
+            }
+        }
+    }*/
+
+    private boolean isAtCorridorWaypoint(Plane plane) {
+        return plane.hasReachedWaypoint(airport.getRunway1().getCorridor().getEntryWaypoint()) ||
+                plane.hasReachedWaypoint(airport.getRunway2().getCorridor().getEntryWaypoint());
     }
 
+    private void handleLanding(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException {
+        Runway runway = controller.getAvailableRunway();
+        out.writeObject(LAND);
+        out.writeObject(runway);
+
+        log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
+
+        // Monitor landing
+        while (true) {
+            Location location = acquireLocation(in, plane);
+            if (location == null) {
+                if (plane.isLanded()) {
+                    log.info("Plane [{}] has landed on runway [{}]", plane.getId(), runway.getId());
+                } else {
+                    log.error("Plane [{}] lost contact", plane.getId());
+                }
+                break;
+            }
+            plane.setLocation(location);
+        }
+
+        // Finalize landing
+        completeLanding(plane, runway);
+    }
+
+    private void completeLanding(Plane plane, Runway runway) {
+        controller.removePlaneFromSpace(plane);
+        log.info("Plane [{}] removed from airspace", plane.getId());
+
+        controller.releaseRunway(runway);
+        log.info("Runway [{}] released", runway.getId());
+    }
+
+    public Location acquireLocation(ObjectInputStream in, Plane plane) {
+        try {
+            return (Location) in.readObject();
+        } catch (IOException | ClassNotFoundException ex) {
+            log.error("Error reading location for Plane [{}]: {}", plane.getId(), ex.getMessage());
+            return null;
+        }
+    }
 }

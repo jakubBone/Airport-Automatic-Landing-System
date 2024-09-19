@@ -17,12 +17,12 @@ import java.util.concurrent.locks.ReentrantLock;
 public class AirTrafficController {
     public Queue <Runway> availableRunways = new LinkedList<>();
     private List<Plane> planes;
-    private AirSpace space;
+    private Airport airport;
     private Lock lock;
 
     public AirTrafficController() {
         this.planes = new ArrayList<>
-        this.space = new AirSpace();
+        this.airport = new Airport();
         this.lock = new ReentrantLock();
         initAvailableRunways();
     }
@@ -30,12 +30,12 @@ public class AirTrafficController {
         planes.add(plane);
     }
     public boolean isSpaceFull(){
-        return planes.size() >= AirSpace.MAX_CAPACITY;
+        return planes.size() >= Airport.MAX_CAPACITY;
     }
 
     public void initAvailableRunways(){
-        availableRunways.add(space.getRunway1());
-        availableRunways.add(space.getRunway2());
+        availableRunways.add(airport.getRunway1());
+        availableRunways.add(airport.getRunway2());
     }
 
     public Runway getAvailableRunway() {

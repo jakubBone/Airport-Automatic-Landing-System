@@ -1,7 +1,5 @@
 package server;
 
-import airport.AirSpace;
-import airport.AirTrafficController;
 import lombok.extern.log4j.Log4j2;
 import handler.PlaneHandler;
 
@@ -13,7 +11,6 @@ import java.net.Socket;
 @Log4j2
 public class AirportServer  {
     private ServerSocket serverSocket;
-
     public void startServer(int port) throws IOException {
         try {
             serverSocket = new ServerSocket(port);

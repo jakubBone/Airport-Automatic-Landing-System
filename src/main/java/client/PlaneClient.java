@@ -1,12 +1,18 @@
 package client;
 
 import airport.Runway;
+import handler.PlaneHandler;
 import lombok.extern.log4j.Log4j2;
 import plane.Plane;
 
 import java.io.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static handler.PlaneHandler.Instruction.DESCENT;
+import static handler.PlaneHandler.Instruction.HOLD_PATTERN;
+import static handler.PlaneHandler.Instruction.LAND;
+import static handler.PlaneHandler.Instruction.FULL;
 
 @Log4j2
 public class PlaneClient extends Client  {
@@ -28,7 +34,7 @@ public class PlaneClient extends Client  {
             out.writeObject(plane);
 
             while (!isProcessCompleted) {
-                plane.maintainFlightPath();
+                plane.maintainFlight();
 
                 if (plane.isOutOfFuel()) {
                     log.info("Plane [{}] is out of fuel, exiting communication loop", plane.getId());
@@ -53,15 +59,15 @@ public class PlaneClient extends Client  {
 
     private void processAirportInstruction(String instruction) throws IOException, ClassNotFoundException {
         switch (instruction) {
-            case "WAIT":
-                log.info("Plane [{}] instructed to [{}] for an available runway", plane.getId(), instruction);
+            case DESCENT, HOLD_PATTERN:
+                log.info("Plane [{}] instructed to [{}]", plane.getId(), instruction);
                 break;
-            case "LAND":
+            case LAND:
                 log.info("Plane [{}] instructed to [{}] on an available runway", plane.getId(), instruction);
                 processLanding();
                 isProcessCompleted = true;
                 break;
-            case "FULL":
+            case FULL:
                 log.info("Airspace is [{}]. Plane [{}] cannot land. Search for an alternative airport.", instruction, plane.getId());                isProcessCompleted = true;
                 isProcessCompleted = true;
                 break;
@@ -76,7 +82,7 @@ public class PlaneClient extends Client  {
         log.info("Plane [{}] assigned to land on runway [{}]", plane.getId(), assignedRunway.getId());
         while (!plane.isLanded()) {
             out.writeObject(plane.getLocation());
-            plane.proceedToLand(assignedRunway);
+            plane.land(assignedRunway);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
