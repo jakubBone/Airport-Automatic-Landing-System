@@ -34,7 +34,6 @@ public class PlaneClient extends Client  {
             out.writeObject(plane);
 
             while (!isProcessCompleted) {
-                plane.maintainFlight();
 
                 if (plane.isOutOfFuel()) {
                     log.info("Plane [{}] is out of fuel, exiting communication loop", plane.getId());
@@ -47,6 +46,12 @@ public class PlaneClient extends Client  {
 
                 String instruction = (String) in.readObject();
                 processAirportInstruction(instruction);
+
+                if(plane.isLanded()){
+                    log.info("Plane [{}] successfully landed", plane.getId());
+                    isProcessCompleted = true;
+                }
+
                 Thread.sleep(1000);
             }
         } catch (IOException | ClassNotFoundException | InterruptedException ex) {
@@ -59,38 +64,37 @@ public class PlaneClient extends Client  {
 
     private void processAirportInstruction(String instruction) throws IOException, ClassNotFoundException {
         switch (instruction) {
-            case DESCENT, HOLD_PATTERN:
-                log.info("Plane [{}] instructed to [{}]", plane.getId(), instruction);
+            case DESCENT:
+                log.info("Plane [{}] instructed to DESCENT", plane.getId());
+                plane.descend();
+                break;
+            case HOLD_PATTERN:
+                log.info("Plane [{}] instructed to HOLD_PATTERN", plane.getId());
+                plane.hold();
                 break;
             case LAND:
-                log.info("Plane [{}] instructed to [{}] on an available runway", plane.getId(), instruction);
-                processLanding();
-                isProcessCompleted = true;
+                Runway runway = (Runway) in.readObject();
+                log.info("Plane [{}] instructed to LAND on an available runway {{}]", plane.getId(), runway.getId());
+                plane.setLandingPhase(runway);
+                while (!plane.isLanded()) {
+                    plane.land(runway);
+                    out.writeObject(plane.getLocation());
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                        log.error("Landing process interrupted for Plane [{}]", plane.getId());
+                    }
+                }
                 break;
             case FULL:
-                log.info("Airspace is [{}]. Plane [{}] cannot land. Search for an alternative airport.", instruction, plane.getId());                isProcessCompleted = true;
+                log.info("Airspace is FULL. Plane [{}] cannot land. Searching for alternative airport", plane.getId());
                 isProcessCompleted = true;
                 break;
             default:
-                log.warn("Plane [{}] received an unknown instruction: [{}]", plane.getId(), instruction);
+                log.warn("Unknown instruction for Plane [{}]: [{}]", plane.getId(), instruction);
                 break;
         }
-    }
-
-    private void processLanding() throws IOException, ClassNotFoundException {
-        Runway assignedRunway = (Runway) in.readObject();
-        log.info("Plane [{}] assigned to land on runway [{}]", plane.getId(), assignedRunway.getId());
-        while (!plane.isLanded()) {
-            out.writeObject(plane.getLocation());
-            plane.land(assignedRunway);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-                log.error("Landing process interrupted for Plane [{}]", plane.getId());
-            }
-        }
-        log.info("Plane [{}] successfully landed on runway [{}]", plane.getId(), assignedRunway.getId());
     }
 
     public static void main(String[] args) throws IOException {

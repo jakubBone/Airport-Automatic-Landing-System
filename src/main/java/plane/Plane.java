@@ -22,6 +22,7 @@ public class Plane implements Serializable {
     public enum FlightPhase {
         DESCENDING,
         HOLDING,
+        LANDING
     }
     private FlightPhase flightPhase;
     private static final AtomicInteger idCounter = new AtomicInteger();
@@ -41,58 +42,60 @@ public class Plane implements Serializable {
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.location = setInitialLocation();
         this.currentWaypointIndex = 0;
+        this.landed = false;
     }
 
-    public void maintainFlight() {
-        switch(flightPhase) {
-            case DESCENDING:
-                if (currentWaypointIndex >= waypoints.size()) {
-                    flightPhase = HOLDING;
-                    waypoints = WaypointGenerator.getHoldingPatternWaypoints()
-                    currentWaypointIndex = 0;
-                }
-                break;
-            case HOLDING:
-                if (currentWaypointIndex >= waypoints.size()) {
-                    currentWaypointIndex = 0;
-                }
-                break;
+    public void descend(){
+        if (flightPhase == DESCENDING) {
+            moveTowardsNextWaypoint();
+            if (isAtLastWaypoint()) {
+                flightPhase = FlightPhase.HOLDING;
+                waypoints = WaypointGenerator.getHoldingPatternWaypoints();
+            }
         }
+    }
 
-        Location nextWaypoint = waypoints.get(currentWaypointIndex);
-        moveTowards(nextWaypoint);
-        log.info("Plane [{}] is moving to waypoint {}: [{}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
-
-        if (hasReachedWaypoint(nextWaypoint)) {
-            currentWaypointIndex++;
+    public void hold(){
+        if (flightPhase == HOLDING) {
+            moveTowardsNextWaypoint();
+            if (isAtLastWaypoint()) {
+                currentWaypointIndex = 0;
+            }
         }
+    }
+    public void land(Runway runway){
+        if (flightPhase == LANDING) {
+            moveTowardsNextWaypoint();
+            Location touchdownPoint = runway.getTouchdownPoint();
+            log.info("Plane [{}] is LANDING on runway [{}]", getId(), runway.getId());
+            if(hasReachedWaypoint(touchdownPoint) {
+                landed = true;
+            }
+        }
+    }
 
+    public void setLandingPhase(Runway runway) {
+        this.flightPhase = FlightPhase.LANDING;
+        this.waypoints = runway.getCorridor().getLandingPath();
+        currentWaypointIndex = 0;
+    }
+
+    private void moveTowardsNextWaypoint() {
+        if (currentWaypointIndex < waypoints.size()) {
+            Location nextWaypoint = waypoints.get(currentWaypointIndex);
+            moveTowards(nextWaypoint);
+            log.info("Plane [{}] is moving to waypoint {}: [{}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
+            if (hasReachedWaypoint(nextWaypoint)) {
+                currentWaypointIndex++;
+            }
+        }
         decreaseAltitude();
         log.info("Plane [{}] current altitude: {}", id, location.getAltitude());
         burnFuel();
-
     }
 
-
-    public void land(Runway runway) {
-        Location touchdownPoint = runway.getTouchdownPoint();
-        waypoints = runway.getCorridor().getLandingPath();
-        log.info("Plane [{}] is LANDING on runway [{}]", getId(), runway.getId());
-
-        Location nextWaypoint = waypoints.get(currentWaypointIndex);
-        moveTowards(nextWaypoint);
-
-        log.info("Plane [{}] is moving to waypoint {}: [{}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY());
-
-        if (hasReachedWaypoint(nextWaypoint)) {
-            currentWaypointIndex++;
-        }
-
-        if (hasReachedWaypoint(touchdownPoint)) {
-            landed = true;
-        }
-
-        burnFuel();
+    public boolean isAtLastWaypoint(){
+        return currentWaypointIndex == waypoints.size() - 1;
     }
 
 

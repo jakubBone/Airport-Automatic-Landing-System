@@ -76,33 +76,9 @@ public class PlaneHandler extends Thread {
             if (isAtCorridorWaypoint(plane)) {
                 if (controller.isAnyRunwayAvailable()) {
                     Runway runway = controller.getAvailableRunway();
-                    //plane.setLandingPhase(runway); // Przejdź do lądowania
-                    out.writeObject(LAND);         // Wyślij komendę lądowania
-                    out.writeObject(runway);       // Wyślij informacje o pasie startowym
-                    break;                         // Kończymy pętlę - samolot ląduje
-                } else {
-                    out.writeObject(HOLD_PATTERN);
-                }
-            } else {
-                out.writeObject(DESCENT);
-            }
-        }
-    }
-    /* private void handlePlaneMovement(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException {
-
-        while (true) {
-            // Getting actual position
-            Location location = acquireLocation(in, plane);
-            if (location == null) {
-                controller.removePlaneFromSpace(plane);
-                return;
-            }
-            plane.setLocation(location);
-
-            // Check if plane reached a corridor
-            if (isAtCorridorWaypoint(plane)) {
-                if (controller.isAnyRunwayAvailable()) {
-                    handleLanding(plane, in, out);
+                    plane.setLandingPhase(runway);
+                    out.writeObject(LAND);
+                    out.writeObject(runway);
                     break;
                 } else {
                     out.writeObject(HOLD_PATTERN);
@@ -111,7 +87,7 @@ public class PlaneHandler extends Thread {
                 out.writeObject(DESCENT);
             }
         }
-    }*/
+    }
 
     private boolean isAtCorridorWaypoint(Plane plane) {
         return plane.hasReachedWaypoint(airport.getRunway1().getCorridor().getEntryWaypoint()) ||
