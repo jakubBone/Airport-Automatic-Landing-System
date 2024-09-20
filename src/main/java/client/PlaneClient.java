@@ -1,29 +1,22 @@
 package client;
 
 import airport.Runway;
-import handler.PlaneHandler;
 import lombok.extern.log4j.Log4j2;
 import plane.Plane;
 
 import java.io.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
-import static handler.PlaneHandler.Instruction.DESCENT;
-import static handler.PlaneHandler.Instruction.HOLD_PATTERN;
-import static handler.PlaneHandler.Instruction.LAND;
-import static handler.PlaneHandler.Instruction.FULL;
+import static handler.PlaneHandler.AirportInstruction;
+
 
 @Log4j2
 public class PlaneClient extends Client  {
     private Plane plane;
     private boolean isProcessCompleted;
-    private Lock lock;
 
     public PlaneClient(String ip, int port) {
         super(ip, port);
         this.plane = new Plane();
-        lock = new ReentrantLock();
         log.info("PlaneClient created for Plane [{}] at IP: {}, Port: {}", plane.getId(), ip, port);
     }
 
@@ -44,7 +37,7 @@ public class PlaneClient extends Client  {
                 out.writeObject(plane.getLocation());
                 out.flush();
 
-                String instruction = (String) in.readObject();
+                AirportInstruction instruction = (AirportInstruction) in.readObject();
                 processAirportInstruction(instruction);
 
                 if(plane.isLanded()){
@@ -62,7 +55,7 @@ public class PlaneClient extends Client  {
         }
     }
 
-    private void processAirportInstruction(String instruction) throws IOException, ClassNotFoundException {
+    private void processAirportInstruction(AirportInstruction instruction) throws IOException, ClassNotFoundException{
         switch (instruction) {
             case DESCENT:
                 log.info("Plane [{}] instructed to DESCENT", plane.getId());
@@ -73,19 +66,8 @@ public class PlaneClient extends Client  {
                 plane.hold();
                 break;
             case LAND:
-                Runway runway = (Runway) in.readObject();
-                log.info("Plane [{}] instructed to LAND on an available runway {{}]", plane.getId(), runway.getId());
-                plane.setLandingPhase(runway);
-                while (!plane.isLanded()) {
-                    plane.land(runway);
-                    out.writeObject(plane.getLocation());
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        Thread.currentThread().interrupt();
-                        log.error("Landing process interrupted for Plane [{}]", plane.getId());
-                    }
-                }
+                log.info("Plane [{}] instructed to LAND", plane.getId());
+                processLanding();
                 break;
             case FULL:
                 log.info("Airspace is FULL. Plane [{}] cannot land. Searching for alternative airport", plane.getId());
@@ -97,13 +79,29 @@ public class PlaneClient extends Client  {
         }
     }
 
+    private void processLanding() throws IOException, ClassNotFoundException {
+        Runway runway = (Runway) in.readObject();
+        log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getId(), runway.getId());
+        plane.setLandingPhase(runway);
+
+        while (!plane.isLanded()) {
+            plane.land(runway);
+            out.writeObject(plane.getLocation());
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                log.error("Landing process interrupted for Plane [{}]", plane.getId());
+            }
+        }
+    }
+
     public static void main(String[] args) throws IOException {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 1; i++) {
             new Thread(() -> {
                 PlaneClient client = new PlaneClient("localhost", 5000);
                 client.startCommunication();
             }).start();
         }
-
     }
 }

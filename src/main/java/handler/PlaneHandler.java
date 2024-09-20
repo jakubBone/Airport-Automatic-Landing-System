@@ -10,12 +10,12 @@ import plane.Plane;
 import java.io.*;
 import java.net.Socket;
 
-import static handler.PlaneHandler.Instruction.*;
+import static handler.PlaneHandler.AirportInstruction.*;
 
 @Log4j2
 public class PlaneHandler extends Thread {
 
-    public enum Instruction {
+    public enum AirportInstruction {
         DESCENT,
         HOLD_PATTERN,
         LAND,
@@ -71,16 +71,14 @@ public class PlaneHandler extends Thread {
                 return;
             }
             plane.setLocation(location);
-
             // Check if plane reached a corridor
-            if (isAtCorridorWaypoint(plane)) {
+            if (isAtHoldingPatternAltitude(plane)) {
                 if (controller.isAnyRunwayAvailable()) {
                     Runway runway = controller.getAvailableRunway();
-                    plane.setLandingPhase(runway);
-                    out.writeObject(LAND);
-                    out.writeObject(runway);
+                    handleLanding(plane, runway, in, out);
                     break;
                 } else {
+                    plane.setHoldingPhase();
                     out.writeObject(HOLD_PATTERN);
                 }
             } else {
@@ -89,13 +87,13 @@ public class PlaneHandler extends Thread {
         }
     }
 
-    private boolean isAtCorridorWaypoint(Plane plane) {
-        return plane.hasReachedWaypoint(airport.getRunway1().getCorridor().getEntryWaypoint()) ||
-                plane.hasReachedWaypoint(airport.getRunway2().getCorridor().getEntryWaypoint());
+
+    private boolean isAtHoldingPatternAltitude(Plane plane) {
+        return plane.getLocation().getAltitude() <= 2000;
     }
 
-    private void handleLanding(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException {
-        Runway runway = controller.getAvailableRunway();
+    private void handleLanding(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException {
+        plane.setLandingPhase(runway);
         out.writeObject(LAND);
         out.writeObject(runway);
 
