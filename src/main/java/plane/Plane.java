@@ -68,7 +68,11 @@ public class Plane implements Serializable {
         }
     }
     public void land(Runway runway){
+        System.out.println("Debugging 1");
+        Location entryPoint = runway.getCorridor().getEntryWaypoint();
         if (flightPhase == LANDING) {
+            System.out.println("Debugging 2");
+            waypoints = WaypointGenerator.getLandingWaypoints(entryPoint);
             moveTowardsNextWaypoint();
             Location touchdownPoint = runway.getTouchdownPoint();
             log.info("Plane [{}] is LANDING on runway [{}]", getId(), runway.getId());
@@ -83,11 +87,11 @@ public class Plane implements Serializable {
         this.waypoints = runway.getCorridor().getLandingPath();
         currentWaypointIndex = 0;
     }
-    public void setHoldingPhase() {
-        this.flightPhase = HOLDING;
+    /*public void setHoldingPhase() {
+        //this.flightPhase = HOLDING;
         this.waypoints = WaypointGenerator.getHoldingPatternWaypoints();
         currentWaypointIndex = 0;
-    }
+    }*/
 
     private void moveTowardsNextWaypoint() {
         if (currentWaypointIndex <= waypoints.size()) {

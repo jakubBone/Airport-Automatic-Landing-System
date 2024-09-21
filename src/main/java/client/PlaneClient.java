@@ -82,7 +82,6 @@ public class PlaneClient extends Client  {
     private void processLanding() throws IOException, ClassNotFoundException {
         Runway runway = (Runway) in.readObject();
         log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getId(), runway.getId());
-        plane.setLandingPhase(runway);
 
         while (!plane.isLanded()) {
             plane.land(runway);

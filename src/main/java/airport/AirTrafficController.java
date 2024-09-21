@@ -24,7 +24,7 @@ public class AirTrafficController {
         this.planes = new ArrayList<>();
         this.airport = new Airport();
         this.lock = new ReentrantLock();
-        //initAvailableRunways();
+        initAvailableRunways();
     }
     public void registerPlane(Plane plane) {
         planes.add(plane);
