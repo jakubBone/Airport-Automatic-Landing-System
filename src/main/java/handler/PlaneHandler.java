@@ -11,7 +11,6 @@ import java.io.*;
 import java.net.Socket;
 
 import static handler.PlaneHandler.AirportInstruction.*;
-import static plane.Plane.FlightPhase.LANDING;
 
 @Log4j2
 public class PlaneHandler extends Thread {
@@ -72,10 +71,11 @@ public class PlaneHandler extends Thread {
             }
             plane.setLocation(location);
 
-            if (isAtLandingAltitude(plane)) {
-                if(isAtCorridorEntryPoint(plane)){
-                    if(controller.isAnyRunwayAvailable()){
-                        Runway runway = controller.getAvailableRunway();
+            if (isPlaneAtLandingAltitude(plane)) {
+                Runway runway = getRunwayIfPlaneInCorridor(plane);
+                if(runway != null){
+                    if(runway.isAvailable()){
+                        controller.lockRunway(runway);
                         handleLanding(plane, runway, in, out);
                     }
                 }
@@ -86,41 +86,49 @@ public class PlaneHandler extends Thread {
         }
     }
 
-    private boolean isAtLandingAltitude(Plane plane) {
+    private boolean isPlaneAtLandingAltitude(Plane plane) {
         return plane.getLocation().getAltitude() <= 2000;
     }
-    private boolean isAtCorridorEntryPoint(Plane plane) {
+
+    private Runway getRunwayIfPlaneInCorridor(Plane plane) {
         Location corridor1Entry = airport.getRunway1().getCorridor().getEntryWaypoint();
         Location corridor2Entry = airport.getRunway2().getCorridor().getEntryWaypoint();
 
         int corridor1EntryX = corridor1Entry.getX();
-        int corridor1EntryY = corridor2Entry.getY();
+        int corridor1EntryY = corridor1Entry.getY();
 
-        int corridor2EntryX = corridor1Entry.getX();
-        int corridor2EntryY = corridor1Entry.getY();
+        int corridor2EntryX = corridor2Entry.getX();
+        int corridor2EntryY = corridor2Entry.getY();
 
         int planeX = plane.getLocation().getX();
         int planeY = plane.getLocation().getY();
 
-        return (planeX == corridor1EntryX && planeY == corridor1EntryY) ||
-                (planeX == corridor2EntryX && planeY == corridor2EntryY);
+        Runway runway = null;
+
+        if (planeX == corridor1EntryX && planeY == corridor1EntryY) {
+            runway = airport.getRunway1();
+        } else if (planeX == corridor2EntryX && planeY == corridor2EntryY) {
+            runway = airport.getRunway2();
+        }
+
+        return runway;
     }
 
     private void handleLanding(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException {
-            out.writeObject(LAND);
-            out.writeObject(runway);
-            log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
-            while (true) {
-                if (plane.getLocation() == null) {
-                    if (plane.isLanded()) {
-                        log.info("Plane [{}] has landed on runway [{}]", plane.getId(), runway.getId());
-                    } else {
-                        log.error("Plane [{}] lost contact", plane.getId());
-                    }
-                    break;
+        out.writeObject(LAND);
+        out.writeObject(runway);
+        log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
+        while (true) {
+            if (plane.getLocation() == null) {
+                if (plane.isLanded()) {
+                    log.info("Plane [{}] has landed on runway [{}]", plane.getId(), runway.getId());
+                } else {
+                    log.error("Plane [{}] lost contact", plane.getId());
                 }
-                Location location = acquireLocation(in, plane);
-                plane.setLocation(location);
+                break;
+            }
+            Location location = acquireLocation(in, plane);
+            plane.setLocation(location);
         }
         completeLanding(plane, runway);
     }

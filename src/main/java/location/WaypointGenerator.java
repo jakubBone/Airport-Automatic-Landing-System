@@ -93,7 +93,7 @@ public class WaypointGenerator implements Serializable {
         int altitudeDecrement = LANDING_ALTITUDE / 5;
         int currentAltitude = corridorEntry.getAltitude();
 
-        // 5 waypoints directing to runway, every 1000 meters
+        // 6 waypoints directing to runway, every 1000 meters
         for (int x = startX; x <= endX; x += WAYPOINT_INTERVAL) {
             waypoints.add(new Location(x, corridorY, currentAltitude));
             currentAltitude -= altitudeDecrement;
