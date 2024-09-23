@@ -73,13 +73,13 @@ public class PlaneHandler extends Thread {
             plane.setLocation(location);
 
             if (isAtLandingAltitude(plane)) {
-                out.writeObject(HOLD_PATTERN);
                 if(isAtCorridorEntryPoint(plane)){
                     if(controller.isAnyRunwayAvailable()){
                         Runway runway = controller.getAvailableRunway();
                         handleLanding(plane, runway, in, out);
                     }
                 }
+                out.writeObject(HOLD_PATTERN);
             } else {
                 out.writeObject(DESCENT);
             }
