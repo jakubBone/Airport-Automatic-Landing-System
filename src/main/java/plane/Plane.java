@@ -40,7 +40,7 @@ public class Plane implements Serializable {
         this.fuelLevel = calcFuelForThreeHours();
         this.flightPhase = DESCENDING;
         this.waypoints = WaypointGenerator.getDescentWaypoints();
-        //this.location = setInitialLocation();
+        //this.location = selectInitialLocationExcludingCorridors();
         this.currentWaypointIndex = 118;
         this.location = waypoints.get(currentWaypointIndex);
 
@@ -112,16 +112,17 @@ public class Plane implements Serializable {
         return idCounter.incrementAndGet();
     }
 
-    public Location setInitialLocation() {
+    public Location selectInitialLocationExcludingCorridors() {
         Random random = new Random();
 
-        List <Location> waypointsWithoutCorridors = waypoints;
+        List <Location> waypointsExcludingCorridors = waypoints;
 
-        waypointsWithoutCorridors.remove(WaypointGenerator.CORRIDOR_C1_WAYPOINT);
-        waypointsWithoutCorridors.remove(WaypointGenerator.CORRIDOR_C2_WAYPOINT);
+        waypointsExcludingCorridors.remove(WaypointGenerator.CORRIDOR_C1_WAYPOINT);
+        waypointsExcludingCorridors.remove(WaypointGenerator.CORRIDOR_C2_WAYPOINT);
 
-        currentWaypointIndex = random.nextInt(waypointsWithoutCorridors.size());
-        Location initialWaypoint = waypointsWithoutCorridors.get(currentWaypointIndex);
+
+        currentWaypointIndex = random.nextInt(waypointsExcludingCorridors.size());
+        Location initialWaypoint = waypointsExcludingCorridors.get(currentWaypointIndex);
 
         return new Location(
                 initialWaypoint.getX(),

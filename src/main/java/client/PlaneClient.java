@@ -33,20 +33,26 @@ public class PlaneClient extends Client  {
                     break;
                 }
 
-                out.reset();
-                out.writeObject(plane.getLocation());
-                out.flush();
+                if(plane.getLocation() != null){
+                    out.reset();
+                    out.writeObject(plane.getLocation());
+                    out.flush();
+                } else {
+                    log.error("Plane [{}] disappeared from the radar ", plane.getId());
+                    break;
+                }
 
                 AirportInstruction instruction = (AirportInstruction) in.readObject();
                 processAirportInstruction(instruction);
 
-                if(plane.isLanded()){
+                /*if(plane.isLanded()){
                     log.info("Plane [{}] successfully landed", plane.getId());
                     isProcessCompleted = true;
-                }
+                }*/
 
                 Thread.sleep(1000);
             }
+
         } catch (IOException | ClassNotFoundException | InterruptedException ex) {
             log.error("Failed to handle communication with plane [{}]: {}", plane.getId(), ex.getMessage());
         } finally {
@@ -92,6 +98,12 @@ public class PlaneClient extends Client  {
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
                 log.error("Landing process interrupted for Plane [{}]", plane.getId());
+            }
+
+            if (plane.isLanded()) {
+                log.info("Plane [{}] has successfully landed", plane.getId());
+                out.writeObject("LANDED");
+                isProcessCompleted = true;
             }
         }
     }

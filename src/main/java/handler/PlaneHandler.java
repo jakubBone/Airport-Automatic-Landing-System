@@ -61,7 +61,7 @@ public class PlaneHandler extends Thread {
         return true;
     }
 
-    private void handlePlaneMovement(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException {
+    private void handlePlaneMovement(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException{
         while (true) {
             // Getting actual position
             Location location = acquireLocation(in, plane);
@@ -75,8 +75,9 @@ public class PlaneHandler extends Thread {
                 Runway runway = getRunwayIfPlaneInCorridor(plane);
                 if(runway != null){
                     if(runway.isAvailable()){
-                        controller.lockRunway(runway);
+                        controller.assignRunway(runway);
                         handleLanding(plane, runway, in, out);
+                        break;
                     }
                 }
                 out.writeObject(HOLD_PATTERN);
@@ -114,21 +115,25 @@ public class PlaneHandler extends Thread {
         return runway;
     }
 
-    private void handleLanding(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException {
+    private void handleLanding(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
         out.writeObject(LAND);
         out.writeObject(runway);
         log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
+
         while (true) {
-            if (plane.getLocation() == null) {
-                if (plane.isLanded()) {
-                    log.info("Plane [{}] has landed on runway [{}]", plane.getId(), runway.getId());
-                } else {
-                    log.error("Plane [{}] lost contact", plane.getId());
-                }
+            Object response = in.readObject();
+
+            if (response instanceof Location) {
+                Location location = (Location) response;
+                plane.setLocation(location);
+            } else if (response instanceof String && response.equals("LANDED")) {
+                log.info("Plane [{}] has successfully landed on runway [{}]", plane.getId(), runway.getId());
+                plane.setLanded(true);
+                break;
+            } else {
+                log.error("Unexpected response for Plane [{}]: {}", plane.getId(), response);
                 break;
             }
-            Location location = acquireLocation(in, plane);
-            plane.setLocation(location);
         }
         completeLanding(plane, runway);
     }
@@ -144,7 +149,7 @@ public class PlaneHandler extends Thread {
     public Location acquireLocation(ObjectInputStream in, Plane plane) {
         try {
             return (Location) in.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
+        } catch (IOException | ClassNotFoundException  | NullPointerException ex) {
             log.error("Error reading location for Plane [{}]: {}", plane.getId(), ex.getMessage());
             return null;
         }

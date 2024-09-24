@@ -27,7 +27,7 @@ public class AirTrafficController {
         return planes.size() >= Airport.MAX_CAPACITY;
     }
 
-    public void lockRunway(Runway runway){
+    public void assignRunway(Runway runway){
        lock.lock();
        try {
             runway.setAvailable(false);
