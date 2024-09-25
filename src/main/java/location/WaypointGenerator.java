@@ -29,6 +29,8 @@ public class WaypointGenerator implements Serializable {
 
         int altitudeDecrement = altitudeLevel / waypointsPerLevel;
 
+
+       // 120 descending waypoints directing to landing level on 2000 meters
         for (int altitude : altitudes) {
             //  Top side
             for (int x = MIN_AIRPORT_SIDE; x <= INNER_MAX_BOUNDARY; x += WAYPOINT_INTERVAL) {
@@ -53,12 +55,6 @@ public class WaypointGenerator implements Serializable {
                 waypoints.add(new Location(MIN_AIRPORT_SIDE, y,altitude- altitudeDecrement));
                 altitude -= altitudeDecrement;
             }
-
-        }
-
-        for(Location location: waypoints){
-            System.out.println(waypoints.indexOf(location));
-            System.out.println(location.getAltitude());
         }
 
         return waypoints;
@@ -67,7 +63,7 @@ public class WaypointGenerator implements Serializable {
     public static List<Location> getHoldingPatternWaypoints() {
         List<Location> waypoints = new ArrayList<>();
 
-        // Waypoints on 2000m level
+        // 40 holding pattern waypoints on landing level
         for (int x = MIN_AIRPORT_SIDE; x <= INNER_MAX_BOUNDARY; x += WAYPOINT_INTERVAL) {
             waypoints.add(new Location(x, MAX_AIRPORT_SIDE, LANDING_ALTITUDE));
         }
@@ -93,7 +89,7 @@ public class WaypointGenerator implements Serializable {
         int altitudeDecrement = LANDING_ALTITUDE / 5;
         int currentAltitude = corridorEntry.getAltitude();
 
-        // 6 waypoints directing to runway, every 1000 meters
+        // 6 descending waypoints directing to runway
         for (int x = startX; x <= endX; x += WAYPOINT_INTERVAL) {
             waypoints.add(new Location(x, corridorY, currentAltitude));
             currentAltitude -= altitudeDecrement;

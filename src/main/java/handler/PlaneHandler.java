@@ -71,17 +71,20 @@ public class PlaneHandler extends Thread {
             }
             plane.setLocation(location);
 
+
             if (isPlaneAtLandingAltitude(plane)) {
                 Runway runway = getRunwayIfPlaneInCorridor(plane);
                 if(runway != null){
-                    if(runway.isAvailable()){
+                    if(controller.isRunwayAvailable(runway)){
                         controller.assignRunway(runway);
                         handleLanding(plane, runway, in, out);
                         break;
                     }
                 }
+                log.info("Plane [{}] is holding pattern", plane.getId());
                 out.writeObject(HOLD_PATTERN);
             } else {
+                log.info("Plane [{}] is descending", plane.getId());
                 out.writeObject(DESCENT);
             }
         }
@@ -92,8 +95,8 @@ public class PlaneHandler extends Thread {
     }
 
     private Runway getRunwayIfPlaneInCorridor(Plane plane) {
-        Location corridor1Entry = airport.getRunway1().getCorridor().getEntryWaypoint();
-        Location corridor2Entry = airport.getRunway2().getCorridor().getEntryWaypoint();
+        Location corridor1Entry = Airport.runway1.getCorridor().getEntryWaypoint();
+        Location corridor2Entry = Airport.runway2.getCorridor().getEntryWaypoint();
 
         int corridor1EntryX = corridor1Entry.getX();
         int corridor1EntryY = corridor1Entry.getY();
@@ -107,9 +110,9 @@ public class PlaneHandler extends Thread {
         Runway runway = null;
 
         if (planeX == corridor1EntryX && planeY == corridor1EntryY) {
-            runway = airport.getRunway1();
+            runway = Airport.runway1;
         } else if (planeX == corridor2EntryX && planeY == corridor2EntryY) {
-            runway = airport.getRunway2();
+            runway = Airport.runway2;
         }
 
         return runway;
@@ -121,17 +124,18 @@ public class PlaneHandler extends Thread {
         log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
 
         while (true) {
-            Object response = in.readObject();
+            Object request = in.readObject();
 
-            if (response instanceof Location) {
-                Location location = (Location) response;
+            if (request instanceof Location) {
+                Location location = (Location) request;
                 plane.setLocation(location);
-            } else if (response instanceof String && response.equals("LANDED")) {
+                log.info("Plane [{}] is landing on runway [{}]", plane.getId(), runway.getId());
+            } else if (request instanceof String && request.equals("LANDED")) {
                 log.info("Plane [{}] has successfully landed on runway [{}]", plane.getId(), runway.getId());
                 plane.setLanded(true);
                 break;
             } else {
-                log.error("Unexpected response for Plane [{}]: {}", plane.getId(), response);
+                log.error("Unexpected response for Plane [{}]: {}", plane.getId(), request);
                 break;
             }
         }

@@ -45,11 +45,6 @@ public class PlaneClient extends Client  {
                 AirportInstruction instruction = (AirportInstruction) in.readObject();
                 processAirportInstruction(instruction);
 
-                /*if(plane.isLanded()){
-                    log.info("Plane [{}] successfully landed", plane.getId());
-                    isProcessCompleted = true;
-                }*/
-
                 Thread.sleep(1000);
             }
 
@@ -109,7 +104,7 @@ public class PlaneClient extends Client  {
     }
 
     public static void main(String[] args) throws IOException {
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 100; i++) {
             new Thread(() -> {
                 PlaneClient client = new PlaneClient("localhost", 5000);
                 client.startCommunication();
