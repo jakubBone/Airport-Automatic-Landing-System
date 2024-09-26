@@ -72,26 +72,37 @@ public class PlaneHandler extends Thread {
             plane.setLocation(location);
 
 
-            if (isPlaneAtLandingAltitude(plane)) {
-                Runway runway = getRunwayIfPlaneInCorridor(plane);
-                if(runway != null){
-                    if(controller.isRunwayAvailable(runway)){
-                        controller.assignRunway(runway);
-                        handleLanding(plane, runway, in, out);
-                        break;
-                    }
+            if (isPlaneReadyToLand(plane)) {
+                if(attemptLanding(plane, in, out)){
+                    break; // break after successful landing
                 }
-                log.info("Plane [{}] is holding pattern", plane.getId());
-                out.writeObject(HOLD_PATTERN);
             } else {
-                log.info("Plane [{}] is descending", plane.getId());
-                out.writeObject(DESCENT);
+                handleDescent(plane, out);
             }
         }
     }
 
-    private boolean isPlaneAtLandingAltitude(Plane plane) {
+    private boolean attemptLanding(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        Runway runway = getRunwayIfPlaneInCorridor(plane);
+        if(runway != null && controller.isRunwayAvailable(runway)){
+            controller.assignRunway(runway);
+            handleLanding(plane, runway, in, out);
+            return true;
+        }
+        log.info("Plane [{}] is holding pattern", plane.getId());
+        out.writeObject(HOLD_PATTERN);
+        return false;
+    }
+
+
+
+    private boolean isPlaneReadyToLand(Plane plane) {
         return plane.getLocation().getAltitude() <= 2000;
+    }
+
+    private void handleDescent(Plane plane, ObjectOutputStream out) throws IOException {
+        log.info("Plane [{}] is descending", plane.getId());
+        out.writeObject(DESCENT);
     }
 
     private Runway getRunwayIfPlaneInCorridor(Plane plane) {
