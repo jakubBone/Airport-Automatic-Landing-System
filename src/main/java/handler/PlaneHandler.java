@@ -19,7 +19,8 @@ public class PlaneHandler extends Thread {
         DESCENT,
         HOLD_PATTERN,
         LAND,
-        FULL
+        FULL,
+        COLLISION
     }
 
     private final Socket clientSocket;
@@ -44,7 +45,6 @@ public class PlaneHandler extends Thread {
             }
 
             handlePlaneMovement(plane, in, out);
-
         } catch (IOException | ClassNotFoundException ex) {
             log.error("Error occurred while handling client request: {}", ex.getMessage());
         }
@@ -64,8 +64,9 @@ public class PlaneHandler extends Thread {
     private void handlePlaneMovement(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException{
         while (true) {
             Location location = acquireLocation(in, plane);
-            if (location == null) {
-                controller.removePlaneFromSpace(plane);
+            if (plane.isDestroyed()) {
+                //controller.removePlaneFromSpace(plane);
+                out.writeObject(AirportInstruction.COLLISION);
                 return;
             }
             plane.setLocation(location);
@@ -132,7 +133,6 @@ public class PlaneHandler extends Thread {
 
         while (true) {
             Object request = in.readObject();
-
             if (request instanceof Location) {
                 Location location = (Location) request;
                 plane.setLocation(location);

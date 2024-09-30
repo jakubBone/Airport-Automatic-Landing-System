@@ -7,7 +7,7 @@ import lombok.extern.log4j.Log4j2;
 public class CollisionDetector extends Thread{
     private AirTrafficController controller;
     public CollisionDetector(AirTrafficController controller){
-        this.controller = new AirTrafficController();
+        this.controller = controller;
     }
 
     @Override
@@ -15,7 +15,8 @@ public class CollisionDetector extends Thread{
         while(true) {
             try {
                 controller.checkCollision();
-                Thread.sleep(1000);
+                log.info("Collision detector is working");
+                Thread.sleep(100);
             } catch (InterruptedException ex){
                 Thread.currentThread().interrupt();
                 log.error("Collision detection interrupted: {}", ex.getMessage());

@@ -21,7 +21,7 @@ public class Client {
         this.port = port;
     }
 
-    protected void startConnection()  {
+    protected void startConnection() {
         try {
             socket = new Socket(ip, port);
             out = new ObjectOutputStream(socket.getOutputStream());

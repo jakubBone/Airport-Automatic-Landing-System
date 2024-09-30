@@ -33,6 +33,7 @@ public class Plane implements Serializable {
     private Location location;
     private List <Location> waypoints;
     private int currentWaypointIndex;
+    private boolean isDestroyed;;
 
     public Plane() {
         this.id = generateID();
@@ -40,10 +41,10 @@ public class Plane implements Serializable {
         this.fuelLevel = calcFuelForThreeHours();
         this.flightPhase = DESCENDING;
         this.waypoints = WaypointGenerator.getDescentWaypoints();
-        this.location = selectInitialLocationExcludingCorridors();
-        // this.currentWaypointIndex = 118;
-        // this.location = waypoints.get(currentWaypointIndex);
-
+        //this.location = selectInitialLocationExcludingCorridors();
+        this.isDestroyed = false;
+        this.currentWaypointIndex = 100;
+        this.location = waypoints.get(currentWaypointIndex);
         this.landed = false;
     }
 
@@ -142,6 +143,9 @@ public class Plane implements Serializable {
 
     public boolean isOutOfFuel() {
         return fuelLevel <= 0;
+    }
+    public void destroyPlane() {
+        this.isDestroyed = true;
     }
 
 }

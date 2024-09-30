@@ -8,7 +8,6 @@ import java.io.*;
 
 import static handler.PlaneHandler.AirportInstruction;
 
-
 @Log4j2
 public class PlaneClient extends Client  {
     private Plane plane;
@@ -44,10 +43,8 @@ public class PlaneClient extends Client  {
 
                 AirportInstruction instruction = (AirportInstruction) in.readObject();
                 processAirportInstruction(instruction);
-
                 Thread.sleep(1000);
             }
-
         } catch (IOException | ClassNotFoundException | InterruptedException ex) {
             log.error("Failed to handle communication with plane [{}]: {}", plane.getId(), ex.getMessage());
         } finally {
@@ -72,6 +69,10 @@ public class PlaneClient extends Client  {
                 break;
             case FULL:
                 log.info("Airspace is FULL. Plane [{}] cannot land. Searching for alternative airport", plane.getId());
+                isProcessCompleted = true;
+                break;
+            case COLLISION:
+                log.info("COLLISION detected for Plane [{}]. Stopping communication", plane.getId());
                 isProcessCompleted = true;
                 break;
             default:
