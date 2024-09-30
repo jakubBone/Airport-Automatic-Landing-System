@@ -21,13 +21,31 @@ public class AirTrafficController {
         this.lock = new ReentrantLock();
     }
     public void registerPlane(Plane plane) {
-        planes.add(plane);
+        lock.lock();
+        try {
+            planes.add(plane);
+        } finally {
+            lock.unlock();
+        }
     }
     public boolean isSpaceFull(){
-        return planes.size() >= Airport.MAX_CAPACITY;
+        lock.lock();
+        try {
+            return planes.size() >= Airport.MAX_CAPACITY;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public boolean isRunwayAvailable(Runway runway){
+       lock.lock();
+       try {
+           return runway.isAvailable();
+       } finally {
+          lock.unlock();
+       }
+    }
+    /*public boolean isRunwayAvailable(Runway runway){
        lock.lock();
        boolean isAvailable = false;
        try {
@@ -38,7 +56,7 @@ public class AirTrafficController {
           lock.unlock();
        }
        return isAvailable;
-    }
+    }*/
     public void assignRunway(Runway runway){
        lock.lock();
        try {
@@ -57,6 +75,11 @@ public class AirTrafficController {
     }
 
     public void removePlaneFromSpace(Plane plane) {
-        planes.remove(plane);
+        lock.lock();
+        try {
+            planes.remove(plane);
+        } finally {
+            lock.unlock();
+        }
     }
 }

@@ -63,7 +63,6 @@ public class PlaneHandler extends Thread {
 
     private void handlePlaneMovement(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException{
         while (true) {
-            // Getting actual position
             Location location = acquireLocation(in, plane);
             if (location == null) {
                 controller.removePlaneFromSpace(plane);
@@ -71,10 +70,9 @@ public class PlaneHandler extends Thread {
             }
             plane.setLocation(location);
 
-
             if (isPlaneReadyToLand(plane)) {
                 if(attemptLanding(plane, in, out)){
-                    break; // break after successful landing
+                    break;
                 }
             } else {
                 handleDescent(plane, out);
@@ -93,8 +91,6 @@ public class PlaneHandler extends Thread {
         out.writeObject(HOLD_PATTERN);
         return false;
     }
-
-
 
     private boolean isPlaneReadyToLand(Plane plane) {
         return plane.getLocation().getAltitude() <= 2000;

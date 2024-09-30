@@ -1,8 +1,8 @@
 # Airport Automatic Landing System
 
 Welcome to the Automatic Landing System with Java. This project is currently under development and demonstrates a client-server architecture
-designed to manage the automatic landing of airplanes in a simulated airspace around an airport. The system ensures safe landings by controllingthe movement
-of airplanes in the airspace, managing fuel levels, and preventing collisions. We are continuously adding new features and improvements as the project evolves.
+designed to manage the automatic landing of airplanes in a simulated airspace around an airport. The system ensures safe landings by controlling the movement
+of airplanes in the airspace, managing fuel levels, and preventing collisions. I am continuously adding new features and improvements as the project evolves.
 
 
 ## Project Structure
@@ -68,6 +68,7 @@ To compile and run the application, you'll need Java Development Kit (JDK) insta
 ## Future Developments
 This project is a work in progress, with ongoing updates focused on enhancing functionality.
 
+
 ## Logging
 The application uses Log4j2 for logging. The application generates detailed logs that are useful
-for developers during troubleshooting. Access to the source code is essential for a full analysis and repair
+for developers during troubleshooting. Access to the source code is essential for a full analysis and repair.
