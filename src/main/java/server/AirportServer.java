@@ -2,6 +2,7 @@ package server;
 
 import airport.AirTrafficController;
 import airport.Airport;
+import collision.CollisionDetector;
 import lombok.extern.log4j.Log4j2;
 import handler.PlaneHandler;
 
@@ -22,12 +23,12 @@ public class AirportServer  {
     }
 
     public void startServer(int port) throws IOException {
-        AirTrafficController controller = new AirTrafficController();
-        Airport airport = new Airport();
-
         try {
             this.serverSocket = new ServerSocket(port);
             log.info("Server started");
+            new CollisionDetector(controller);
+            log.info("Collision detector started");
+
             while (true) {
                 try {
                     Socket clientSocket = serverSocket.accept();

@@ -72,4 +72,8 @@ public class AirTrafficController {
             lock.unlock();
         }
     }
+
+    public void checkCollision(){
+
+    }
 }
