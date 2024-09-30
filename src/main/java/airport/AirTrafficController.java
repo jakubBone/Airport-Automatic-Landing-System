@@ -45,18 +45,7 @@ public class AirTrafficController {
           lock.unlock();
        }
     }
-    /*public boolean isRunwayAvailable(Runway runway){
-       lock.lock();
-       boolean isAvailable = false;
-       try {
-           if(runway.isAvailable()){
-            isAvailable = true;
-           }
-       } finally {
-          lock.unlock();
-       }
-       return isAvailable;
-    }*/
+
     public void assignRunway(Runway runway){
        lock.lock();
        try {
@@ -65,6 +54,7 @@ public class AirTrafficController {
           lock.unlock();
        }
     }
+
     public void releaseRunway(Runway runway){
        lock.lock();
        try {

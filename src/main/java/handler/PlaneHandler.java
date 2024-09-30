@@ -26,10 +26,10 @@ public class PlaneHandler extends Thread {
     private final AirTrafficController controller;
     private final Airport airport;
 
-    public PlaneHandler(Socket clientSocket) {
+    public PlaneHandler(Socket clientSocket, AirTrafficController controller, Airport airport) {
         this.clientSocket = clientSocket;
-        this.controller = new AirTrafficController();
-        this.airport = new Airport();
+        this.controller = controller;
+        this.airport = airport;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class PlaneHandler extends Thread {
 
             Plane plane = (Plane) in.readObject();
 
-            if (!registerPlane(plane, out)){
+            if (!isPlaneRegistered(plane, out)){
                 return;
             }
 
@@ -50,7 +50,7 @@ public class PlaneHandler extends Thread {
         }
     }
 
-    private boolean registerPlane(Plane plane, ObjectOutputStream out) throws IOException {
+    private boolean isPlaneRegistered(Plane plane, ObjectOutputStream out) throws IOException {
         if (controller.isSpaceFull()) {
             out.writeObject(FULL);
             log.info("No capacity in airspace for Plane [{}]", plane.getId());
