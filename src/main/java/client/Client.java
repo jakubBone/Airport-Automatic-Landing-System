@@ -9,7 +9,7 @@ import java.net.Socket;
 
 @Log4j2
 public class Client {
-    private static int connectionAttempts = 0;
+    private int connectionAttempts = 0;
     private Socket socket;
     protected ObjectOutputStream out;
     protected ObjectInputStream in;
@@ -33,7 +33,7 @@ public class Client {
     }
 
     private void retryConnection() {
-        if (connectionAttempts >= 2) {
+        if (connectionAttempts > 2) {
             log.error("Max reconnection attempts reached. Giving up");
             stopConnection();
             return;
