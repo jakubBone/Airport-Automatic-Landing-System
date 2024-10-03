@@ -64,11 +64,11 @@ public class PlaneHandler extends Thread {
     private void handlePlaneMovement(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException{
         while (true) {
             Location location = acquireLocation(in, plane);
-            if (plane.isDestroyed()) {
+            /*if (plane.isDestroyed()) {
                 //controller.removePlaneFromSpace(plane);
                 out.writeObject(AirportInstruction.COLLISION);
                 return;
-            }
+            }*/
             plane.setLocation(location);
 
             if (isPlaneReadyToLand(plane)) {

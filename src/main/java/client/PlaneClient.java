@@ -71,10 +71,10 @@ public class PlaneClient extends Client  {
                 log.info("Airspace is FULL. Plane [{}] cannot land. Searching for alternative airport", plane.getId());
                 isProcessCompleted = true;
                 break;
-            case COLLISION:
+            /*case COLLISION:
                 log.info("COLLISION detected for Plane [{}]. Stopping communication", plane.getId());
                 isProcessCompleted = true;
-                break;
+                break;*/
             default:
                 log.warn("Unknown instruction for Plane [{}]: [{}]", plane.getId(), instruction);
                 break;

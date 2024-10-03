@@ -144,8 +144,8 @@ public class Plane implements Serializable {
     public boolean isOutOfFuel() {
         return fuelLevel <= 0;
     }
-    public void destroyPlane() {
+    /*public void destroyPlane() {
         this.isDestroyed = true;
-    }
+    }*/
 
 }
