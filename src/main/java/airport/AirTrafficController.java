@@ -85,8 +85,8 @@ public class AirTrafficController {
                         planesToRemove.add(plane1);
                         planesToRemove.add(plane2);
 
-                        //plane1.destroyPlane();
-                        //plane2.destroyPlane();
+                        plane1.destroyPlane();
+                        plane2.destroyPlane();
 
                         log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getId(), plane2.getId());
                     }

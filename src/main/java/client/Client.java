@@ -15,6 +15,7 @@ public class Client {
     protected ObjectInputStream in;
     private int port;
     private String ip;
+    private boolean stopReconnection = false;
 
     public Client(String ip,int port) {
         this.ip = ip;
@@ -27,6 +28,9 @@ public class Client {
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
         } catch (IOException ex) {
+            if(stopReconnection){
+                return;
+            }
             retryConnection();
             log.error("Failed to establish connection with the server at port {}. Error: {}", port, ex.getMessage());
         }
@@ -63,5 +67,9 @@ public class Client {
         } catch (IOException ex) {
             log.error("Error occurred while closing resources: {}", ex.getMessage());
         }
+    }
+
+    protected void disableReconnection() {
+        this.stopReconnection = true;
     }
 }

@@ -71,10 +71,11 @@ public class PlaneClient extends Client  {
                 log.info("Airspace is FULL. Plane [{}] cannot land. Searching for alternative airport", plane.getId());
                 isProcessCompleted = true;
                 break;
-            /*case COLLISION:
+            case COLLISION:
                 log.info("COLLISION detected for Plane [{}]. Stopping communication", plane.getId());
+                disableReconnection();
                 isProcessCompleted = true;
-                break;*/
+                break;
             default:
                 log.warn("Unknown instruction for Plane [{}]: [{}]", plane.getId(), instruction);
                 break;
@@ -105,10 +106,11 @@ public class PlaneClient extends Client  {
     }
 
     public static void main(String[] args) throws IOException {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 60; i++) {
             new Thread(() -> {
                 PlaneClient client = new PlaneClient("localhost", 5000);
                 client.startCommunication();
+                client.stopConnection();
             }).start();
         }
     }

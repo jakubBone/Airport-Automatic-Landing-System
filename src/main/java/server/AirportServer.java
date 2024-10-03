@@ -2,6 +2,7 @@ package server;
 
 import airport.AirTrafficController;
 import airport.Airport;
+import collision.CollisionDetector;
 import lombok.extern.log4j.Log4j2;
 import handler.PlaneHandler;
 
@@ -26,15 +27,15 @@ public class AirportServer  {
             this.serverSocket = new ServerSocket(port);
             log.info("Server started");
 
-            //new CollisionDetector(controller).start();
-            //log.info("Collision detector started");
+            new CollisionDetector(controller).start();
+            log.info("Collision detector started");
 
             while (true) {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     if (clientSocket != null) {
                         log.info("Server connected with client at port: {}", port);
-                        new PlaneHandler(clientSocket, controller, airport).start();
+                        new PlaneHandler(clientSocket, controller, airport).start();;
                     }
                 } catch (Exception ex) {
                     log.error("Error occurred: {}", ex.getMessage());
