@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static plane.Plane.FlightPhase.*;
 
@@ -41,10 +42,10 @@ public class Plane implements Serializable {
         this.fuelLevel = calcFuelForThreeHours();
         this.flightPhase = DESCENDING;
         this.waypoints = WaypointGenerator.getDescentWaypoints();
-        //this.location = selectInitialLocationExcludingCorridors();
+        this.location = selectInitialLocationExcludingCorridors();
         this.isDestroyed = false;
-        this.currentWaypointIndex = 155;
-        this.location = waypoints.get(currentWaypointIndex);
+        //this.currentWaypointIndex = 155;
+        //this.location = waypoints.get(currentWaypointIndex);
         this.landed = false;
     }
 
@@ -87,7 +88,6 @@ public class Plane implements Serializable {
             log.info("Plane [{}] is moving to waypoint {}: [{}, {}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY(), nextWaypoint.getAltitude());
             if (hasReachedWaypoint(nextWaypoint)) {
                 currentWaypointIndex++;
-                System.out.println("CURRENT WAYPOINT: " + currentWaypointIndex);
             }
         }
         burnFuel();
@@ -115,14 +115,13 @@ public class Plane implements Serializable {
     public Location selectInitialLocationExcludingCorridors() {
         Random random = new Random();
 
-        List <Location> waypointsExcludingCorridors = waypoints;
+        List<Location> waypointsToSpawn = waypoints.stream()
+                .filter(wp -> wp.getAltitude() >= 2000 && wp.getAltitude() <= 5000)
+                .collect(Collectors.toList());
 
-        waypointsExcludingCorridors.remove(WaypointGenerator.CORRIDOR_C1_WAYPOINT);
-        waypointsExcludingCorridors.remove(WaypointGenerator.CORRIDOR_C2_WAYPOINT);
 
-
-        currentWaypointIndex = random.nextInt(waypointsExcludingCorridors.size());
-        Location initialWaypoint = waypointsExcludingCorridors.get(currentWaypointIndex);
+        currentWaypointIndex = random.nextInt(waypointsToSpawn.size());
+        Location initialWaypoint = waypointsToSpawn.get(currentWaypointIndex);
 
         return new Location(
                 initialWaypoint.getX(),
