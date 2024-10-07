@@ -1,5 +1,6 @@
 package airport;
 
+import location.Location;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import plane.Plane;
@@ -36,6 +37,22 @@ public class AirTrafficController {
             lock.unlock();
         }
     }
+
+    public boolean isLocationOccupied(Plane plane1) {
+        lock.lock();
+        Location plane1Location = plane1.getLocation();
+        try {
+            for (Plane plane2 : planes) {
+                if (plane2.getLocation().equals(plane1Location)) {
+                 return true;
+             }
+            }
+            return false;
+        } finally {
+            lock.unlock();
+        }
+    }
+
 
     public boolean isRunwayAvailable(Runway runway){
        lock.lock();

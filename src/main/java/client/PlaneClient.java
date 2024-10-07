@@ -68,7 +68,10 @@ public class PlaneClient extends Client  {
                 processLanding();
                 break;
             case FULL:
-                log.info("Airspace is FULL. Plane [{}] cannot land. Searching for alternative airport", plane.getId());
+                log.info("Airspace is FULL. Plane [{}] instructed look for a alternative airport. Stopping communication", plane.getId());                isProcessCompleted = true;
+                break;
+            case OCCUPIED:
+                log.info("Initial location OCCUPIED. Plane [{}] cannot be registered in the location. Stopping communication", plane.getId());
                 isProcessCompleted = true;
                 break;
             case COLLISION:
@@ -106,9 +109,9 @@ public class PlaneClient extends Client  {
     }
 
     public static void main(String[] args) throws IOException {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 50; i++) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

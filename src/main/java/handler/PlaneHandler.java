@@ -20,7 +20,8 @@ public class PlaneHandler extends Thread {
         HOLD_PATTERN,
         LAND,
         FULL,
-        COLLISION
+        COLLISION,
+        OCCUPIED
     }
 
     private final Socket clientSocket;
@@ -54,6 +55,11 @@ public class PlaneHandler extends Thread {
         if (controller.isSpaceFull()) {
             out.writeObject(FULL);
             log.info("No capacity in airspace for Plane [{}]", plane.getId());
+            return false;
+        }
+        if (controller.isLocationOccupied(plane)) {
+            out.writeObject(OCCUPIED);
+            log.info("Initial location Plane [{}] is occupied", plane.getId());
             return false;
         }
         controller.registerPlane(plane);
