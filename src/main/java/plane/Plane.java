@@ -41,36 +41,36 @@ public class Plane implements Serializable {
         this.fuelLevel = calcFuelForThreeHours();
         this.flightPhase = DESCENDING;
         this.waypoints = WaypointGenerator.getDescentWaypoints();
-        this.location = selectInitialLocationExcludingCorridors();
+        //this.location = selectInitialLocationExcludingCorridors();
         this.isDestroyed = false;
-        //this.currentWaypointIndex = 100;
-        //this.location = waypoints.get(currentWaypointIndex);
+        this.currentWaypointIndex = 155;
+        this.location = waypoints.get(currentWaypointIndex);
         this.landed = false;
     }
 
     public void descend(){
-            moveTowardsNextWaypoint();
-            if (isAtLastWaypoint()) {
-                flightPhase = FlightPhase.HOLDING;
-                waypoints = WaypointGenerator.getHoldingPatternWaypoints();
-                currentWaypointIndex = 0;
-            }
+        moveTowardsNextWaypoint();
+        if (isAtLastWaypoint()) {
+            flightPhase = FlightPhase.HOLDING;
+            waypoints = WaypointGenerator.getHoldingPatternWaypoints();
+            currentWaypointIndex = 0;
+        }
     }
 
     public void hold(){
-            moveTowardsNextWaypoint();
-            if (isAtLastWaypoint()) {
-                currentWaypointIndex = 0;
-            }
+        moveTowardsNextWaypoint();
+        if (isAtLastWaypoint()) {
+            currentWaypointIndex = 0;
+        }
     }
     public void land(Runway runway){
-            moveTowardsNextWaypoint();
-            Location touchdownPoint = runway.getTouchdownPoint();
-            log.info("Plane [{}] is LANDING on runway [{}]", getId(), runway.getId());
+        moveTowardsNextWaypoint();
+        Location touchdownPoint = runway.getTouchdownPoint();
+        log.info("Plane [{}] is LANDING on runway [{}]", getId(), runway.getId());
 
-            if(hasReachedWaypoint(touchdownPoint)) {
-                landed = true;
-            }
+        if(hasReachedWaypoint(touchdownPoint)) {
+            landed = true;
+        }
     }
 
     public void setLandingPhase(Runway runway) {
@@ -79,7 +79,6 @@ public class Plane implements Serializable {
         this.waypoints = WaypointGenerator.getLandingWaypoints(entryPoint);
         currentWaypointIndex = 0;
     }
-
 
     private void moveTowardsNextWaypoint() {
         if (currentWaypointIndex <= waypoints.size()) {

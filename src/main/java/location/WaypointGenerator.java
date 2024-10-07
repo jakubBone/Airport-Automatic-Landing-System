@@ -1,5 +1,6 @@
 package location;
 
+import airport.Runway;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -85,16 +86,41 @@ public class WaypointGenerator implements Serializable {
         int endX = 1000;
         int corridorY = corridorEntry.getY();
 
+        int altitudeDecrement = LANDING_ALTITUDE / 5;
         int currentAltitude = corridorEntry.getAltitude();
 
         // 6 descending waypoints directing to runway
         for (int x = startX; x <= endX; x += WAYPOINT_INTERVAL) {
             waypoints.add(new Location(x, corridorY, currentAltitude));
-            currentAltitude -= 200;
+            currentAltitude -= altitudeDecrement;
+            // 4000, 3000, 2000, 1000, 0, 1000
         }
 
         return waypoints;
     }
+
+    /*public static List<Location> getLandingWaypoints(Runway runway) {
+        List<Location> waypoints = new ArrayList<>();
+        Location corridorPoint = runway.getCorridor().getEntryWaypoint();
+        Location runwayPoint = runway.getTouchdownPoint();
+
+        int corridorX = corridorPoint.getX();
+        int corridorY = corridorPoint.getY();
+        int runwayX = runwayPoint.getX();
+
+        int initialAltitude = corridorPoint.getAltitude();
+        int currentAltitude = initialAltitude;
+
+        int numberOfWaypoints = 6;
+        int descentInterval = (runwayX - corridorX) / numberOfWaypoints;
+
+        // 5 descending waypoints directing to runway
+        for (int x = corridorX; x <= runwayX; x += descentInterval) {
+            waypoints.add(new Location(x, corridorY, currentAltitude));
+            currentAltitude -= 200;
+        }
+        return waypoints;
+    }*/
 
 }
 
