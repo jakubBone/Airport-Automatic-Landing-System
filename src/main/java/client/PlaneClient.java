@@ -107,6 +107,11 @@ public class PlaneClient extends Client  {
 
     public static void main(String[] args) throws IOException {
         for (int i = 0; i < 100; i++) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             new Thread(() -> {
                 PlaneClient client = new PlaneClient("localhost", 5000);
                 client.startCommunication();
