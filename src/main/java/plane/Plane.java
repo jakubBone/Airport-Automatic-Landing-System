@@ -98,6 +98,12 @@ public class Plane implements Serializable {
     }
 
     public void moveTowards(Location nextWaypoint) {
+        try{
+            Thread.sleep(1000);
+        } catch (InterruptedException ex){
+            Thread.currentThread().interrupt();
+        }
+
         location.setX(nextWaypoint.getX());
         location.setY(nextWaypoint.getY());
         location.setAltitude(nextWaypoint.getAltitude());

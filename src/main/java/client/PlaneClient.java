@@ -5,11 +5,13 @@ import lombok.extern.log4j.Log4j2;
 import plane.Plane;
 
 import java.io.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static handler.PlaneHandler.AirportInstruction;
 
 @Log4j2
-public class PlaneClient extends Client  {
+public class PlaneClient extends Client implements Runnable {
     private Plane plane;
     private boolean isProcessCompleted;
 
@@ -17,40 +19,6 @@ public class PlaneClient extends Client  {
         super(ip, port);
         this.plane = new Plane();
         log.info("PlaneClient created for Plane [{}] at IP: {}, Port: {}", plane.getId(), ip, port);
-    }
-
-    private void startCommunication() {
-        try {
-            startConnection();
-
-            out.writeObject(plane);
-
-            while (!isProcessCompleted) {
-
-                if (plane.isOutOfFuel()) {
-                    log.info("Plane [{}] is out of fuel, exiting communication loop", plane.getId());
-                    break;
-                }
-
-                if(plane.getLocation() != null){
-                    out.reset();
-                    out.writeObject(plane.getLocation());
-                    out.flush();
-                } else {
-                    log.error("Plane [{}] disappeared from the radar ", plane.getId());
-                    break;
-                }
-
-                AirportInstruction instruction = (AirportInstruction) in.readObject();
-                processAirportInstruction(instruction);
-                Thread.sleep(1000);
-            }
-        } catch (IOException | ClassNotFoundException | InterruptedException ex) {
-            log.error("Failed to handle communication with plane [{}]: {}", plane.getId(), ex.getMessage());
-        } finally {
-            log.info("Plane [{}] exited communication", plane.getId());
-            stopConnection();
-        }
     }
 
     private void processAirportInstruction(AirportInstruction instruction) throws IOException, ClassNotFoundException{
@@ -108,17 +76,55 @@ public class PlaneClient extends Client  {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        for (int i = 0; i < 50; i++) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+    @Override
+    public void run() {
+        try {
+            startConnection();
+
+            try{
+                Thread.sleep(2000);
+            } catch (InterruptedException ex){
+                Thread.currentThread().interrupt();
             }
-            new Thread(() -> {
-                PlaneClient client = new PlaneClient("localhost", 5000);
-                client.startCommunication();
-            }).start();
+
+            out.writeObject(plane);
+
+            while (!isProcessCompleted) {
+
+                if (plane.isOutOfFuel()) {
+                    log.info("Plane [{}] is out of fuel, exiting communication loop", plane.getId());
+                    break;
+                }
+
+                if(plane.getLocation() != null){
+                    out.reset();
+                    out.writeObject(plane.getLocation());
+                    out.flush();
+                } else {
+                    log.error("Plane [{}] disappeared from the radar ", plane.getId());
+                    break;
+                }
+
+                AirportInstruction instruction = (AirportInstruction) in.readObject();
+                processAirportInstruction(instruction);
+            }
+        } catch (IOException | ClassNotFoundException ex) {
+            log.error("Failed to handle communication with plane [{}]: {}", plane.getId(), ex.getMessage());
+        } finally {
+            log.info("Plane [{}] exited communication", plane.getId());
+            stopConnection();
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        int numberOfClients = 50;
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfClients);
+
+        for (int i = 0; i < numberOfClients; i++) {
+            PlaneClient client = new PlaneClient("localhost", 5000);
+            executorService.execute(client);
+        }
+
+        executorService.shutdown();
     }
 }

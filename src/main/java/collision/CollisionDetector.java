@@ -16,7 +16,7 @@ public class CollisionDetector extends Thread{
             try {
                 controller.checkCollision();
                 log.info("Collision detector is working");
-                Thread.sleep(100);
+                Thread.sleep(500);
             } catch (InterruptedException ex){
                 Thread.currentThread().interrupt();
                 log.error("Collision detection interrupted: {}", ex.getMessage());
