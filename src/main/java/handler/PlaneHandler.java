@@ -44,7 +44,11 @@ public class PlaneHandler extends Thread {
             if (!isPlaneRegistered(plane, out)){
                 return;
             }
-
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
             handlePlaneMovement(plane, in, out);
         } catch (IOException | ClassNotFoundException ex) {
             log.error("Error occurred while handling client request: {}", ex.getMessage());
@@ -63,7 +67,7 @@ public class PlaneHandler extends Thread {
             return false;
         }
         controller.registerPlane(plane);
-        log.info("Plane [{}] registered in airspace", plane.getId());
+        log.info("Plane [{}] registered in airspace on [{}] / [{}] / [{}]", plane.getId(), plane.getLocation().getX(), plane.getLocation().getY(), plane.getLocation().getAltitude() );
         return true;
     }
 

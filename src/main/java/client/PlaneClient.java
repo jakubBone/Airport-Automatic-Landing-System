@@ -61,12 +61,19 @@ public class PlaneClient extends Client implements Runnable {
         while (!plane.isLanded()) {
             plane.land(runway);
             out.writeObject(plane.getLocation());
+
+
+
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
                 log.error("Landing process interrupted for Plane [{}]", plane.getId());
             }
+
+
+
+
 
             if (plane.isLanded()) {
                 log.info("Plane [{}] has successfully landed", plane.getId());
@@ -117,7 +124,7 @@ public class PlaneClient extends Client implements Runnable {
     }
 
     public static void main(String[] args) throws IOException {
-        int numberOfClients = 50;
+        int numberOfClients = 20;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfClients);
 
         for (int i = 0; i < numberOfClients; i++) {

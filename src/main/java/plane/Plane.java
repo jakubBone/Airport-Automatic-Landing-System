@@ -98,15 +98,15 @@ public class Plane implements Serializable {
     }
 
     public void moveTowards(Location nextWaypoint) {
-        try{
+        try {
             Thread.sleep(1000);
-        } catch (InterruptedException ex){
+        } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
-
         location.setX(nextWaypoint.getX());
         location.setY(nextWaypoint.getY());
         location.setAltitude(nextWaypoint.getAltitude());
+        System.out.println("PLANE [" + getId() + "] COO: " + nextWaypoint.getX() + " / " + nextWaypoint.getY() + " / " +  nextWaypoint.getAltitude());
     }
 
     public boolean hasReachedWaypoint(Location waypoint) {
