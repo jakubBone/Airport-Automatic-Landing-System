@@ -98,7 +98,8 @@ public class AirTrafficController {
                 Plane plane1 = planes.get(i);
                 for (int j = i + 1; j < planes.size(); j++) {
                     Plane plane2 = planes.get(j);
-                    if (plane1.getLocation().equals(plane2.getLocation())) {
+                    if (plane1.getLocation().equals(plane2.getLocation()) &&
+                            plane1.getCurrentWaypointIndex() == plane2.getCurrentWaypointIndex()) {
                         planesToRemove.add(plane1);
                         planesToRemove.add(plane2);
 

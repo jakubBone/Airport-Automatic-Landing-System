@@ -44,8 +44,6 @@ public class Plane implements Serializable {
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.location = selectInitialLocationExcludingCorridors();
         this.isDestroyed = false;
-        //this.currentWaypointIndex = 155;
-        //this.location = waypoints.get(currentWaypointIndex);
         this.landed = false;
     }
 
@@ -106,7 +104,6 @@ public class Plane implements Serializable {
         location.setX(nextWaypoint.getX());
         location.setY(nextWaypoint.getY());
         location.setAltitude(nextWaypoint.getAltitude());
-        System.out.println("PLANE [" + getId() + "] COO: " + nextWaypoint.getX() + " / " + nextWaypoint.getY() + " / " +  nextWaypoint.getAltitude());
     }
 
     public boolean hasReachedWaypoint(Location waypoint) {
