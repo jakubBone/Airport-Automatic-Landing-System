@@ -1,11 +1,9 @@
 package airport;
 
 import location.Location;
-import location.WaypointGenerator;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Getter
 public class Corridor implements Serializable {

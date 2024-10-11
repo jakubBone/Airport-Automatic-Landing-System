@@ -143,7 +143,6 @@ public class PlaneHandler extends Thread {
 
         while (!isLandedOnRunway(plane, runway)) {
             Location location = acquireLocation(in, plane);
-            System.out.println(location.getX() + " / " + location.getY() + " / " + location.getAltitude());
 
             plane.setLocation(location);
             log.info("Plane [{}] is landing on runway [{}]", plane.getId(), runway.getId());
@@ -169,9 +168,8 @@ public class PlaneHandler extends Thread {
         try {
             return (Location) in.readObject();
         } catch (IOException | ClassNotFoundException ex) {
-            log.error("Error reading location for Plane [{}]: {}", plane.getId(), ex.getMessage());
+            log.error("Error reading location for Plane [{}]: {}. Cause: {}", plane.getId(), ex.getMessage(), ex);
             throw new LocationAcquisitionException("Failed to acquire location for Plane [{}]: " + plane.getId(), ex);
         }
     }
-
 }
