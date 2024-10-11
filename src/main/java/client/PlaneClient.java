@@ -61,13 +61,9 @@ public class PlaneClient extends Client implements Runnable {
         while (!plane.isLanded()) {
             plane.land(runway);
             out.writeObject(plane.getLocation());
-
-            if (plane.isLanded()) {
-                log.info("Plane [{}] has successfully landed", plane.getId());
-                out.writeObject("LANDED");
-                isProcessCompleted = true;
-            }
         }
+            log.info("Plane [{}] has successfully landed", plane.getId());
+            isProcessCompleted = true;
     }
 
     @Override
@@ -111,7 +107,7 @@ public class PlaneClient extends Client implements Runnable {
     }
 
     public static void main(String[] args) throws IOException {
-        int numberOfClients = 100;
+        int numberOfClients = 50;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfClients);
 
         for (int i = 0; i < numberOfClients; i++) {

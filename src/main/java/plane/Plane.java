@@ -43,6 +43,8 @@ public class Plane implements Serializable {
         this.flightPhase = DESCENDING;
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.location = selectInitialLocationExcludingCorridors();
+        //this.currentWaypointIndex = 155;
+        //this.location = waypoints.get(currentWaypointIndex);
         this.isDestroyed = false;
         this.landed = false;
     }
@@ -67,7 +69,8 @@ public class Plane implements Serializable {
         Location touchdownPoint = runway.getTouchdownPoint();
         log.info("Plane [{}] is LANDING on runway [{}]", getId(), runway.getId());
 
-        if(hasReachedWaypoint(touchdownPoint)) {
+        if(isAtLastWaypoint()) {
+            setLocation(touchdownPoint);
             landed = true;
         }
     }
