@@ -116,4 +116,11 @@ public class AirTrafficController {
         }
     }
 
+    public boolean isRunwayCollision (Plane plane) {
+        return (plane.getLocation().getAltitude() < 0 && !plane.isLanded());
+    }
+
+    public boolean isLandedOnRunway(Plane plane, Runway runway){
+        return (plane.getLocation().equals(runway.getTouchdownPoint()));
+    }
 }

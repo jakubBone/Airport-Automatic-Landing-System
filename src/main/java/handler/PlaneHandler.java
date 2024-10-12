@@ -141,22 +141,38 @@ public class PlaneHandler extends Thread {
         out.writeObject(runway);
         log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
 
-        while (!isLandedOnRunway(plane, runway)) {
+        while (!controller.isLandedOnRunway(plane, runway)) {
             Location location = acquireLocation(in, plane);
-
             plane.setLocation(location);
-            log.info("Plane [{}] is landing on runway [{}]", plane.getId(), runway.getId());
+            System.out.println("1) IS RUNWAY COLLSION: " + controller.isRunwayCollision(plane));
+            if(controller.isRunwayCollision(plane)){
+                System.out.println("2) IS RUNWAY COLLSIOON: " + controller.isRunwayCollision(plane));
+                plane.destroyPlane();
+                out.writeObject(COLLISION);
+                log.info("Runway collision detected for Plane [{}]:", plane.getId());
+                break;
+            }
+
         }
         completeLanding(plane, runway);
     }
+    /*private void handleLanding(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException {
+        out.writeObject(LAND);
+        out.writeObject(runway);
+        log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
 
-    private boolean isLandedOnRunway(Plane plane, Runway runway){
-        return (plane.getLocation().equals(runway.getTouchdownPoint()));
-    }
+        while (!controller.isLandedOnRunway(plane, runway)) {
+            Location location = acquireLocation(in, plane);
+            plane.setLocation(location);
+
+        }
+        completeLanding(plane, runway);
+    }*/
 
     private void completeLanding(Plane plane, Runway runway) {
-        log.info("Plane [{}] has successfully landed on runway [{}]", plane.getId(), runway.getId());
-
+        if(plane.isLanded()){
+            log.info("Plane [{}] is landing on runway [{}]", plane.getId(), runway.getId());
+        }
         controller.removePlaneFromSpace(plane);
         log.info("Plane [{}] removed from airspace", plane.getId());
 
