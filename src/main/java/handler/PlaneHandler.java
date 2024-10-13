@@ -144,18 +144,19 @@ public class PlaneHandler extends Thread {
         while (!controller.isLandedOnRunway(plane, runway)) {
             Location location = acquireLocation(in, plane);
             plane.setLocation(location);
-            System.out.println("1) IS RUNWAY COLLSION: " + controller.isRunwayCollision(plane));
+
             if(controller.isRunwayCollision(plane)){
-                System.out.println("2) IS RUNWAY COLLSIOON: " + controller.isRunwayCollision(plane));
                 plane.destroyPlane();
                 out.writeObject(COLLISION);
                 log.info("Runway collision detected for Plane [{}]:", plane.getId());
                 break;
             }
-
+            // debbuging sout
+            System.out.println(plane.getLocation().getX() + " / " + plane.getLocation().getY() + " / " + plane.getLocation().getAltitude());
         }
         completeLanding(plane, runway);
     }
+
     /*private void handleLanding(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException {
         out.writeObject(LAND);
         out.writeObject(runway);

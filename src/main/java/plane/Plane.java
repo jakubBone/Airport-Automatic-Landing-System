@@ -98,6 +98,7 @@ public class Plane implements Serializable {
         return currentWaypointIndex == waypoints.size();
     }
 
+
     public void moveTowards(Location nextWaypoint) {
         try {
             Thread.sleep(1000);

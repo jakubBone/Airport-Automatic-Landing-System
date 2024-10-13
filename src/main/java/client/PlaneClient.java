@@ -60,7 +60,13 @@ public class PlaneClient extends Client implements Runnable {
 
         while (!plane.isLanded()) {
             plane.land(runway);
+
+            out.reset();
             out.writeObject(plane.getLocation());
+            out.flush();
+
+            System.out.println(plane.getLocation().getX() + " / " + plane.getLocation().getY() + " / " + plane.getLocation().getAltitude());
+
         }
         log.info("Plane [{}] has successfully landed", plane.getId());
         isProcessCompleted = true;
