@@ -141,39 +141,27 @@ public class PlaneHandler extends Thread {
         out.writeObject(runway);
         log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
 
-        while (!controller.isLandedOnRunway(plane, runway)) {
+        while (true) {
             Location location = acquireLocation(in, plane);
             plane.setLocation(location);
+            log.info("Plane [{}] is landing", plane.getId());
+
+            if(controller.hasLandedOnRunway(plane, runway)){
+                log.info("Plane [{}] has successfully landed on runway [{}]", plane.getId(), runway.getId());
+                break;
+            }
 
             if(controller.isRunwayCollision(plane)){
                 plane.destroyPlane();
-                out.writeObject(COLLISION);
                 log.info("Runway collision detected for Plane [{}]:", plane.getId());
                 break;
             }
-            // debbuging sout
             System.out.println(plane.getLocation().getX() + " / " + plane.getLocation().getY() + " / " + plane.getLocation().getAltitude());
         }
         completeLanding(plane, runway);
     }
 
-    /*private void handleLanding(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException {
-        out.writeObject(LAND);
-        out.writeObject(runway);
-        log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
-
-        while (!controller.isLandedOnRunway(plane, runway)) {
-            Location location = acquireLocation(in, plane);
-            plane.setLocation(location);
-
-        }
-        completeLanding(plane, runway);
-    }*/
-
     private void completeLanding(Plane plane, Runway runway) {
-        if(plane.isLanded()){
-            log.info("Plane [{}] is landing on runway [{}]", plane.getId(), runway.getId());
-        }
         controller.removePlaneFromSpace(plane);
         log.info("Plane [{}] removed from airspace", plane.getId());
 

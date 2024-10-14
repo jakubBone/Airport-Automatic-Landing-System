@@ -34,6 +34,7 @@ public class PlaneClient extends Client implements Runnable {
             case LAND:
                 log.info("Plane [{}] instructed to LAND", plane.getId());
                 processLanding();
+                isProcessCompleted = true;
                 break;
             case FULL:
                 log.info("Airspace is FULL. Plane [{}] instructed look for a alternative airport. Stopping communication", plane.getId());                isProcessCompleted = true;
@@ -60,16 +61,17 @@ public class PlaneClient extends Client implements Runnable {
 
         while (!plane.isLanded()) {
             plane.land(runway);
-
             out.reset();
             out.writeObject(plane.getLocation());
             out.flush();
 
+            if(plane.getLocation().getAltitude() < 0){
+                log.info("RUNWAY COLLISION detected for Plane [{}]", plane.getId());
+                return;
+            }
             System.out.println(plane.getLocation().getX() + " / " + plane.getLocation().getY() + " / " + plane.getLocation().getAltitude());
-
         }
-        log.info("Plane [{}] has successfully landed", plane.getId());
-        isProcessCompleted = true;
+        log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
     }
 
     @Override
@@ -120,7 +122,6 @@ public class PlaneClient extends Client implements Runnable {
             PlaneClient client = new PlaneClient("localhost", 5000);
             executorService.execute(client);
         }
-
         executorService.shutdown();
     }
 }

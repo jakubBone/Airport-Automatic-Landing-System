@@ -79,7 +79,7 @@ public class WaypointGenerator implements Serializable {
         return waypoints;
     }
 
-    public static List<Location> getLandingWaypoints(Location corridorEntry) {
+    /*public static List<Location> getLandingWaypoints(Location corridorEntry) {
         List<Location> waypoints = new ArrayList<>();
         int startX = -4000;
         int endX = 1000;
@@ -92,10 +92,10 @@ public class WaypointGenerator implements Serializable {
             waypoints.add(new Location(x, corridorY, currentAltitude));
             currentAltitude -= altitudeDecrement ;
         }
-
         return waypoints;
-    }
-    /*public static List<Location> getLandingWaypoints(Location corridorEntry) {
+    }*/
+
+    public static List<Location> getLandingWaypoints(Location corridorEntry) {
         List<Location> waypoints = new ArrayList<>();
         int startX = -4000;
         int endX = 1000;
@@ -110,6 +110,6 @@ public class WaypointGenerator implements Serializable {
         }
 
         return waypoints;
-    }*/
+    }
 }
 

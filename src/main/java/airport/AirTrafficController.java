@@ -120,7 +120,7 @@ public class AirTrafficController {
         return plane.getLocation().getAltitude() < 0;
     }
 
-    public boolean isLandedOnRunway(Plane plane, Runway runway){
+    public boolean hasLandedOnRunway(Plane plane, Runway runway){
         return (plane.getLocation().equals(runway.getTouchdownPoint()));
     }
 }
