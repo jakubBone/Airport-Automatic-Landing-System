@@ -3,6 +3,7 @@ package handler;
 import airport.AirTrafficController;
 import airport.Airport;
 import airport.Runway;
+import client.PlaneClient;
 import exceptions.LocationAcquisitionException;
 import location.Location;
 import lombok.extern.log4j.Log4j2;
@@ -49,6 +50,7 @@ public class PlaneHandler extends Thread {
                 Thread.sleep(2000);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
+                return;
             }
             handlePlaneMovement(plane, in, out);
         } catch (IOException | ClassNotFoundException | LocationAcquisitionException ex ) {
@@ -74,12 +76,22 @@ public class PlaneHandler extends Thread {
 
     private void handlePlaneMovement(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException{
         while (true) {
-            Location location = acquireLocation(in, plane);
+            Object state = receivePlaneStateUpdate(in, plane);
+            plane.burnFuel();
+
             if (plane.isDestroyed()) {
                 out.writeObject(AirportInstruction.COLLISION);
                 return;
             }
-            plane.setLocation(location);
+
+            if(isOutOfFuel(state)){
+                plane.destroyPlane();
+                controller.removePlaneFromSpace(plane);
+                log.info("Plane [{}] is out of fuel. Disappeared from the radar ", plane.getId());
+                return;
+            }
+
+            plane.setLocation((Location) state);
 
             if (isPlaneReadyToLand(plane)) {
                 if(attemptLanding(plane, in, out)){
@@ -91,7 +103,8 @@ public class PlaneHandler extends Thread {
         }
     }
 
-    private boolean attemptLanding(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException {
+
+    private boolean attemptLanding(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException, ClassNotFoundException {
         Runway runway = getRunwayIfPlaneInCorridor(plane);
         if(runway != null && controller.isRunwayAvailable(runway)){
             controller.assignRunway(runway);
@@ -136,14 +149,31 @@ public class PlaneHandler extends Thread {
         return runway;
     }
 
-    private void handleLanding(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException {
+    private boolean isOutOfFuel(Object state){
+        if(state instanceof PlaneClient.PlaneStatus) {
+            PlaneClient.PlaneStatus status = (PlaneClient.PlaneStatus) state;
+            if (status == PlaneClient.PlaneStatus.OUT_OF_FUEL) {
+              return true;
+            }
+        }
+        return false;
+    }
+
+    private void handleLanding(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException, ClassNotFoundException*/ {
         out.writeObject(LAND);
         out.writeObject(runway);
         log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
 
         while (true) {
-            Location location = acquireLocation(in, plane);
-            plane.setLocation(location);
+            Object state = receivePlaneStateUpdate(in, plane);
+
+            if(isOutOfFuel(state)){
+                plane.destroyPlane();
+                log.info("Plane [{}] is out of fuel. Disappeared from the radar", plane.getId());
+                break;
+            }
+
+            plane.setLocation((Location) state);
             log.info("Plane [{}] is landing", plane.getId());
 
             if(controller.hasLandedOnRunway(plane, runway)){
@@ -156,7 +186,6 @@ public class PlaneHandler extends Thread {
                 log.info("Runway collision detected for Plane [{}]:", plane.getId());
                 break;
             }
-            System.out.println(plane.getLocation().getX() + " / " + plane.getLocation().getY() + " / " + plane.getLocation().getAltitude());
         }
         completeLanding(plane, runway);
     }
@@ -169,12 +198,13 @@ public class PlaneHandler extends Thread {
         log.info("Runway [{}] released", runway.getId());
     }
 
-    public Location acquireLocation(ObjectInputStream in, Plane plane) throws LocationAcquisitionException {
-        try {
-            return (Location) in.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
-            log.error("Error reading location for Plane [{}]: {}. Cause: {}", plane.getId(), ex.getMessage(), ex);
-            throw new LocationAcquisitionException("Failed to acquire location for Plane [{}]: " + plane.getId(), ex);
+    public Object receivePlaneStateUpdate(ObjectInputStream in, Plane plane) throws LocationAcquisitionException, IOException, ClassNotFoundException {
+        Object request = in.readObject();
+
+        if (request instanceof Location || request instanceof PlaneClient.PlaneStatus) {
+            return request;
         }
+
+        throw new LocationAcquisitionException("Unexpected request type: " + request);
     }
 }

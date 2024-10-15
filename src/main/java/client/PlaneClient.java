@@ -12,6 +12,10 @@ import static handler.PlaneHandler.AirportInstruction;
 
 @Log4j2
 public class PlaneClient extends Client implements Runnable {
+
+    public enum PlaneStatus {
+        OUT_OF_FUEL,
+    }
     private Plane plane;
     private boolean isProcessCompleted;
 
@@ -60,18 +64,28 @@ public class PlaneClient extends Client implements Runnable {
         log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getId(), runway.getId());
 
         while (!plane.isLanded()) {
+            if (plane.isOutOfFuel()) {
+                log.info("Plane [{}] is out of fuel. Collision", plane.getId());
+                out.writeObject(PlaneStatus.OUT_OF_FUEL);
+                return;
+            }
+
             plane.land(runway);
+
             out.reset();
             out.writeObject(plane.getLocation());
             out.flush();
+
+            if (plane.isLanded()) {
+                log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
+                return;
+            }
 
             if(plane.getLocation().getAltitude() < 0){
                 log.info("RUNWAY COLLISION detected for Plane [{}]", plane.getId());
                 return;
             }
-            System.out.println(plane.getLocation().getX() + " / " + plane.getLocation().getY() + " / " + plane.getLocation().getAltitude());
         }
-        log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
     }
 
     @Override
@@ -88,9 +102,9 @@ public class PlaneClient extends Client implements Runnable {
             out.writeObject(plane);
 
             while (!isProcessCompleted) {
-
                 if (plane.isOutOfFuel()) {
-                    log.info("Plane [{}] is out of fuel, exiting communication loop", plane.getId());
+                    log.info("Plane [{}] is out of fuel. Collision", plane.getId());
+                    out.writeObject(PlaneStatus.OUT_OF_FUEL);
                     break;
                 }
 
@@ -99,7 +113,7 @@ public class PlaneClient extends Client implements Runnable {
                     out.writeObject(plane.getLocation());
                     out.flush();
                 } else {
-                    log.error("Plane [{}] disappeared from the radar ", plane.getId());
+                    log.error("Plane [{}] disappeared from the radar", plane.getId());
                     break;
                 }
 
@@ -115,7 +129,7 @@ public class PlaneClient extends Client implements Runnable {
     }
 
     public static void main(String[] args) throws IOException {
-        int numberOfClients = 10;
+        int numberOfClients = 50;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfClients);
 
         for (int i = 0; i < numberOfClients; i++) {
