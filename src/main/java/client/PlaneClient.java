@@ -2,6 +2,7 @@ package client;
 
 import airport.Runway;
 import com.google.gson.Gson;
+import communication.Messenger;
 import lombok.extern.log4j.Log4j2;
 import plane.Plane;
 
@@ -15,12 +16,12 @@ import static handler.PlaneHandler.AirportInstruction;
 public class PlaneClient extends Client implements Runnable {
     private Plane plane;
     private boolean isProcessCompleted;
-    private Gson gson;
+    private Messenger messenger;
 
     public PlaneClient(String ip, int port) {
         super(ip, port);
         this.plane = new Plane();
-        this.gson = new Gson();
+        this.messenger = new Messenger();
         log.info("PlaneClient created for Plane [{}] at IP: {}, Port: {}", plane.getId(), ip, port);
     }
 
@@ -35,23 +36,23 @@ public class PlaneClient extends Client implements Runnable {
                 Thread.currentThread().interrupt();
             }
 
-            sendMessage(plane);
+            messenger.send(plane, out);
 
             while (!isProcessCompleted) {
                 if (plane.isOutOfFuel()) {
                     log.info("Plane [{}] is out of fuel. Collision", plane.getId());
-                    sendMessage("OUT_OF_FUEL");
+                    messenger.send("OUT_OF_FUEL", out);
                     break;
                 }
 
                 if(plane.getLocation() != null){
-                    sendMessage(plane.getLocation());
+                    messenger.send(plane.getLocation(), out);
                 } else {
                     log.error("Plane [{}] disappeared from the radar", plane.getId());
                     break;
                 }
-                String message = receiveMessage();
-                AirportInstruction instruction = gson.fromJson(message, AirportInstruction.class);
+                String message = messenger.receive(in);
+                AirportInstruction instruction = messenger.parse(message, AirportInstruction.class);
                 processInstruction(instruction);
             }
         } catch (IOException | ClassNotFoundException ex) {
@@ -75,8 +76,8 @@ public class PlaneClient extends Client implements Runnable {
     }
 
     private void processLanding() throws IOException, ClassNotFoundException {
-        String message = receiveMessage();
-        Runway runway = gson.fromJson(message, Runway.class);
+        String message = messenger.receive(in);
+        Runway runway = messenger.parse(message, Runway.class);
 
         plane.setLandingPhase(runway);
         log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getId(), runway.getId());
@@ -84,13 +85,13 @@ public class PlaneClient extends Client implements Runnable {
         while (!plane.isLanded()) {
             if (plane.isOutOfFuel()) {
                 log.info("Plane [{}] is out of fuel. Collision", plane.getId());
-                sendMessage("OUT_OF_FUEL");
+                messenger.send("OUT_OF_FUEL", out);
                 return;
             }
 
             plane.land(runway);
 
-            sendMessage(plane.getLocation());
+            messenger.send(plane.getLocation(), out);
 
             if (plane.isLanded()) {
                 log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
@@ -135,16 +136,6 @@ public class PlaneClient extends Client implements Runnable {
         isProcessCompleted = true;
     }
 
-
-    private void sendMessage(Object message) throws IOException {
-        String jsonMessage = gson.toJson(message);
-        out.writeObject(jsonMessage);
-        out.flush();
-    }
-
-    private String receiveMessage() throws IOException, ClassNotFoundException {
-        return (String) in.readObject();
-    }
 
     public static void main(String[] args) throws IOException {
         int numberOfClients = 50;

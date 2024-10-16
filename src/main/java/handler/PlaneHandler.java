@@ -4,6 +4,7 @@ import airport.AirTrafficController;
 import airport.Airport;
 import airport.Runway;
 import com.google.gson.Gson;
+import communication.Messenger;
 import exceptions.LocationAcquisitionException;
 import location.Location;
 import lombok.extern.log4j.Log4j2;
@@ -24,13 +25,13 @@ public class PlaneHandler extends Thread {
     private final Socket clientSocket;
     private final AirTrafficController controller;
     private final Airport airport;
-    private Gson gson;
+    private Messenger messenger;
 
     public PlaneHandler(Socket clientSocket, AirTrafficController controller, Airport airport) {
         this.clientSocket = clientSocket;
         this.controller = controller;
         this.airport = airport;
-        this.gson = new Gson();
+        this.messenger = new Messenger();
     }
 
     @Override
@@ -38,8 +39,8 @@ public class PlaneHandler extends Thread {
         try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
              ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
 
-            String message = receiveMessage(in);
-            Plane plane = gson.fromJson(message, Plane.class);
+            String message = messenger.receive(in);
+            Plane plane = messenger.parse(message, Plane.class);
 
             if (!isPlaneRegistered(plane, out)){
                 return;
@@ -60,12 +61,12 @@ public class PlaneHandler extends Thread {
 
     private boolean isPlaneRegistered(Plane plane, ObjectOutputStream out) throws IOException {
         if (controller.isSpaceFull()) {
-            sendMessage(FULL, out);
+            messenger.send(FULL, out);
             log.info("No capacity in airspace for Plane [{}]", plane.getId());
             return false;
         }
         if (controller.isLocationOccupied(plane)) {
-            sendMessage(OCCUPIED, out);
+            messenger.send(OCCUPIED, out);
             log.info("Initial location Plane [{}] is occupied", plane.getId());
             return false;
         }
@@ -77,17 +78,17 @@ public class PlaneHandler extends Thread {
     private void managePlane(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException{
         while (true) {
             if (plane.isDestroyed()) {
-                sendMessage(COLLISION, out);
+                messenger.send(COLLISION, out);
                 return;
             }
-            String message = receiveMessage(in);
+            String message = messenger.receive(in);
 
             if(message.equals("OUT_OF_FUEL")){
                 handleOutOfFuel(plane);
                 return;
             }
 
-            Location location = gson.fromJson(message, Location.class);
+            Location location = messenger.parse(message,Location.class);
             plane.setLocation(location);
 
             if (isPlaneAtLandingAltitude(plane)) {
@@ -110,7 +111,7 @@ public class PlaneHandler extends Thread {
         }
 
         log.info("Plane [{}] is holding pattern", plane.getId());
-        sendMessage(HOLD_PATTERN, out);
+        messenger.send(HOLD_PATTERN, out);
         return false;
     }
 
@@ -120,7 +121,7 @@ public class PlaneHandler extends Thread {
     }
 
     private void handleDescent(Plane plane, ObjectOutputStream out) throws IOException {
-        sendMessage(DESCENT, out);
+        messenger.send(DESCENT, out);
         log.info("Plane [{}] is descending", plane.getId());
     }
 
@@ -145,17 +146,17 @@ public class PlaneHandler extends Thread {
     }
 
     private void handleLanding(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException, ClassNotFoundException {
-        sendMessage(LAND, out);
-        sendMessage(runway, out);
+        messenger.send(LAND, out);
+        messenger.send(runway, out);
         log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
 
         while (true) {
-            String message = receiveMessage(in);
+            String message = messenger.receive(in);
 
             if(message.equals("OUT_OF_FUEL")){
                 break;
             } else {
-                Location location = gson.fromJson(message, Location.class);
+                Location location = messenger.parse(message, Location.class);
                 plane.setLocation(location);
             }
 
@@ -180,16 +181,5 @@ public class PlaneHandler extends Thread {
 
         controller.releaseRunway(runway);
         log.info("Runway [{}] released", runway.getId());
-    }
-
-    private void sendMessage(Object message, ObjectOutputStream out) throws IOException {
-        String jsonMessage = gson.toJson(message);
-        out.reset();
-        out.writeObject(jsonMessage);
-        out.flush();
-    }
-
-    private String receiveMessage(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        return (String) in.readObject();
     }
 }
