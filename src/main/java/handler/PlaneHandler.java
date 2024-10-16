@@ -3,6 +3,7 @@ package handler;
 import airport.AirTrafficController;
 import airport.Airport;
 import airport.Runway;
+import com.google.gson.Gson;
 import exceptions.LocationAcquisitionException;
 import location.Location;
 import lombok.extern.log4j.Log4j2;
@@ -23,11 +24,13 @@ public class PlaneHandler extends Thread {
     private final Socket clientSocket;
     private final AirTrafficController controller;
     private final Airport airport;
+    private Gson gson;
 
     public PlaneHandler(Socket clientSocket, AirTrafficController controller, Airport airport) {
         this.clientSocket = clientSocket;
         this.controller = controller;
         this.airport = airport;
+        this.gson = new Gson();
     }
 
     @Override
@@ -35,7 +38,8 @@ public class PlaneHandler extends Thread {
         try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
              ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
 
-            Plane plane = (Plane) in.readObject();
+            String message = receiveMessage(in);
+            Plane plane = gson.fromJson(message, Plane.class);
 
             if (!isPlaneRegistered(plane, out)){
                 return;
@@ -56,12 +60,12 @@ public class PlaneHandler extends Thread {
 
     private boolean isPlaneRegistered(Plane plane, ObjectOutputStream out) throws IOException {
         if (controller.isSpaceFull()) {
-            out.writeObject(FULL);
+            sendMessage(FULL, out);
             log.info("No capacity in airspace for Plane [{}]", plane.getId());
             return false;
         }
         if (controller.isLocationOccupied(plane)) {
-            out.writeObject(OCCUPIED);
+            sendMessage(OCCUPIED, out);
             log.info("Initial location Plane [{}] is occupied", plane.getId());
             return false;
         }
@@ -73,20 +77,18 @@ public class PlaneHandler extends Thread {
     private void managePlane(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException{
         while (true) {
             if (plane.isDestroyed()) {
-                out.writeObject(AirportInstruction.COLLISION);
+                sendMessage(COLLISION, out);
                 return;
             }
+            String message = receiveMessage(in);
 
-            Object message = in.readObject();
-
-            if(message instanceof String && message.equals("OUT_OF_FUEL")){
+            if(message.equals("OUT_OF_FUEL")){
                 handleOutOfFuel(plane);
                 return;
             }
 
-            if(message instanceof Location){
-                plane.setLocation((Location) message);
-            }
+            Location location = gson.fromJson(message, Location.class);
+            plane.setLocation(location);
 
             if (isPlaneAtLandingAltitude(plane)) {
                 if(attemptLanding(plane, in, out)){
@@ -98,7 +100,6 @@ public class PlaneHandler extends Thread {
         }
     }
 
-
     private boolean attemptLanding(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException, ClassNotFoundException {
         Runway runway = getRunwayIfPlaneAtCorridor(plane);
 
@@ -109,7 +110,7 @@ public class PlaneHandler extends Thread {
         }
 
         log.info("Plane [{}] is holding pattern", plane.getId());
-        out.writeObject(HOLD_PATTERN);
+        sendMessage(HOLD_PATTERN, out);
         return false;
     }
 
@@ -119,7 +120,7 @@ public class PlaneHandler extends Thread {
     }
 
     private void handleDescent(Plane plane, ObjectOutputStream out) throws IOException {
-        out.writeObject(DESCENT);
+        sendMessage(DESCENT, out);
         log.info("Plane [{}] is descending", plane.getId());
     }
 
@@ -127,7 +128,7 @@ public class PlaneHandler extends Thread {
         Location runway1Corridor = Airport.runway1.getCorridor().getEntryWaypoint();
         Location runway2Corridor = Airport.runway2.getCorridor().getEntryWaypoint();
 
-        Runway runway = null;
+        Runway runway;
 
         if (plane.getLocation().equals(runway1Corridor)){
             return runway = Airport.runway1;
@@ -135,7 +136,7 @@ public class PlaneHandler extends Thread {
         else if (plane.getLocation().equals(runway2Corridor)) {
             return runway = Airport.runway2;
         }
-        return runway;
+        return null;
     }
 
     private void handleOutOfFuel(Plane plane) throws IOException {
@@ -144,19 +145,18 @@ public class PlaneHandler extends Thread {
     }
 
     private void handleLanding(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException, ClassNotFoundException {
-        out.writeObject(LAND);
-        out.writeObject(runway);
+        sendMessage(LAND, out);
+        sendMessage(runway, out);
         log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
 
         while (true) {
-            Object message = in.readObject();
+            String message = receiveMessage(in);
 
-            if(message instanceof String && message.equals("OUT_OF_FUEL")){
+            if(message.equals("OUT_OF_FUEL")){
                 break;
-            }
-
-            if(message instanceof Location){
-                plane.setLocation((Location) message);
+            } else {
+                Location location = gson.fromJson(message, Location.class);
+                plane.setLocation(location);
             }
 
             log.info("Plane [{}] is landing", plane.getId());
@@ -180,5 +180,16 @@ public class PlaneHandler extends Thread {
 
         controller.releaseRunway(runway);
         log.info("Runway [{}] released", runway.getId());
+    }
+
+    private void sendMessage(Object message, ObjectOutputStream out) throws IOException {
+        String jsonMessage = gson.toJson(message);
+        out.reset();
+        out.writeObject(jsonMessage);
+        out.flush();
+    }
+
+    private String receiveMessage(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        return (String) in.readObject();
     }
 }

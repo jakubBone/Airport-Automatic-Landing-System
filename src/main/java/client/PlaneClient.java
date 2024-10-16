@@ -1,6 +1,7 @@
 package client;
 
 import airport.Runway;
+import com.google.gson.Gson;
 import lombok.extern.log4j.Log4j2;
 import plane.Plane;
 
@@ -14,14 +15,54 @@ import static handler.PlaneHandler.AirportInstruction;
 public class PlaneClient extends Client implements Runnable {
     private Plane plane;
     private boolean isProcessCompleted;
+    private Gson gson;
 
     public PlaneClient(String ip, int port) {
         super(ip, port);
         this.plane = new Plane();
+        this.gson = new Gson();
         log.info("PlaneClient created for Plane [{}] at IP: {}, Port: {}", plane.getId(), ip, port);
     }
 
-    private void processAirportInstruction(AirportInstruction instruction) throws IOException, ClassNotFoundException{
+    @Override
+    public void run() {
+        try {
+            startConnection();
+
+            try{
+                Thread.sleep(2000);
+            } catch (InterruptedException ex){
+                Thread.currentThread().interrupt();
+            }
+
+            sendMessage(plane);
+
+            while (!isProcessCompleted) {
+                if (plane.isOutOfFuel()) {
+                    log.info("Plane [{}] is out of fuel. Collision", plane.getId());
+                    sendMessage("OUT_OF_FUEL");
+                    break;
+                }
+
+                if(plane.getLocation() != null){
+                    sendMessage(plane.getLocation());
+                } else {
+                    log.error("Plane [{}] disappeared from the radar", plane.getId());
+                    break;
+                }
+                String message = receiveMessage();
+                AirportInstruction instruction = gson.fromJson(message, AirportInstruction.class);
+                processInstruction(instruction);
+            }
+        } catch (IOException | ClassNotFoundException ex) {
+            log.error("Failed to handle communication with plane [{}]: {}", plane.getId(), ex.getMessage());
+        } finally {
+            log.info("Plane [{}] exited communication", plane.getId());
+            stopConnection();
+        }
+    }
+
+    private void processInstruction(AirportInstruction instruction) throws IOException, ClassNotFoundException{
         switch (instruction) {
             case DESCENT -> executeDescent();
             case HOLD_PATTERN -> executeHoldPattern();
@@ -30,6 +71,36 @@ public class PlaneClient extends Client implements Runnable {
             case OCCUPIED -> executeOccupiedLocation();
             case COLLISION -> executeCollision();
             default -> log.warn("Unknown instruction for Plane [{}]: [{}]", plane.getId(), instruction);
+        }
+    }
+
+    private void processLanding() throws IOException, ClassNotFoundException {
+        String message = receiveMessage();
+        Runway runway = gson.fromJson(message, Runway.class);
+
+        plane.setLandingPhase(runway);
+        log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getId(), runway.getId());
+
+        while (!plane.isLanded()) {
+            if (plane.isOutOfFuel()) {
+                log.info("Plane [{}] is out of fuel. Collision", plane.getId());
+                sendMessage("OUT_OF_FUEL");
+                return;
+            }
+
+            plane.land(runway);
+
+            sendMessage(plane.getLocation());
+
+            if (plane.isLanded()) {
+                log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
+                return;
+            }
+
+            if(plane.getLocation().getAltitude() < 0){
+                log.info("RUNWAY COLLISION detected for Plane [{}]", plane.getId());
+                return;
+            }
         }
     }
 
@@ -64,78 +135,15 @@ public class PlaneClient extends Client implements Runnable {
         isProcessCompleted = true;
     }
 
-    private void processLanding() throws IOException, ClassNotFoundException {
-        Runway runway = (Runway) in.readObject();
-        plane.setLandingPhase(runway);
-        log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getId(), runway.getId());
-
-        while (!plane.isLanded()) {
-            if (plane.isOutOfFuel()) {
-                log.info("Plane [{}] is out of fuel. Collision", plane.getId());
-                sendMessage("OUT_OF_FUEL");
-                return;
-            }
-
-            plane.land(runway);
-
-            sendMessage(plane.getLocation());
-
-            if (plane.isLanded()) {
-                log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
-                return;
-            }
-
-            if(plane.getLocation().getAltitude() < 0){
-                log.info("RUNWAY COLLISION detected for Plane [{}]", plane.getId());
-                return;
-            }
-        }
-    }
-
-    @Override
-    public void run() {
-        try {
-            startConnection();
-
-            try{
-                Thread.sleep(2000);
-            } catch (InterruptedException ex){
-                Thread.currentThread().interrupt();
-            }
-
-           sendMessage(plane);
-
-            while (!isProcessCompleted) {
-                if (plane.isOutOfFuel()) {
-                    log.info("Plane [{}] is out of fuel. Collision", plane.getId());
-                    sendMessage("OUT_OF_FUEL");
-                    break;
-                }
-
-                if(plane.getLocation() != null){
-                    sendMessage(plane.getLocation());
-                } else {
-                    log.error("Plane [{}] disappeared from the radar", plane.getId());
-                    break;
-                }
-
-                AirportInstruction instruction = (AirportInstruction) in.readObject();
-                processAirportInstruction(instruction);
-            }
-        } catch (IOException | ClassNotFoundException ex) {
-            log.error("Failed to handle communication with plane [{}]: {}", plane.getId(), ex.getMessage());
-        } finally {
-            log.info("Plane [{}] exited communication", plane.getId());
-            stopConnection();
-        }
-    }
-
-
 
     private void sendMessage(Object message) throws IOException {
-        out.reset();
-        out.writeObject(message);
+        String jsonMessage = gson.toJson(message);
+        out.writeObject(jsonMessage);
         out.flush();
+    }
+
+    private String receiveMessage() throws IOException, ClassNotFoundException {
+        return (String) in.readObject();
     }
 
     public static void main(String[] args) throws IOException {
