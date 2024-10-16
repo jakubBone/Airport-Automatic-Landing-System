@@ -17,12 +17,7 @@ import static handler.PlaneHandler.AirportInstruction.*;
 public class PlaneHandler extends Thread {
 
     public enum AirportInstruction {
-        DESCENT,
-        HOLD_PATTERN,
-        LAND,
-        FULL,
-        COLLISION,
-        OCCUPIED
+        DESCENT, HOLD_PATTERN, LAND, FULL, COLLISION, OCCUPIED
     }
 
     private final Socket clientSocket;
@@ -105,16 +100,19 @@ public class PlaneHandler extends Thread {
 
 
     private boolean attemptLanding(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException, ClassNotFoundException {
-        Runway runway = getRunwayIfPlaneInCorridor(plane);
+        Runway runway = getRunwayIfPlaneAtCorridor(plane);
+
         if(runway != null && controller.isRunwayAvailable(runway)){
             controller.assignRunway(runway);
             handleLanding(plane, runway, in, out);
             return true;
         }
+
         log.info("Plane [{}] is holding pattern", plane.getId());
         out.writeObject(HOLD_PATTERN);
         return false;
     }
+
 
     private boolean isPlaneAtLandingAltitude(Plane plane) {
         return plane.getLocation().getAltitude() <= 1000;
@@ -125,27 +123,18 @@ public class PlaneHandler extends Thread {
         log.info("Plane [{}] is descending", plane.getId());
     }
 
-    private Runway getRunwayIfPlaneInCorridor(Plane plane) {
+    private Runway getRunwayIfPlaneAtCorridor(Plane plane) {
         Location runway1Corridor = Airport.runway1.getCorridor().getEntryWaypoint();
         Location runway2Corridor = Airport.runway2.getCorridor().getEntryWaypoint();
 
-        int corridor1EntryX = runway1Corridor.getX();
-        int corridor1EntryY = runway1Corridor.getY();
-
-        int corridor2EntryX = runway2Corridor.getX();
-        int corridor2EntryY = runway2Corridor.getY();
-
-        int planeX = plane.getLocation().getX();
-        int planeY = plane.getLocation().getY();
-
         Runway runway = null;
 
-        if (planeX == corridor1EntryX && planeY == corridor1EntryY) {
-            runway = Airport.runway1;
-        } else if (planeX == corridor2EntryX && planeY == corridor2EntryY) {
-            runway = Airport.runway2;
+        if (plane.getLocation().equals(runway1Corridor)){
+            return runway = Airport.runway1;
         }
-
+        else if (plane.getLocation().equals(runway2Corridor)) {
+            return runway = Airport.runway2;
+        }
         return runway;
     }
 

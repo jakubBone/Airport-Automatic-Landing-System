@@ -12,10 +12,6 @@ import static handler.PlaneHandler.AirportInstruction;
 
 @Log4j2
 public class PlaneClient extends Client implements Runnable {
-
-    public enum PlaneStatus {
-        OUT_OF_FUEL,
-    }
     private Plane plane;
     private boolean isProcessCompleted;
 
@@ -27,35 +23,45 @@ public class PlaneClient extends Client implements Runnable {
 
     private void processAirportInstruction(AirportInstruction instruction) throws IOException, ClassNotFoundException{
         switch (instruction) {
-            case DESCENT:
-                log.info("Plane [{}] instructed to DESCENT", plane.getId());
-                plane.descend();
-                break;
-            case HOLD_PATTERN:
-                log.info("Plane [{}] instructed to HOLD_PATTERN", plane.getId());
-                plane.hold();
-                break;
-            case LAND:
-                log.info("Plane [{}] instructed to LAND", plane.getId());
-                processLanding();
-                isProcessCompleted = true;
-                break;
-            case FULL:
-                log.info("Airspace is FULL. Plane [{}] instructed look for a alternative airport. Stopping communication", plane.getId());                isProcessCompleted = true;
-                break;
-            case OCCUPIED:
-                log.info("Initial location OCCUPIED. Plane [{}] cannot be registered in the location. Stopping communication", plane.getId());
-                isProcessCompleted = true;
-                break;
-            case COLLISION:
-                log.info("COLLISION detected for Plane [{}]. Stopping communication", plane.getId());
-                disableReconnection();
-                isProcessCompleted = true;
-                break;
-            default:
-                log.warn("Unknown instruction for Plane [{}]: [{}]", plane.getId(), instruction);
-                break;
+            case DESCENT -> executeDescent();
+            case HOLD_PATTERN -> executeHoldPattern();
+            case LAND -> executeLanding();
+            case FULL -> executeFullAirspace();
+            case OCCUPIED -> executeOccupiedLocation();
+            case COLLISION -> executeCollision();
+            default -> log.warn("Unknown instruction for Plane [{}]: [{}]", plane.getId(), instruction);
         }
+    }
+
+    private void executeDescent() {
+        log.info("Plane [{}] instructed to DESCENT", plane.getId());
+        plane.descend();
+    }
+
+    private void executeHoldPattern() {
+        log.info("Plane [{}] instructed to HOLD_PATTERN", plane.getId());
+        plane.hold();
+    }
+
+    private void executeLanding() throws IOException, ClassNotFoundException {
+        processLanding();
+        isProcessCompleted = true;
+    }
+
+    private void executeFullAirspace() {
+        log.info("Airspace is FULL. Plane [{}] instructed to find an alternative airport. Stopping communication", plane.getId());
+        isProcessCompleted = true;
+    }
+
+    private void executeOccupiedLocation() {
+        log.info("Initial location OCCUPIED. Plane [{}] cannot be registered in the location. Stopping communication", plane.getId());
+        isProcessCompleted = true;
+    }
+
+    private void executeCollision() {
+        log.info("COLLISION detected for Plane [{}]. Stopping communication", plane.getId());
+        disableReconnection();
+        isProcessCompleted = true;
     }
 
     private void processLanding() throws IOException, ClassNotFoundException {
@@ -66,15 +72,13 @@ public class PlaneClient extends Client implements Runnable {
         while (!plane.isLanded()) {
             if (plane.isOutOfFuel()) {
                 log.info("Plane [{}] is out of fuel. Collision", plane.getId());
-                out.writeObject(PlaneStatus.OUT_OF_FUEL);
+                sendMessage("OUT_OF_FUEL");
                 return;
             }
 
             plane.land(runway);
 
-            out.reset();
-            out.writeObject(plane.getLocation());
-            out.flush();
+            sendMessage(plane.getLocation());
 
             if (plane.isLanded()) {
                 log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
@@ -99,19 +103,17 @@ public class PlaneClient extends Client implements Runnable {
                 Thread.currentThread().interrupt();
             }
 
-            out.writeObject(plane);
+           sendMessage(plane);
 
             while (!isProcessCompleted) {
                 if (plane.isOutOfFuel()) {
                     log.info("Plane [{}] is out of fuel. Collision", plane.getId());
-                    out.writeObject(PlaneStatus.OUT_OF_FUEL);
+                    sendMessage("OUT_OF_FUEL");
                     break;
                 }
 
                 if(plane.getLocation() != null){
-                    out.reset();
-                    out.writeObject(plane.getLocation());
-                    out.flush();
+                    sendMessage(plane.getLocation());
                 } else {
                     log.error("Plane [{}] disappeared from the radar", plane.getId());
                     break;
@@ -126,6 +128,14 @@ public class PlaneClient extends Client implements Runnable {
             log.info("Plane [{}] exited communication", plane.getId());
             stopConnection();
         }
+    }
+
+
+
+    private void sendMessage(Object message) throws IOException {
+        out.reset();
+        out.writeObject(message);
+        out.flush();
     }
 
     public static void main(String[] args) throws IOException {
