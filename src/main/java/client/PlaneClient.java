@@ -1,7 +1,6 @@
 package client;
 
 import airport.Runway;
-import com.google.gson.Gson;
 import communication.Messenger;
 import lombok.extern.log4j.Log4j2;
 import plane.Plane;
