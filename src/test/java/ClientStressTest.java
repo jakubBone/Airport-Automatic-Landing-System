@@ -1,5 +1,6 @@
 import client.PlaneClient;
 
+import java.io.FileWriter;
 import java.io.IOException;
 
 import java.util.Timer;
@@ -13,6 +14,15 @@ class ClientStressTest {
     static final Logger logger = Logger.getLogger(ClientStressTest.class.getName());
 
     public static void main(String[] args) throws IOException {
+        String outputDir = "C:\\Users\\Jakub Bone\\Desktop\\";
+        String outputFileName = outputDir + "Client_error-log.txt";
+
+        try{
+            new FileWriter(outputFileName);
+        } catch (IOException ex){
+            logger.warning("Failed to create a file");
+        }
+
         LoggerConfigurator.configureLogger("Client_error-log.txt");
         LoggerConfigurator.configureUncaughtExceptionHandler();
 
@@ -23,7 +33,7 @@ class ClientStressTest {
                 logger.info("Client stopped after 1 hour of operation");
                 System.exit(0);
             }
-        }, 30000);  // 30s
+        }, 10000);  // 30s
 
         ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -42,6 +52,4 @@ class ClientStressTest {
             }
         }
     }
-
-
 }
