@@ -3,7 +3,6 @@ package handler;
 import airport.AirTrafficController;
 import airport.Airport;
 import airport.Runway;
-import com.google.gson.Gson;
 import communication.Messenger;
 import exceptions.LocationAcquisitionException;
 import location.Location;

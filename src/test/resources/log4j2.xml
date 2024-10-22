@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <Appenders>
+        <!-- Appender to client file -->
+        <File name="ClientLogFile" fileName="${sys:user.home}/Desktop/client.log" append="false">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+        </File>
+
+        <!-- Appender to server file -->
+        <File name="ServerLogFile" fileName="${sys:user.home}/Desktop/server.log" append="false">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+        </File>
+
+        <!-- Appender to console  -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <!-- Client logger -->
+        <Logger name="client.Client" level="info" additivity="false">
+            <AppenderRef ref="ClientLogFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- Server logger -->
+        <Logger name="server.AirportServer" level="info" additivity="false">
+            <AppenderRef ref="ServerLogFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- General logger -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>

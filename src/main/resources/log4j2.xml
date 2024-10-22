@@ -1,37 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="INFO">
     <Appenders>
-        <File name="ServerLog" fileName="C:\Users\Jakub Bone\Desktop\Server_error.txt" append="true">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-            <Filters>
-                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-        </File>
-
-        <File name="ClientLog" fileName="C:\Users\Jakub Bone\Desktop\Client_error.txt" append="true">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-            <Filters>
-                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-        </File>
-
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
     </Appenders>
-
     <Loggers>
-        <Logger name="server" level="info" additivity="false">
-            <AppenderRef ref="ServerLog"/>
-            <AppenderRef ref="Console"/>
-        </Logger>
-
-        <Logger name="client" level="info" additivity="false">
-            <AppenderRef ref="ClientLog"/>
-            <AppenderRef ref="Console"/>
-        </Logger>
-
-        <Root level="info">
+        <Root level="INFO">
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>

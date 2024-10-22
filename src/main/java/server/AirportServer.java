@@ -5,6 +5,8 @@ import airport.Airport;
 import collision.CollisionDetector;
 import lombok.extern.log4j.Log4j2;
 import handler.PlaneHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
 
 import java.io.IOException;
 import java.net.ServerSocket;
