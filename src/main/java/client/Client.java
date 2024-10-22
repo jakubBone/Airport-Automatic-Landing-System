@@ -17,6 +17,8 @@ public class Client {
     private String ip;
     private boolean stopReconnection = false;
 
+    protected boolean isConnected;
+
     public Client(String ip,int port) {
         this.ip = ip;
         this.port = port;
@@ -27,16 +29,17 @@ public class Client {
             socket = new Socket(ip, port);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
+            isConnected = true;
         } catch (IOException ex) {
             if(stopReconnection){
                 return;
             }
-            retryConnection();
+            //retryConnection();
             log.error("Failed to establish connection with the server at port {}. Error: {}", port, ex.getMessage());
         }
     }
 
-    private void retryConnection() {
+    /*private void retryConnection() {
         if (connectionAttempts > 2) {
             log.error("Max reconnection attempts reached. Giving up");
             stopConnection();
@@ -51,7 +54,7 @@ public class Client {
             Thread.currentThread().interrupt();
             log.warn("Reconnection attempt interrupted: {} ", ie.getMessage());
         }
-    }
+    }*/
 
     protected void stopConnection() {
         try {

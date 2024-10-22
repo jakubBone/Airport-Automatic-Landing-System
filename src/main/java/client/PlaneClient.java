@@ -19,6 +19,7 @@ public class PlaneClient extends Client implements Runnable {
     private boolean isProcessCompleted;
     private Messenger messenger;
 
+
     public PlaneClient(String ip, int port) {
         super(ip, port);
         this.plane = new Plane();
@@ -30,6 +31,10 @@ public class PlaneClient extends Client implements Runnable {
     public void run() {
         try {
             startConnection();
+
+            if(!isConnected){
+                return;
+            }
 
             try{
                 Thread.sleep(2000);
