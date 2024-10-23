@@ -15,16 +15,16 @@ public class ServerStressTest {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                logger.info("Server stopped");
+                logger.info("Server stopped after 70 minutes");
                 System.exit(0);
 
             }
-        }, 40000);  // 10s
+        }, 4200000);  // 10s
 
         try {
             airportServer.startServer(5000);
         } catch (Exception ex) {
-            logger.log(Level.SEVERE, "Failed to start the server:", ex.getMessage());
+            logger.log(Level.WARNING, "Failed to start the server:", ex.getMessage());
         }
     }
 }

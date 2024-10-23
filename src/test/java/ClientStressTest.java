@@ -15,10 +15,10 @@ public class ClientStressTest {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                logger.info("Client stopped");
+                logger.info("Client stopped after 60 minutes");
                 System.exit(0);
             }
-        }, 20000);
+        }, 3600000);
 
         ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -34,7 +34,7 @@ public class ClientStressTest {
                     Thread.currentThread().interrupt();
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "An error occurred", e);
+                logger.log(Level.WARNING, "An error occurred", e);
             }
         }
     }
