@@ -48,6 +48,7 @@ public class PlaneHandler extends Thread {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException ex) {
+                log.warn("PlaneHandler interrupted during sleep for Plane handling. Thread was interrupted");
                 Thread.currentThread().interrupt();
                 return;
             }
@@ -120,7 +121,6 @@ public class PlaneHandler extends Thread {
     }
 
     private void handleDescent(Plane plane, ObjectOutputStream out) throws IOException {
-        log.error("jasia");
         messenger.send(DESCENT, out);
         log.info("Plane [{}] is descending", plane.getId());
     }

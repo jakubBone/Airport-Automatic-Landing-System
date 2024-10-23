@@ -5,8 +5,6 @@ import airport.Airport;
 import collision.CollisionDetector;
 import lombok.extern.log4j.Log4j2;
 import handler.PlaneHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.LoggerContext;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -40,11 +38,11 @@ public class AirportServer  {
                         new PlaneHandler(clientSocket, controller, airport).start();;
                     }
                 } catch (Exception ex) {
-                    log.error("Error occurred: {}", ex.getMessage());
+                    log.error("Error handling client connection: {}", ex.getMessage(), ex);
                 }
             }
         } catch (IOException ex){
-            log.error("Failed to start server on port {}: {}", port, ex.getMessage());
+            log.error("Failed to start AirportServer on port {}: {}", port, ex.getMessage(), ex);
         }
     }
 

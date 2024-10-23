@@ -31,7 +31,6 @@ public class PlaneClient extends Client implements Runnable {
     public void run() {
         try {
             startConnection();
-            log.error("dupa");
             if(!isConnected){
                 return;
             }
@@ -39,6 +38,7 @@ public class PlaneClient extends Client implements Runnable {
             try{
                 Thread.sleep(2000);
             } catch (InterruptedException ex){
+                log.warn("PlaneClient [{}]: Sleep was interrupted", plane.getId());
                 Thread.currentThread().interrupt();
             }
 
@@ -54,7 +54,7 @@ public class PlaneClient extends Client implements Runnable {
                 if(plane.getLocation() != null){
                     messenger.send(plane.getLocation(), out);
                 } else {
-                    log.error("Plane [{}] disappeared from the radar", plane.getId());
+                    log.info("Plane [{}] disappeared from the radar", plane.getId());
                     break;
                 }
                 String message = messenger.receive(in);
@@ -62,7 +62,7 @@ public class PlaneClient extends Client implements Runnable {
                 processInstruction(instruction);
             }
         } catch (IOException | ClassNotFoundException ex) {
-            log.error("Failed to handle communication with plane [{}]: {}", plane.getId(), ex.getMessage());
+            log.error("PlaneClient [{}]: Communication failure: {}", plane.getId(), ex.getMessage());
         } finally {
             log.info("Plane [{}] exited communication", plane.getId());
             stopConnection();

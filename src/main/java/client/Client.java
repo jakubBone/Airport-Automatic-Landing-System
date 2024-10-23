@@ -30,7 +30,6 @@ public class Client {
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
             isConnected = true;
-
         } catch (IOException ex) {
             if(stopReconnection){
                 return;
