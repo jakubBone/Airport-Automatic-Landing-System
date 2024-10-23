@@ -31,7 +31,7 @@ public class PlaneClient extends Client implements Runnable {
     public void run() {
         try {
             startConnection();
-
+            log.error("dupa");
             if(!isConnected){
                 return;
             }

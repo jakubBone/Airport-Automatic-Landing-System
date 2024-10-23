@@ -15,10 +15,10 @@ public class ClientStressTest {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                logger.info("Client stopped after 10 seconds of operation");
+                logger.info("Client stopped");
                 System.exit(0);
             }
-        }, 10000);
+        }, 20000);
 
         ExecutorService executorService = Executors.newCachedThreadPool();
 

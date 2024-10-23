@@ -15,11 +15,11 @@ public class ServerStressTest {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                logger.info("Server stopped after 1 hour of operation");
+                logger.info("Server stopped");
                 System.exit(0);
 
             }
-        }, 30000);  // 10s
+        }, 40000);  // 10s
 
         try {
             airportServer.startServer(5000);

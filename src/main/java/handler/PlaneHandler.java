@@ -120,6 +120,7 @@ public class PlaneHandler extends Thread {
     }
 
     private void handleDescent(Plane plane, ObjectOutputStream out) throws IOException {
+        log.error("jasia");
         messenger.send(DESCENT, out);
         log.info("Plane [{}] is descending", plane.getId());
     }

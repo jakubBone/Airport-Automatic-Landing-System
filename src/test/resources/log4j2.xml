@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" monitorInterval="30">
     <Appenders>
         <!-- Appender to client file -->
@@ -6,6 +5,9 @@
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</Pattern>
             </PatternLayout>
+            <Filters>
+                <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
         </File>
 
         <!-- Appender to server file -->
@@ -13,30 +15,51 @@
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</Pattern>
             </PatternLayout>
+            <Filters>
+                <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
         </File>
 
-        <!-- Appender to console  -->
+        <!-- Appender to console -->
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
     </Appenders>
 
     <Loggers>
-        <!-- Client logger -->
-        <Logger name="client.Client" level="info" additivity="false">
-            <AppenderRef ref="ClientLogFile"/>
-            <AppenderRef ref="Console"/>
+        <!-- Logger for PlaneClient package -->
+        <Logger name="client" level="info" additivity="false">
+            <AppenderRef ref="ClientLogFile"/> <!-- Warn, Error, Fatal tylko do pliku client.log -->
+            <AppenderRef ref="Console"/> <!-- Wszystkie poziomy do konsoli -->
         </Logger>
 
-        <!-- Server logger -->
-        <Logger name="server.AirportServer" level="info" additivity="false">
-            <AppenderRef ref="ServerLogFile"/>
-            <AppenderRef ref="Console"/>
+        <!-- Logger for server package -->
+        <Logger name="server" level="info" additivity="false">
+            <AppenderRef ref="ServerLogFile"/> <!-- Warn, Error, Fatal tylko do pliku server.log -->
+            <AppenderRef ref="Console"/> <!-- Wszystkie poziomy do konsoli -->
         </Logger>
 
-        <!-- General logger -->
+        <!-- Logger for collision package -->
+        <Logger name="collision" level="info" additivity="false">
+            <AppenderRef ref="ServerLogFile"/> <!-- Warn, Error, Fatal tylko do pliku client.log -->
+            <AppenderRef ref="Console"/> <!-- Wszystkie poziomy do konsoli -->
+        </Logger>
+
+        <!-- Logger for handler classes -->
+        <Logger name="handler" level="info" additivity="false">
+            <AppenderRef ref="ServerLogFile"/> <!-- Tylko warn i wyższe do pliku server.log -->
+            <AppenderRef ref="Console"/> <!-- Wszystkie poziomy do konsoli -->
+        </Logger>
+
+        <!-- Logger for airport classes -->
+        <Logger name="airport" level="info" additivity="false">
+            <AppenderRef ref="ServerLogFile"/> <!-- Tylko warn i wyższe do pliku server.log -->
+            <AppenderRef ref="Console"/> <!-- Wszystkie poziomy do konsoli -->
+        </Logger>
+
+        <!-- Root logger for all classes -->
         <Root level="info">
-            <AppenderRef ref="Console"/>
+            <AppenderRef ref="Console"/> <!-- Wszystkie logi wyświetlane w konsoli -->
         </Root>
     </Loggers>
 </Configuration>
