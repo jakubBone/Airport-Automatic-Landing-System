@@ -29,37 +29,37 @@
     <Loggers>
         <!-- Logger for PlaneClient package -->
         <Logger name="client" level="info" additivity="false">
-            <AppenderRef ref="ClientLogFile"/> <!-- Warn, Error, Fatal tylko do pliku client.log -->
-            <AppenderRef ref="Console"/> <!-- Wszystkie poziomy do konsoli -->
+            <AppenderRef ref="ClientLogFile"/> <!-- Only warn and up to file client.log -->
+            <AppenderRef ref="Console"/> <!-- All levels in console-->
         </Logger>
 
         <!-- Logger for server package -->
         <Logger name="server" level="info" additivity="false">
-            <AppenderRef ref="ServerLogFile"/> <!-- Warn, Error, Fatal tylko do pliku server.log -->
-            <AppenderRef ref="Console"/> <!-- Wszystkie poziomy do konsoli -->
+            <AppenderRef ref="ServerLogFile"/> <!-- Only warn and up to file server.log -->
+            <AppenderRef ref="Console"/> <!-- All levels in console-->
         </Logger>
 
         <!-- Logger for collision package -->
         <Logger name="collision" level="info" additivity="false">
-            <AppenderRef ref="ServerLogFile"/> <!-- Warn, Error, Fatal tylko do pliku client.log -->
-            <AppenderRef ref="Console"/> <!-- Wszystkie poziomy do konsoli -->
+            <AppenderRef ref="ServerLogFile"/> <!-- Only warn and up to file server.log -->
+            <AppenderRef ref="Console"/> <!-- All levels in console-->
         </Logger>
 
         <!-- Logger for handler classes -->
         <Logger name="handler" level="info" additivity="false">
-            <AppenderRef ref="ServerLogFile"/> <!-- Tylko warn i wyższe do pliku server.log -->
-            <AppenderRef ref="Console"/> <!-- Wszystkie poziomy do konsoli -->
+            <AppenderRef ref="ServerLogFile"/> <!-- Only warn and up to file server.log -->
+            <AppenderRef ref="Console"/> <!-- All levels in console-->
         </Logger>
 
         <!-- Logger for airport classes -->
         <Logger name="airport" level="info" additivity="false">
-            <AppenderRef ref="ServerLogFile"/> <!-- Tylko warn i wyższe do pliku server.log -->
-            <AppenderRef ref="Console"/> <!-- Wszystkie poziomy do konsoli -->
+            <AppenderRef ref="ServerLogFile"/> <!-- Only warn and up to file server.log -->
+            <AppenderRef ref="Console"/> <!-- All levels in console-->
         </Logger>
 
         <!-- Root logger for all classes -->
         <Root level="info">
-            <AppenderRef ref="Console"/> <!-- Wszystkie logi wyświetlane w konsoli -->
+            <AppenderRef ref="Console"/> <!-- All logs printed in console -->
         </Root>
     </Loggers>
 </Configuration>
