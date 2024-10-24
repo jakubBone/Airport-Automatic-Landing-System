@@ -1,3 +1,6 @@
+package performance;
+
+import performance.ClientStressTest;
 import server.AirportServer;
 
 import java.io.IOException;
