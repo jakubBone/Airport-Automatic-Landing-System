@@ -11,6 +11,7 @@ import plane.Plane;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 import static handler.PlaneHandler.AirportInstruction.*;
 
@@ -54,8 +55,17 @@ public class PlaneHandler extends Thread {
             }
 
             managePlane(plane, in, out);
+
+        } catch (EOFException | SocketException ex) {
+            log.warn("Connection to client lost. Client disconnected: {}", ex.getMessage());
         } catch (IOException | ClassNotFoundException | LocationAcquisitionException ex ) {
-            log.error("Error occurred while handling client request: {}", ex.getMessage());
+            log.error("Error occurred while handling client request: {}", ex.getMessage(), ex);
+        } finally {
+            try {
+                clientSocket.close();
+            } catch (IOException ex) {
+                log.error("Failed to close client socket: {}", ex.getMessage(), ex);
+            }
         }
     }
 

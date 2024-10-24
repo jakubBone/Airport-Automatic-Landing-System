@@ -16,7 +16,6 @@ public class Client {
     private int port;
     private String ip;
     private boolean stopReconnection = false;
-
     protected boolean isConnected;
 
     public Client(String ip,int port) {
