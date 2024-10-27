@@ -3,8 +3,6 @@ package client;
 import airport.Runway;
 import communication.Messenger;
 import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.LoggerContext;
 import plane.Plane;
 
 import java.io.*;
