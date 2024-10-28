@@ -2,114 +2,109 @@ package simulation;
 
 import airport.AirTrafficController;
 import airport.Airport;
-import airport.Runway;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.geometry.Point3D;
 import javafx.scene.Group;
+import javafx.scene.text.Text;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Sphere;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import location.Location;
 import plane.Plane;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class AirportVisualization extends Application {
     private Group root;
     private Airport airport;
     private final AirTrafficController controller;
-    private Map<Plane, PlaneView> planeViews;
+    private Map<Plane, Sphere> planeMap;
+    private RunwayModel runwayModel;
+    private PlaneModel planeModel;
+    private AirspaceModel airspaceModel;
     public AirportVisualization(AirTrafficController controller) {
         this.root = new Group();
         this.airport = new Airport();
         this.controller = controller;
-        this.planeViews = new HashMap<>();
+        this.runwayModel = new RunwayModel();
+        this.airspaceModel = new AirspaceModel();
+        this.planeModel = new PlaneModel();
+        this.planeMap = new HashMap<>();
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         Scene scene = new Scene(root, 800, 600, Color.SKYBLUE);
         PerspectiveCamera camera = new PerspectiveCamera();
-        camera.setTranslateX(0);
-        camera.setTranslateY(-100);
-        camera.setTranslateZ(-100);
-        scene.setCamera(camera);
+
+        camera.setTranslateX(100);
+        camera.setTranslateY(-500);
+        camera.setTranslateZ(-1500);
+        camera.setNearClip(0.1);
+        camera.setFarClip(5000);
 
         primaryStage.setTitle("Airport Automatic Landing System");
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        drawRunways();
+        setRunway();
+        setAirspace();
 
-        // Test plane
-        Plane testPlane = new Plane();
-        testPlane.setLocation(new Location(5000, 5000, 2000));
-        PlaneView testPlaneView = new PlaneView(testPlane);
-        root.getChildren().add(testPlaneView);
-
-        startUpdatingPlanes();
+        startUpdatingAirspace();
     }
 
-    public void drawRunways(){
-        Runway runway1 = Airport.runway1;
-        Runway runway2 = Airport.runway2;
-
-        Rectangle runway1Rect = new Rectangle(200, 20);
-        Rectangle runway2Rect = new Rectangle(200, 20);
-        runway1Rect.setFill(Color.DARKGRAY);
-        runway2Rect.setFill(Color.DARKGRAY);
-
-        Point3D position1 = new Airspace3D().convertToDisplayScale(runway1.getTouchdownPoint());
-        Point3D position2 = new Airspace3D().convertToDisplayScale(runway2.getTouchdownPoint());
-
-        runway1Rect.setTranslateX(position1.getX());
-        runway1Rect.setTranslateY(position1.getY());
-        runway2Rect.setTranslateX(position2.getX());
-        runway2Rect.setTranslateY(position2.getY());
-
+    public void setRunway(){
+        Rectangle runway1Rect = runwayModel.createRunway(Airport.runway1);
+        Rectangle runway2Rect = runwayModel.createRunway(Airport.runway2);
         root.getChildren().addAll(runway1Rect, runway2Rect);
     }
-    public void startUpdatingPlanes() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> updatePlanes()));
+
+    public void setAirspace(){
+        root.getChildren().add(airspaceModel.createAirspace());
+    }
+
+    public void setPlane(Plane plane){
+        root.getChildren().add(planeModel.createPlane(plane));
+    }
+
+    public void startUpdatingAirspace() {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> updateAirspace()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
 
-
-    public void updatePlanes(){
-        List<Plane> planes = new ArrayList<>();
-        planes.add(new Plane());
-        planes.get(0).setLocation(new Location(5000, 5000, 5000));
-        PlaneView testPlaneView = new PlaneView(planes.get(0));
-        root.getChildren().add(testPlaneView);
-
-
-
-        /*// Adding new planes to View
+    public void updateAirspace(){
         for (Plane plane : controller.getPlanes()) {
-            if (!planeViews.containsKey(plane)) {  // check if plane is already in the space
-                PlaneView planeView = new PlaneView(plane);
-                planeViews.put(plane, planeView);
-                root.getChildren().add(planeView);  // add new plane
+            if (!planeMap.containsKey(plane)) {
+                Sphere model = planeModel.createPlane(plane);
+                planeMap.put(plane, model);
+                setPlane(plane);
             }
         }
-        // Aktualizacja pozycji każdego samolotu
-        for (Plane plane : controller.getPlanes()) {
-            PlaneView planeView = planeViews.get(plane);
-            if (planeView != null) {
-                planeView.updatePosition();
-            }
-        }*/
 
-        //planeViews.values().forEach(PlaneView::updatePosition); // update each plane position
+        for (Plane plane : controller.getPlanes()) {
+            Sphere planeModel = planeMap.get(plane);
+            if (planeModel != null) {
+                planeModel.setTranslateX(plane.getLocation().getX());
+                planeModel.setTranslateY(plane.getLocation().getY());
+                planeModel.setTranslateZ(plane.getLocation().getAltitude());
+
+                Text planeIdText = (Text) root.getChildren().stream()
+                        .filter(node -> node instanceof Text && ((Text) node).getText().equals(Integer.toString(plane.getId())))
+                        .findFirst()
+                        .orElse(null);
+                if (planeIdText != null) {
+                    planeIdText.setTranslateX(plane.getLocation().getX());
+                    planeIdText.setTranslateY(plane.getLocation().getY() - 20);
+                    planeIdText.setTranslateZ(plane.getLocation().getAltitude());
+                }
+            }
+        }
     }
 
     public static void main (String[]args){

@@ -4,8 +4,10 @@ import airport.AirTrafficController;
 import client.PlaneClient;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import server.AirportServer;
 
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,7 +17,6 @@ public class SimulationApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         this.controller = new AirTrafficController();
 
-        /*
         // Start Server
         new Thread(() -> {
             AirportServer airportServer = new AirportServer(controller);
@@ -25,7 +26,6 @@ public class SimulationApp extends Application {
                 e.printStackTrace();
             }
         });
-        */
 
         // Start Clients
         int numberOfClients = 50;
