@@ -2,7 +2,6 @@ plugins {
     id 'application'
     id 'java'
     id 'org.openjfx.javafxplugin' version '0.1.0'
-
 }
 
 group 'org.example'
@@ -27,20 +26,20 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
 
-    // JavaFX
-    implementation files('libs/javafx-controls-21.0.5.jar')
-
-}
-
-javafx {
-    version = "21.0.5"
-    modules = ['javafx.controls']
+    //JavaFX
+    implementation 'org.openjfx:javafx-controls:21.0.4'
+    implementation 'org.openjfx:javafx-fxml:21.0.4'
+    implementation 'org.openjfx:javafx-graphics:21.0.4'
 }
 
 application {
-    mainClass = 'SimulationApp'
+    mainClass = 'simulation.SimulationApp'
 }
 
 test {
     useJUnitPlatform()
 }
+
+
+
+

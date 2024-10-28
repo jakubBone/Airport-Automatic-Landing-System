@@ -27,8 +27,6 @@ public class SimulationApp extends Application {
         });
         */
 
-
-
         // Start Clients
         int numberOfClients = 50;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfClients);
@@ -38,7 +36,6 @@ public class SimulationApp extends Application {
             executorService.execute(client);
         }
         executorService.shutdown();
-
 
 
         // Start Visualization
