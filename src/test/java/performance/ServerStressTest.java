@@ -1,6 +1,6 @@
 package performance;
 
-import performance.ClientStressTest;
+import airport.AirTrafficController;
 import server.AirportServer;
 
 import java.io.IOException;
@@ -12,8 +12,9 @@ import java.util.logging.Logger;
 public class ServerStressTest {
     static final Logger logger = Logger.getLogger(ClientStressTest.class.getName());
     public static void main(String[] args) throws IOException {
+        AirTrafficController controller = new AirTrafficController();
 
-        AirportServer airportServer = new AirportServer();
+        AirportServer airportServer = new AirportServer(controller);
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override

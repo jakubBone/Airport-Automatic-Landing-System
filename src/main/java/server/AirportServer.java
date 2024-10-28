@@ -17,8 +17,8 @@ public class AirportServer  {
     private AirTrafficController controller;
     private Airport airport;
 
-    public AirportServer() {
-        this.controller = new AirTrafficController();
+    public AirportServer(AirTrafficController controller) {
+        this.controller = controller;
         this.airport = new Airport();
     }
 
@@ -57,7 +57,8 @@ public class AirportServer  {
     }
 
     public static void main(String[] args) throws IOException {
-        AirportServer airportServer = new AirportServer();
+        AirTrafficController airTrafficController = new AirTrafficController();
+        AirportServer airportServer = new AirportServer(airTrafficController);
         airportServer.startServer(5000);
     }
 }

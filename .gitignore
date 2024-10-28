@@ -88,3 +88,8 @@ nb-configuration.xml
 ## Miscellaneous
 ##############################
 *.log
+
+##############################
+## JavaFX SDK
+##############################
+libs/javafx-sdk-21.0.5/legal

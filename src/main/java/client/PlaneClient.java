@@ -143,7 +143,7 @@ public class PlaneClient extends Client implements Runnable {
     }
 
 
-    public static void main(String[] args) throws IOException {
+    /*public static void main(String[] args) throws IOException {
         int numberOfClients = 50;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfClients);
 
@@ -152,5 +152,5 @@ public class PlaneClient extends Client implements Runnable {
             executorService.execute(client);
         }
         executorService.shutdown();
-    }
+    }*/
 }

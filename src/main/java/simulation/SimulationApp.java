@@ -1,35 +1,49 @@
 package simulation;
 
+import airport.AirTrafficController;
+import client.PlaneClient;
 import javafx.application.Application;
-import javafx.scene.PerspectiveCamera;
-import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import plane.Plane;
+
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SimulationApp extends Application {
-
-
+    private AirTrafficController controller;
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Plane plane = new Plane();
-        PlaneController planeController = new PlaneController(plane);
-        Pane root = new AnchorPane();
-        PerspectiveCamera camera = new PerspectiveCamera();
-        camera.setTranslateX(100);
-        camera.setTranslateY(100);
-        camera.setTranslateZ(-100);
+        this.controller = new AirTrafficController();
+
+        /*
+        // Start Server
+        new Thread(() -> {
+            AirportServer airportServer = new AirportServer(controller);
+            try {
+                airportServer.startServer(5000);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        */
 
 
-        Scene scene = new Scene(root, 800, 600, Color.WHITE);
-        scene.setCamera(camera);
 
-        primaryStage.setTitle("Airport Automatic Landing System");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        // Start Clients
+        int numberOfClients = 50;
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfClients);
 
+        for (int i = 0; i < numberOfClients; i++) {
+            PlaneClient client = new PlaneClient("localhost", 5000);
+            executorService.execute(client);
+        }
+        executorService.shutdown();
+
+
+
+        // Start Visualization
+        AirportVisualization visualization = new AirportVisualization(controller);
+        visualization.start(primaryStage);
     }
 
     public static void main(String[] args) {
