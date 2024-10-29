@@ -1,6 +1,6 @@
-package collision;
+package controller;
 
-import airport.AirTrafficController;
+import controller.AirTrafficController;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2

@@ -6,6 +6,9 @@ import lombok.Getter;
 
 @Getter
 public class Airport {
+    public int width = 10000;
+    public int height = 5000;
+    public int depth = 10000;
     public static final int MAX_CAPACITY = 100;
     public static Runway runway1;
     public static Runway runway2;

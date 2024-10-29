@@ -1,8 +1,8 @@
 package server;
 
-import airport.AirTrafficController;
+import controller.AirTrafficController;
 import airport.Airport;
-import collision.CollisionDetector;
+import controller.CollisionDetector;
 import lombok.extern.log4j.Log4j2;
 import handler.PlaneHandler;
 

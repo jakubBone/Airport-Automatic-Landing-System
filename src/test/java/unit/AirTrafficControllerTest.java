@@ -1,6 +1,6 @@
 package unit;
 
-import airport.AirTrafficController;
+import controller.AirTrafficController;
 import airport.Corridor;
 import airport.Runway;
 import location.Location;
@@ -11,7 +11,6 @@ import plane.Plane;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

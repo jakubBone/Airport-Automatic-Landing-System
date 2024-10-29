@@ -1,6 +1,6 @@
 package simulation;
 
-import airport.AirTrafficController;
+import controller.AirTrafficController;
 import client.PlaneClient;
 import javafx.application.Application;
 import javafx.stage.Stage;

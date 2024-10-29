@@ -1,6 +1,6 @@
 package performance;
 
-import airport.AirTrafficController;
+import controller.AirTrafficController;
 import server.AirportServer;
 
 import java.io.IOException;

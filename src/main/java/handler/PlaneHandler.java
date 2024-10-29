@@ -1,6 +1,6 @@
 package handler;
 
-import airport.AirTrafficController;
+import controller.AirTrafficController;
 import airport.Airport;
 import airport.Runway;
 import communication.Messenger;

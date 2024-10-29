@@ -1,6 +1,6 @@
 package simulation;
 
-import airport.AirTrafficController;
+import controller.AirTrafficController;
 import airport.Airport;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -32,7 +32,7 @@ public class AirportVisualization extends Application {
         this.airport = new Airport();
         this.controller = controller;
         this.runwayModel = new RunwayModel();
-        this.airspaceModel = new AirspaceModel();
+        this.airspaceModel = new AirspaceModel(airport);
         this.planeModel = new PlaneModel();
         this.planeMap = new HashMap<>();
     }
@@ -41,10 +41,11 @@ public class AirportVisualization extends Application {
     public void start(Stage primaryStage) throws Exception {
         Scene scene = new Scene(root, 800, 600, Color.SKYBLUE);
         PerspectiveCamera camera = new PerspectiveCamera();
+        scene.setCamera(camera);
 
-        camera.setTranslateX(100);
-        camera.setTranslateY(-500);
-        camera.setTranslateZ(-1500);
+        camera.setTranslateX(0);
+        camera.setTranslateY(0);
+        camera.setTranslateZ(-4000);
         camera.setNearClip(0.1);
         camera.setFarClip(5000);
 
@@ -65,7 +66,11 @@ public class AirportVisualization extends Application {
     }
 
     public void setAirspace(){
-        root.getChildren().add(airspaceModel.createAirspace());
+        Rectangle floor = airspaceModel.floor;
+        root.getChildren().add(floor);
+        //Rectangle leftWall = airspaceModel.createLeftWall();
+        //Rectangle rightWall = airspaceModel.createRightWall();
+        //root.getChildren().addAll(floor,leftWall, rightWall);
     }
 
     public void setPlane(Plane plane){

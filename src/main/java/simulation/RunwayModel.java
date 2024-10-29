@@ -8,7 +8,7 @@ import javafx.scene.transform.Rotate;
 public class RunwayModel {
     public Rectangle createRunway(Runway runway) {
         Rectangle runwayRect = new Rectangle(200, 30);
-        runwayRect.setFill(Color.DARKGRAY);
+        runwayRect.setFill(Color.WHITE);
         runwayRect.setTranslateX(runway.getTouchdownPoint().getX());
         runwayRect.setTranslateY(runway.getTouchdownPoint().getY());
         runwayRect.setRotationAxis(Rotate.X_AXIS);

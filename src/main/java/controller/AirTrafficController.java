@@ -1,5 +1,7 @@
-package airport;
+package controller;
 
+import airport.Airport;
+import airport.Runway;
 import location.Location;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
