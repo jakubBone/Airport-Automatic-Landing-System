@@ -8,7 +8,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
+import lombok.Getter;
 
+@Getter
 public class AirspaceModel {
     Airport airport;
     Rectangle floor;
@@ -17,18 +19,32 @@ public class AirspaceModel {
 
     public AirspaceModel(Airport airport) {
         this.airport = airport;
-        this.floor = createWall(airport.width, airport.depth);
-        this.leftWall = createWall(airport.width, airport.depth);
-        this.rightWall = createWall(airport.width, airport.depth);
+        this.floor = createFloor(airport.width, airport.depth);
+        //this.floor = createWall(airport.width, airport.depth);
+        //this.leftWall = createWall(airport.width, airport.depth);
+        //this.rightWall = createWall(airport.width, airport.depth);
         setupFloor();
     }
 
-    private Rectangle createWall(int width, int height){
-        Rectangle wall = new Rectangle(width / 2, height / 2, Color.BLACK);
-        return createGriddedWall(wall);
+    private Rectangle createFloor(int width, int depth) {
+        Rectangle floor = new Rectangle(width / 2, depth / 2, Color.DARKGRAY);  // Rozmiar i kolor podłogi
+        return floor;
     }
 
-    public Rectangle createGriddedWall(Rectangle wall) {
+    private void setupFloor() {
+        floor.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
+        floor.setTranslateX(-floor.getWidth() / 2);
+        floor.setTranslateY(floor.getHeight() / 2);
+    }
+
+
+    /*private Rectangle createWall(int width, int height){
+        Rectangle wall = new Rectangle(width / 2, height / 2, Color.BLACK);
+        return createGriddedWall(wall);
+    }*/
+
+
+    /*public Rectangle createGriddedWall(Rectangle wall) {
         Canvas canvas = new Canvas(wall.getWidth(), wall.getHeight());
         GraphicsContext context2D = canvas.getGraphicsContext2D();
 
@@ -57,19 +73,19 @@ public class AirspaceModel {
         floor.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
         floor.setTranslateX(-floor.getWidth() / 2);
         floor.setTranslateY(floor.getHeight() / 2);
-    }
-    private void setupLeftWall() {
+    }*/
+    /*private void setupLeftWall() {
         leftWall.setTranslateX(-leftWall.getWidth() / 2);
         leftWall.setTranslateY(-leftWall.getHeight() / 4);
         leftWall.setTranslateZ(leftWall.getWidth());
 
-    }
+    }*/
 
-    private void setupRightWall() {
+    /*private void setupRightWall() {
         rightWall.getTransforms().add(new Rotate(90, Rotate.Y_AXIS));
         rightWall.setTranslateX(rightWall.getHeight() / 2);
         rightWall.setTranslateY(-rightWall.getHeight() / 4);
         rightWall.setTranslateZ(rightWall.getWidth());
 
-    }
+    }*/
 }

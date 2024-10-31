@@ -24,66 +24,43 @@ public class AirportVisualization extends Application {
     private Airport airport;
     private final AirTrafficController controller;
     private Map<Plane, Sphere> planeMap;
-    private RunwayModel runwayModel;
-    private PlaneModel planeModel;
-    private AirspaceModel airspaceModel;
     public AirportVisualization(AirTrafficController controller) {
         this.root = new Group();
         this.airport = new Airport();
         this.controller = controller;
-        this.runwayModel = new RunwayModel();
-        this.airspaceModel = new AirspaceModel(airport);
-        this.planeModel = new PlaneModel();
         this.planeMap = new HashMap<>();
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Scene scene = new Scene(root, 800, 600, Color.SKYBLUE);
-        PerspectiveCamera camera = new PerspectiveCamera();
-        scene.setCamera(camera);
+        Scene scene = new Scene(root, 800, 600, Color.BLACK);
+        Camera camera = new Camera();
+        RunwayModel runway1Model = new RunwayModel(Airport.runway1);
+        RunwayModel runway2Model = new RunwayModel(Airport.runway2);
+        AirspaceModel airspaceModel = new AirspaceModel(airport);
+        //PlaneModel planeModel = new PlaneModel(new Plane())
 
-        camera.setTranslateX(0);
-        camera.setTranslateY(0);
-        camera.setTranslateZ(-4000);
-        camera.setNearClip(0.1);
-        camera.setFarClip(5000);
+        //root.getChildren().add(airspaceModel.getFloor());
 
+        scene.setCamera(camera.getCamera());
         primaryStage.setTitle("Airport Automatic Landing System");
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        setRunway();
-        setAirspace();
 
-        startUpdatingAirspace();
+        root.getChildren().addAll(runway1Model.getRunwayRect(), runway2Model.getRunwayRect(),
+              airspaceModel.getFloor()); // Add also planeModel
+
+        //startUpdatingAirspace();
     }
 
-    public void setRunway(){
-        Rectangle runway1Rect = runwayModel.createRunway(Airport.runway1);
-        Rectangle runway2Rect = runwayModel.createRunway(Airport.runway2);
-        root.getChildren().addAll(runway1Rect, runway2Rect);
-    }
-
-    public void setAirspace(){
-        Rectangle floor = airspaceModel.floor;
-        root.getChildren().add(floor);
-        //Rectangle leftWall = airspaceModel.createLeftWall();
-        //Rectangle rightWall = airspaceModel.createRightWall();
-        //root.getChildren().addAll(floor,leftWall, rightWall);
-    }
-
-    public void setPlane(Plane plane){
-        root.getChildren().add(planeModel.createPlane(plane));
-    }
-
-    public void startUpdatingAirspace() {
+    /*public void startUpdatingAirspace() {
         Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> updateAirspace()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
-    }
+    }*/
 
-    public void updateAirspace(){
+    /*public void updateAirspace(){
         for (Plane plane : controller.getPlanes()) {
             if (!planeMap.containsKey(plane)) {
                 Sphere model = planeModel.createPlane(plane);
@@ -109,8 +86,7 @@ public class AirportVisualization extends Application {
                     planeIdText.setTranslateZ(plane.getLocation().getAltitude());
                 }
             }
-        }
-    }
+        }*/
 
     public static void main (String[]args){
         launch(args);
