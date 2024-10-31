@@ -1,4 +1,4 @@
-package performance;
+package load_tests;
 
 import controller.AirTrafficController;
 import server.AirportServer;
@@ -9,8 +9,8 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ServerStressTest {
-    static final Logger logger = Logger.getLogger(ClientStressTest.class.getName());
+public class ServerLoadTest {
+    static final Logger logger = Logger.getLogger(ClientLoadTest.class.getName());
     public static void main(String[] args) throws IOException {
         AirTrafficController controller = new AirTrafficController();
 

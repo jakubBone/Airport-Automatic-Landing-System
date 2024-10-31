@@ -35,8 +35,7 @@ public class AirspaceModel {
         drawGrid(wall, context2D);
 
         Image gridImage = canvas.snapshot(null, null);
-        ImagePattern gridPattern = new ImagePattern(gridImage);
-        wall.setFill(gridPattern);
+        wall.setFill(new ImagePattern(gridImage));
 
         return wall;
     }

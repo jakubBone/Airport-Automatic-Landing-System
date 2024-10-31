@@ -1,4 +1,4 @@
-package performance;
+package load_tests;
 
 import client.PlaneClient;
 import java.util.Timer;
@@ -8,8 +8,8 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ClientStressTest {
-    static final Logger logger = Logger.getLogger(ClientStressTest.class.getName());
+public class ClientLoadTest {
+    static final Logger logger = Logger.getLogger(ClientLoadTest.class.getName());
 
     public static void main(String[] args) {
 

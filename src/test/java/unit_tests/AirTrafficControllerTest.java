@@ -1,4 +1,4 @@
-package unit;
+package unit_tests;
 
 import controller.AirTrafficController;
 import airport.Corridor;
