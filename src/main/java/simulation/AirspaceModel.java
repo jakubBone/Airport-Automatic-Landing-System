@@ -3,6 +3,7 @@ package simulation;
 import airport.Airport;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.transform.Rotate;
 import lombok.Getter;
 
 @Getter
@@ -14,7 +15,7 @@ public class AirspaceModel {
 
     public AirspaceModel(Airport airport) {
         this.airport = airport;
-        this.floor = createFloor(5000, 5000);
+        this.floor = createFloor(5000, 7000);
         setupFloor();
     }
 
@@ -24,11 +25,10 @@ public class AirspaceModel {
     }
 
     private void setupFloor() {
-        //this.floor.setRotationAxis(Rotate.X_AXIS);
-        //this.floor.setRotate(90);
-        floor.setTranslateX(500);
+        this.floor.setRotationAxis(Rotate.X_AXIS);
+        this.floor.setRotate(90);
+        floor.setTranslateX(0);
         floor.setTranslateY(0);
         floor.setTranslateZ(0);
-
     }
 }
