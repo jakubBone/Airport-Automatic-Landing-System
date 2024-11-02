@@ -9,7 +9,7 @@ public class Camera {
     public Camera() {
         this.camera = new PerspectiveCamera();
         this.camera.setTranslateX(0);
-        this.camera.setTranslateY(-2000);
-        this.camera.setTranslateZ(-10000);
+        this.camera.setTranslateY(-3000);
+        this.camera.setTranslateZ(-15000);
     }
 }

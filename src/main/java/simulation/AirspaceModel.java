@@ -15,18 +15,18 @@ public class AirspaceModel {
 
     public AirspaceModel(Airport airport) {
         this.airport = airport;
-        this.floor = createFloor(5000, 5000);
+        this.floor = createFloor(10000 / 2, 10000 / 2);
         setupFloor();
     }
 
     private Rectangle createFloor(int width, int depth) {
-        return new Rectangle(width , depth , Color.DARKGRAY);
+        return new Rectangle(width, depth, Color.DARKGRAY);
     }
 
     private void setupFloor() {
         this.floor.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
         this.floor.setTranslateX(0);
         this.floor.setTranslateY(0);
-        this.floor.setTranslateZ(-2000);
+        this.floor.setTranslateZ(-2500);
     }
 }
