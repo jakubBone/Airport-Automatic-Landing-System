@@ -25,10 +25,11 @@ public class AirspaceModel {
     }
 
     private void setupFloor() {
-        this.floor.setRotationAxis(Rotate.X_AXIS);
-        this.floor.setRotate(90);
         floor.setTranslateX(0);
         floor.setTranslateY(0);
         floor.setTranslateZ(0);
+
+        //this.floor.setRotationAxis(Rotate.X_AXIS);
+        //this.floor.setRotate(90);
     }
 }

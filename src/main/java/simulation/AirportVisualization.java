@@ -37,7 +37,7 @@ public class AirportVisualization extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        root.getChildren().addAll(runway1Model.getRunwayRect(), airspaceModel.getFloor());
+        root.getChildren().addAll(airspaceModel.getFloor(), runway1Model.getRunwayRect());
     }
 
 
