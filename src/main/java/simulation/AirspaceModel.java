@@ -8,28 +8,25 @@ import lombok.Getter;
 
 @Getter
 public class AirspaceModel {
-    Airport airport;
-    Rectangle floor;
-    Rectangle leftWall;
-    Rectangle rightWall;
+    private Airport airport;
+    private Rectangle floor;
+    private Rectangle leftWall;
+    private Rectangle rightWall;
 
     public AirspaceModel(Airport airport) {
         this.airport = airport;
-        this.floor = createFloor(5000, 7000);
+        this.floor = createFloor(5000, 5000);
         setupFloor();
     }
 
     private Rectangle createFloor(int width, int depth) {
-        Rectangle floor = new Rectangle(width , depth , Color.DARKGRAY);
-        return floor;
+        return new Rectangle(width , depth , Color.DARKGRAY);
     }
 
     private void setupFloor() {
-        floor.setTranslateX(0);
-        floor.setTranslateY(0);
-        floor.setTranslateZ(0);
-
-        //this.floor.setRotationAxis(Rotate.X_AXIS);
-        //this.floor.setRotate(90);
+        this.floor.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
+        this.floor.setTranslateX(0);
+        this.floor.setTranslateY(0);
+        this.floor.setTranslateZ(-2000);
     }
 }

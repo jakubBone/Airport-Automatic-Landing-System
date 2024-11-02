@@ -15,15 +15,15 @@ public class Runway implements Serializable {
     private Location touchdownPoint;
     private Corridor corridor;
     private boolean isAvailable;
-    private double length;
-    private double width;
+    public int width;
+    public int height;
 
     public Runway(String id, Location touchdownPoint, Corridor corridor, Boolean isAvailable) {
         this.id = id;
         this.touchdownPoint = touchdownPoint;
         this.corridor = corridor;
         this.isAvailable = isAvailable;
-        this.length = 5000;
-        this.width = 1000;
+        this.width = 5000;
+        this.height = 1000;
     }
 }

@@ -10,16 +10,14 @@ import lombok.Getter;
 public class RunwayModel {
     private Rectangle runwayRect;
 
-    public RunwayModel() {
-        this.runwayRect = new Rectangle(5000, 5000);
+    public RunwayModel(Runway runway) {
+        this.runwayRect = new Rectangle(runway.getWidth(), runway.getHeight());
         this.runwayRect.setFill(Color.BLUE);
 
-        this.runwayRect.setTranslateX(-4000);
-        this.runwayRect.setTranslateY(0);
-        this.runwayRect.setTranslateZ(0);
-
-        //this.runwayRect.setRotationAxis(Rotate.X_AXIS);
-        //this.runwayRect.setRotate(90);
-
+        this.runwayRect.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
+        this.runwayRect.setTranslateX(0);
+        this.runwayRect.setTranslateY(10);
+        this.runwayRect.setTranslateZ(runway.getTouchdownPoint().getY());
     }
+
 }

@@ -1,5 +1,6 @@
 package simulation;
 
+import airport.Runway;
 import controller.AirTrafficController;
 import airport.Airport;
 import javafx.application.Application;
@@ -29,7 +30,8 @@ public class AirportVisualization extends Application {
     public void start(Stage primaryStage) throws Exception {
         Scene scene = new Scene(root, 800, 600, Color.BLACK);
         Camera camera = new Camera();
-        RunwayModel runway1Model = new RunwayModel();
+        RunwayModel runway1Model = new RunwayModel(Airport.runway1);
+        RunwayModel runway2Model = new RunwayModel(Airport.runway2);
         AirspaceModel airspaceModel = new AirspaceModel(airport);
 
         scene.setCamera(camera.getCamera());
@@ -37,7 +39,8 @@ public class AirportVisualization extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        root.getChildren().addAll(airspaceModel.getFloor(), runway1Model.getRunwayRect());
+        //root.getChildren().addAll(airspaceModel.getFloor(), runway1Model.getRunwayRect());
+        root.getChildren().addAll(airspaceModel.getFloor(), runway1Model.getRunwayRect(), runway2Model.getRunwayRect());
     }
 
 
