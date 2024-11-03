@@ -1,6 +1,5 @@
 package simulation;
 
-import airport.Runway;
 import controller.AirTrafficController;
 import airport.Airport;
 import javafx.application.Application;
@@ -14,12 +13,12 @@ import plane.Plane;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AirportVisualization extends Application {
+public class Visualization extends Application {
     private Group root;
     private Airport airport;
     private final AirTrafficController controller;
     private Map<Plane, Sphere> planeMap;
-    public AirportVisualization(AirTrafficController controller) {
+    public Visualization(AirTrafficController controller) {
         this.root = new Group();
         this.airport = new Airport();
         this.controller = controller;
@@ -40,7 +39,7 @@ public class AirportVisualization extends Application {
         primaryStage.show();
 
         //root.getChildren().addAll(airspaceModel.getFloor(), runway1Model.getRunwayRect());
-        root.getChildren().addAll(airspaceModel.getFloor(), runway1Model.getRunwayRect(), runway2Model.getRunwayRect());
+        root.getChildren().addAll(airspaceModel.getFloor(), airspaceModel.getLeftWall(), runway1Model.getRunwayRect(), runway2Model.getRunwayRect());
     }
 
 

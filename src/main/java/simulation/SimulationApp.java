@@ -39,7 +39,7 @@ public class SimulationApp extends Application {
 
 
         // Start Visualization
-        AirportVisualization visualization = new AirportVisualization(controller);
+        Visualization visualization = new Visualization(controller);
         visualization.start(primaryStage);
     }
 
