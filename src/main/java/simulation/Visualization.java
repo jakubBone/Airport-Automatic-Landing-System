@@ -38,8 +38,8 @@ public class Visualization extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        //root.getChildren().addAll(airspaceModel.getFloor(), runway1Model.getRunwayRect());
-        root.getChildren().addAll(airspaceModel.getFloor(), airspaceModel.getLeftWall(), runway1Model.getRunwayRect(), runway2Model.getRunwayRect());
+        root.getChildren().addAll(airspaceModel.getFloor(), airspaceModel.getLeftWall(), airspaceModel.getRightWall(),
+                runway1Model.getRunwayRect(), runway2Model.getRunwayRect());
     }
 
 

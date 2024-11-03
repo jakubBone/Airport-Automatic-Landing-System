@@ -16,9 +16,11 @@ public class AirspaceModel {
     public AirspaceModel(Airport airport) {
         this.airport = airport;
         this.floor = createFloor(10000 / 2, 10000 / 2);
-        this.leftWall = createFloor(10000 / 2, 10000 / 2);
+        this.leftWall = createFloor(10000 / 2, 5000 / 2);
+        this.rightWall = createFloor(5000 / 2, 10000 / 2);
         setupFloor();
         setupLeftWall();
+        setupRightWall();
     }
 
     private Rectangle createFloor(int width, int depth) {
@@ -37,5 +39,13 @@ public class AirspaceModel {
         this.leftWall.setTranslateX(0);
         this.leftWall.setTranslateY(0);
         this.leftWall.setTranslateZ(2500);
+    }
+
+    private void setupRightWall() {
+        this.rightWall.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
+        this.rightWall.getTransforms().add(new Rotate(270, Rotate.Y_AXIS));
+        this.rightWall.setTranslateX(0);
+        this.rightWall.setTranslateY(0);
+        this.rightWall.setTranslateZ(-2500);
     }
 }
