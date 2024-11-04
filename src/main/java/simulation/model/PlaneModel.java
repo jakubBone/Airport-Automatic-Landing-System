@@ -14,27 +14,30 @@ public class PlaneModel {
     private Text label;
 
     public PlaneModel(Plane plane) {
-        createPlane(plane);
+        createPlane();
         createLabel(plane);
+        updatePosition(plane);
     }
 
-    public void createPlane(Plane plane) {
+    public void createPlane() {
         PhongMaterial material = new PhongMaterial(Color.WHITE);
-
         this.planeSphere = new Sphere(100);
         this.planeSphere.setMaterial(material);
-        this.planeSphere.setTranslateX(plane.getLocation().getX() / 2);
-        this.planeSphere.setTranslateY(plane.getLocation().getY() / 2);
-        this.planeSphere.setTranslateZ(plane.getLocation().getAltitude() / 2);
     }
 
-    public void createLabel(Plane plane){
+    public void createLabel(Plane plane) {
         this.label = new Text(Integer.toString(plane.getId()));
         this.label.setFont(new Font(120));
         this.label.setFill(Color.BLACK);
+    }
 
-        this.label.setTranslateX((plane.getLocation().getX() / 2) + 100);
-        this.label.setTranslateY((plane.getLocation().getY() / 2) - 100);
+    public void updatePosition(Plane plane) {
+        this.planeSphere.setTranslateX(plane.getLocation().getX() / 2);
+        this.planeSphere.setTranslateY(plane.getLocation().getY() / 2);
+        this.planeSphere.setTranslateZ(plane.getLocation().getAltitude() / 2);
+
+        this.label.setTranslateX((plane.getLocation().getX() + 150) / 2);
+        this.label.setTranslateY((plane.getLocation().getY() - 150) / 2);
         this.label.setTranslateZ(plane.getLocation().getAltitude() / 2);
     }
 }

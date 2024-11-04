@@ -18,7 +18,7 @@ public class SimulationApp extends Application {
         this.controller = new AirTrafficController();
 
         // Start Server
-        new Thread(() -> {
+        Thread serverThread = new Thread(() -> {
             AirportServer airportServer = new AirportServer(controller);
             try {
                 airportServer.startServer(5000);
@@ -26,12 +26,15 @@ public class SimulationApp extends Application {
                 e.printStackTrace();
             }
         });
+        serverThread.isDaemon();
+        serverThread.start();
+
 
         // Start Clients
         int numberOfClients = 50;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfClients);
 
-        for (int i = 0; i < numberOfClients; i++) {
+        for (int i = 0; i < 5; i++) {
             PlaneClient client = new PlaneClient("localhost", 5000);
             executorService.execute(client);
         }
