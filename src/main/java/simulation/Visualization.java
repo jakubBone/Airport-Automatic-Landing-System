@@ -9,6 +9,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Sphere;
 import javafx.stage.Stage;
 import plane.Plane;
+import simulation.model.AirspaceModel;
+import simulation.model.RunwayModel;
 
 import java.util.HashMap;
 import java.util.Map;
