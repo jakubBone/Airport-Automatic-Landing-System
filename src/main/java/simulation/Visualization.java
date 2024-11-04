@@ -33,7 +33,7 @@ public class Visualization extends Application {
         Camera camera = new Camera();
         RunwayModel runway1Model = new RunwayModel(Airport.runway1);
         RunwayModel runway2Model = new RunwayModel(Airport.runway2);
-        AirspaceModel airspaceModel = new AirspaceModel(airport);
+        AirspaceModel airspaceModel = new AirspaceModel();
 
         scene.setCamera(camera.getCamera());
         primaryStage.setTitle("Airport Automatic Landing System");
