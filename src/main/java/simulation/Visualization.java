@@ -49,7 +49,8 @@ public class Visualization extends Application {
         primaryStage.show();
 
         root.getChildren().addAll(airspaceModel.getFloor(), airspaceModel.getLeftWall(), airspaceModel.getRightWall(),
-                runway1Model.getRunwayRect(), runway2Model.getRunwayRect(), planeModel.getPlaneSphere());
+                runway1Model.getRunwayRect(), runway2Model.getRunwayRect(),
+                planeModel.getPlaneSphere(), planeModel.getLabel());
     }
 
     public static void main (String[]args){

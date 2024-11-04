@@ -3,6 +3,7 @@ package simulation.model;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import lombok.Getter;
 import plane.Plane;
@@ -10,9 +11,11 @@ import plane.Plane;
 @Getter
 public class PlaneModel {
     private Sphere planeSphere;
+    private Text label;
+
     public PlaneModel(Plane plane) {
         createPlane(plane);
-        setTestField(plane);
+        createLabel(plane);
     }
 
     public void createPlane(Plane plane) {
@@ -24,11 +27,14 @@ public class PlaneModel {
         this.planeSphere.setTranslateY(plane.getLocation().getY() / 2);
         this.planeSphere.setTranslateZ(plane.getLocation().getAltitude() / 2);
     }
-    public void setTestField(Plane plane){
-        Text planeId = new Text(Integer.toString(plane.getId()));
-        planeId.setTranslateX(plane.getLocation().getX());
-        planeId.setTranslateY(plane.getLocation().getY() - 20);
-        planeId.setTranslateZ(plane.getLocation().getAltitude());
-        planeId.setFill(Color.BLACK);
+
+    public void createLabel(Plane plane){
+        this.label = new Text(Integer.toString(plane.getId()));
+        this.label.setFont(new Font(120));
+        this.label.setFill(Color.BLACK);
+
+        this.label.setTranslateX((plane.getLocation().getX() / 2) + 100);
+        this.label.setTranslateY((plane.getLocation().getY() / 2) - 100);
+        this.label.setTranslateZ(plane.getLocation().getAltitude() / 2);
     }
 }
