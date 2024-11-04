@@ -8,8 +8,10 @@ import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Sphere;
 import javafx.stage.Stage;
+import location.Location;
 import plane.Plane;
 import simulation.model.AirspaceModel;
+import simulation.model.PlaneModel;
 import simulation.model.RunwayModel;
 
 import java.util.HashMap;
@@ -35,15 +37,20 @@ public class Visualization extends Application {
         RunwayModel runway2Model = new RunwayModel(Airport.runway2);
         AirspaceModel airspaceModel = new AirspaceModel();
 
+        // Test plane
+        Plane plane = new Plane();
+        Location location = new Location(5000 , -2500 , -2500);
+        plane.setLocation(location);
+        PlaneModel planeModel = new PlaneModel(plane);
+
         scene.setCamera(camera.getCamera());
         primaryStage.setTitle("Airport Automatic Landing System");
         primaryStage.setScene(scene);
         primaryStage.show();
 
         root.getChildren().addAll(airspaceModel.getFloor(), airspaceModel.getLeftWall(), airspaceModel.getRightWall(),
-                runway1Model.getRunwayRect(), runway2Model.getRunwayRect());
+                runway1Model.getRunwayRect(), runway2Model.getRunwayRect(), planeModel.getPlaneSphere());
     }
-
 
     public static void main (String[]args){
         launch(args);

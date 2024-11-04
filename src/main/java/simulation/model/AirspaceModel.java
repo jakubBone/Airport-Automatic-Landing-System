@@ -1,6 +1,5 @@
 package simulation.model;
 
-import airport.Airport;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;

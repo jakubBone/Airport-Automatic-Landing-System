@@ -11,17 +11,18 @@ import plane.Plane;
 public class PlaneModel {
     private Sphere planeSphere;
     public PlaneModel(Plane plane) {
-        setPlaneModel(plane);
+        createPlane(plane);
         setTestField(plane);
     }
 
-    public void setPlaneModel(Plane plane) {
-        this.planeSphere = new Sphere(10);
+    public void createPlane(Plane plane) {
         PhongMaterial material = new PhongMaterial(Color.WHITE);
-        planeSphere.setMaterial(material);
-        planeSphere.setTranslateX(plane.getLocation().getX());
-        planeSphere.setTranslateY(plane.getLocation().getY());
-        planeSphere.setTranslateZ(plane.getLocation().getAltitude());
+
+        this.planeSphere = new Sphere(100);
+        this.planeSphere.setMaterial(material);
+        this.planeSphere.setTranslateX(plane.getLocation().getX() / 2);
+        this.planeSphere.setTranslateY(plane.getLocation().getY() / 2);
+        this.planeSphere.setTranslateZ(plane.getLocation().getAltitude() / 2);
     }
     public void setTestField(Plane plane){
         Text planeId = new Text(Integer.toString(plane.getId()));
