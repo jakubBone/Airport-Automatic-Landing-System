@@ -33,13 +33,6 @@ public class PlaneClient extends Client implements Runnable {
                 return;
             }
 
-            try{
-                Thread.sleep(2000);
-            } catch (InterruptedException ex){
-                log.warn("PlaneClient [{}]: Sleep was interrupted", plane.getId());
-                Thread.currentThread().interrupt();
-            }
-
             messenger.send(plane, out);
 
             while (!isProcessCompleted) {
@@ -143,14 +136,14 @@ public class PlaneClient extends Client implements Runnable {
     }
 
 
-    /*public static void main(String[] args) throws IOException {
-        int numberOfClients = 50;
+    public static void main(String[] args) throws IOException {
+        /*int numberOfClients = 5;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfClients);
 
         for (int i = 0; i < numberOfClients; i++) {
             PlaneClient client = new PlaneClient("localhost", 5000);
             executorService.execute(client);
         }
-        executorService.shutdown();
-    }*/
+        executorService.shutdown();*/
+    }
 }

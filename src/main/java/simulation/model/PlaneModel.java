@@ -27,7 +27,7 @@ public class PlaneModel {
 
     public void createLabel(Plane plane) {
         this.label = new Text();
-        this.label.setFont(new Font(200));
+        this.label.setFont(new Font(100));
         this.label.setFill(Color.MAGENTA);
     }
 

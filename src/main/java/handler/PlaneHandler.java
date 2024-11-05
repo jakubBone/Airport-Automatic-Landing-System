@@ -46,14 +46,6 @@ public class PlaneHandler extends Thread {
                 return;
             }
 
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException ex) {
-                log.warn("PlaneHandler interrupted during sleep for Plane handling. Thread was interrupted");
-                Thread.currentThread().interrupt();
-                return;
-            }
-
             managePlane(plane, in, out);
 
         } catch (EOFException | SocketException ex) {

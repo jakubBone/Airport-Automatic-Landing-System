@@ -6,10 +6,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import server.AirportServer;
 
-
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class SimulationApp extends Application {
     private AirTrafficController controller;
@@ -30,21 +27,25 @@ public class SimulationApp extends Application {
         serverThread.start();
 
 
-        // Start Clients
         int numberOfClients = 50;
-        ExecutorService executorService = Executors.newFixedThreadPool(numberOfClients);
 
-        for (int i = 0; i < 1; i++) {
-            PlaneClient client = new PlaneClient("localhost", 5000);
-            executorService.execute(client);
-        }
-        executorService.shutdown();
-
+        new Thread(() -> {
+            for (int i = 0; i < numberOfClients; i++) {
+                PlaneClient client = new PlaneClient("localhost", 5000);
+                new Thread(client).start();
+                try {
+                    Thread.sleep(4000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
         // Start Visualization
         Visualization visualization = new Visualization(controller);
         visualization.start(primaryStage);
     }
+
 
     public static void main(String[] args) {
         launch(args);
