@@ -1,7 +1,5 @@
 package simulation.model;
 
-import airport.Airport;
-import javafx.geometry.Point3D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
@@ -9,12 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
-import location.Location;
-import location.WaypointGenerator;
 import lombok.Getter;
-
-import java.util.List;
-import java.util.Map;
 
 @Getter
 public class AirspaceModel {

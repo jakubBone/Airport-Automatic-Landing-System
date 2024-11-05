@@ -1,7 +1,6 @@
 package simulation.model;
 
 import airport.Airport;
-import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
@@ -30,8 +29,8 @@ public class WaypointModel {
     }
 
     public void createWaypoint(){
-        this.landingWaypointsR1 = WaypointGenerator.getLandingWaypoints(Airport.runway1.getTouchdownPoint());
-        this.landingWaypointsR2 = WaypointGenerator.getLandingWaypoints(Airport.runway2.getTouchdownPoint());
+        this.landingWaypointsR1 = WaypointGenerator.getLandingWaypoints(Airport.runway1.getCorridor().getEntryWaypoint());
+        this.landingWaypointsR2 = WaypointGenerator.getLandingWaypoints(Airport.runway2.getCorridor().getEntryWaypoint());
         this.holdingPatternWaypoints = WaypointGenerator.getHoldingPatternWaypoints();
         this.descentWaypoints = WaypointGenerator.getDescentWaypoints();
     }
@@ -55,9 +54,10 @@ public class WaypointModel {
             material.setDiffuseColor(Color.BLACK);
             waypointModel.setMaterial(material);
 
-            waypointModel.setTranslateX(waypoint.getX() / 2);
-            waypointModel.setTranslateY(-(waypoint.getAltitude() / 2));
-            waypointModel.setTranslateZ(waypoint.getY() / 2);
+            waypointModel.setTranslateX((waypoint.getX()) / 2);
+            waypointModel.setTranslateY(-(waypoint.getAltitude()) / 2);
+
+            waypointModel.setTranslateZ((waypoint.getY()) / 2);
             models.add(waypointModel);
         }
     }
