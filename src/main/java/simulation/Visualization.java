@@ -61,9 +61,9 @@ public class Visualization extends Application {
                 runway1Model.getRunwayRect(), runway2Model.getRunwayRect());
 
         addWaypointModels(waypointModel.getLandingR1Models());
-        addWaypointModels(waypointModel.getLandingR2Models());
-        addWaypointModels(waypointModel.getHoldingPatternModels());
-        addWaypointModels(waypointModel.getDescentModels());
+        //addWaypointModels(waypointModel.getLandingR2Models());
+        //addWaypointModels(waypointModel.getHoldingPatternModels());
+        //addWaypointModels(waypointModel.getDescentModels());
     }
 
     public void startUpdatingAirspace() {
@@ -85,7 +85,7 @@ public class Visualization extends Application {
             }
 
             if(plane.isLanded() || plane.isDestroyed()){
-                root.getChildren().removeAll(planeModel.getPlaneSphere(), planeModel.getLabel());
+               root.getChildren().removeAll(planeModel.getPlaneSphere(), planeModel.getLabel());
             } else {
                 planeModel.updatePosition(plane);
             }

@@ -186,6 +186,14 @@ public class PlaneHandler extends Thread {
     }
 
     private void completeLanding(Plane plane, Runway runway) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            log.warn("PlaneHandler interrupted during sleep for completing landing. Thread was interrupted");
+            Thread.currentThread().interrupt();
+            return;
+        }
+
         controller.removePlaneFromSpace(plane);
         log.info("Plane [{}] removed from airspace", plane.getId());
 
