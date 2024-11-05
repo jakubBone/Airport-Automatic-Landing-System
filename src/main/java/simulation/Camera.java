@@ -9,10 +9,10 @@ public class Camera {
     private PerspectiveCamera camera;
     public Camera() {
         this.camera = new PerspectiveCamera();
-        this.camera.setTranslateX(8000);
+        this.camera.setTranslateX(-5000);
         this.camera.setTranslateY(-2500);
-        this.camera.setTranslateZ(-12000);
+        this.camera.setTranslateZ(-10000);
 
-        this.camera.getTransforms().add(new Rotate(-25, Rotate.Y_AXIS));
+        this.camera.getTransforms().add(new Rotate(25, Rotate.Y_AXIS));
     }
 }

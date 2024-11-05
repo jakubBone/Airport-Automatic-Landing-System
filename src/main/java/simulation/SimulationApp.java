@@ -34,7 +34,7 @@ public class SimulationApp extends Application {
         int numberOfClients = 50;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfClients);
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 1; i++) {
             PlaneClient client = new PlaneClient("localhost", 5000);
             executorService.execute(client);
         }

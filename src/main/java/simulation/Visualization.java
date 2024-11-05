@@ -24,6 +24,7 @@ public class Visualization extends Application {
     private Airport airport;
     private final AirTrafficController controller;
     private Map<Integer, PlaneModel> planeMap;
+
     public Visualization(AirTrafficController controller) {
         this.root = new Group();
         this.airport = new Airport();

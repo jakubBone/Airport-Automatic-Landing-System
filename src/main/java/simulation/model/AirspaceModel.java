@@ -15,13 +15,42 @@ public class AirspaceModel {
     private Rectangle leftWall;
     private Rectangle rightWall;
 
+
     public AirspaceModel() {
         setupFloor();
         setupLeftWall();
         setupRightWall();
     }
 
-    private void setupFloor() {
+
+private void setupFloor() {
+        this.floor = createWall(10000 / 2, 10000 / 2);
+        this.floor.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
+        this.floor.setTranslateX(- 5000 / 2);
+        this.floor.setTranslateY(0);
+        this.floor.setTranslateZ(- 5000 / 2) ;
+    }
+
+    private void setupLeftWall() {
+        this.leftWall = createWall(10000 / 2, 5000 / 2);
+
+        this.leftWall.getTransforms().add(new Rotate(180, Rotate.X_AXIS));
+        this.leftWall.setTranslateX(-5000 / 2);
+        this.leftWall.setTranslateY(0);
+        this.leftWall.setTranslateZ(5000 / 2);
+    }
+
+    private void setupRightWall() {
+        this.rightWall = createWall(5000 / 2, 10000 / 2);
+
+        this.rightWall.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
+        this.rightWall.getTransforms().add(new Rotate(270, Rotate.Y_AXIS));
+        this.rightWall.setTranslateX(5000 / 2);
+        this.rightWall.setTranslateY(0);
+        this.rightWall.setTranslateZ(-5000 / 2);
+    }
+
+    /*private void setupFloor() {
         this.floor = createWall(10000 / 2, 10000 / 2);
 
         this.floor.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
@@ -47,8 +76,7 @@ public class AirspaceModel {
         this.rightWall.setTranslateX(0);
         this.rightWall.setTranslateY(0);
         this.rightWall.setTranslateZ(-2500);
-    }
-
+    }*/
 
     private Rectangle createWall(int width, int height) {
         Rectangle wall = new Rectangle(width, height);
@@ -61,6 +89,7 @@ public class AirspaceModel {
         wall.setFill(new ImagePattern(image));
         return wall;
     }
+
 
     private void addGrid(Canvas canvas, int width, int height, int spacing){
         GraphicsContext gc = canvas.getGraphicsContext2D();

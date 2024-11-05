@@ -12,7 +12,7 @@ public class RunwayModel {
 
     public RunwayModel(Runway runway) {
         this.runwayRect = new Rectangle(runway.getWidth() / 2, runway.getHeight() / 2);
-        this.runwayRect.setFill(Color.BLUE);
+        this.runwayRect.setFill(Color.BLACK);
 
         this.runwayRect.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
         this.runwayRect.setTranslateX(0);
