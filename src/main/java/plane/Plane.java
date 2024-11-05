@@ -35,6 +35,7 @@ public class Plane implements Serializable {
     private List <Location> waypoints;
     private int currentWaypointIndex;
     private boolean isDestroyed;
+    private boolean isFirstMove;
 
     public Plane() {
         this.id = generateID();
@@ -47,10 +48,12 @@ public class Plane implements Serializable {
         //this.location = waypoints.get(currentWaypointIndex);
         this.isDestroyed = false;
         this.landed = false;
+        this.isFirstMove = true;
     }
 
     public void descend(){
         moveTowardsNextWaypoint();
+        isFirstMove = false;
         if (isAtLastWaypoint()) {
             flightPhase = FlightPhase.HOLDING;
             waypoints = WaypointGenerator.getHoldingPatternWaypoints();
@@ -99,10 +102,12 @@ public class Plane implements Serializable {
     }
 
     public void moveTowards(Location nextWaypoint) {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
+        if(!isFirstMove){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
         }
         location.setX(nextWaypoint.getX());
         location.setY(nextWaypoint.getY());

@@ -46,7 +46,6 @@ public class Visualization extends Application {
         primaryStage.setTitle("Airport Automatic Landing System");
         primaryStage.setScene(scene);
         primaryStage.show();
-
     }
 
     public void setupSceneElements(Scene scene, Camera camera){
@@ -60,14 +59,14 @@ public class Visualization extends Application {
         root.getChildren().addAll(airspaceModel.getFloor(), airspaceModel.getLeftWall(), airspaceModel.getRightWall(),
                 runway1Model.getRunwayRect(), runway2Model.getRunwayRect());
 
-        addWaypointModels(waypointModel.getLandingR1Models());
-        addWaypointModels(waypointModel.getLandingR2Models());
-        addWaypointModels(waypointModel.getHoldingPatternModels());
-        addWaypointModels(waypointModel.getDescentModels());
+        //addWaypointModels(waypointModel.getLandingR1Models());
+        //addWaypointModels(waypointModel.getLandingR2Models());
+        //addWaypointModels(waypointModel.getHoldingPatternModels());
+        //addWaypointModels(waypointModel.getDescentModels());
     }
 
     public void startUpdatingAirspace() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> updateAirspace()));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1), event -> updateAirspace()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
@@ -81,6 +80,7 @@ public class Visualization extends Application {
             if (planeModel == null) {
                 planeModel = new PlaneModel(plane);
                 planeMap.put(plane.getId(), planeModel);
+
                 root.getChildren().addAll(planeModel.getPlaneSphere(), planeModel.getLabel());
             }
 
