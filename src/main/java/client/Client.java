@@ -33,27 +33,9 @@ public class Client {
             if(stopReconnection){
                 return;
             }
-            //retryConnection();
             log.error("Failed to establish connection with the server at port {}. Error: {}", port, ex.getMessage());
         }
     }
-
-    /*private void retryConnection() {
-        if (connectionAttempts > 2) {
-            log.error("Max reconnection attempts reached. Giving up");
-            stopConnection();
-            return;
-        }
-        try {
-            Thread.sleep(2000);
-            log.info("Attempting to reconnect to the server... (Attempt {})", connectionAttempts + 1);
-            connectionAttempts++;
-            startConnection();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-            log.warn("Reconnection attempt interrupted: {} ", ie.getMessage());
-        }
-    }*/
 
     protected void stopConnection() {
         try {
