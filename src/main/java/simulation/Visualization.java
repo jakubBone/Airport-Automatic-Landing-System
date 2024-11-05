@@ -5,15 +5,20 @@ import airport.Airport;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Sphere;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import location.Location;
+import location.WaypointGenerator;
 import plane.Plane;
 import simulation.model.AirspaceModel;
 import simulation.model.PlaneModel;
 import simulation.model.RunwayModel;
+import simulation.model.WaypointModel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -53,9 +58,15 @@ public class Visualization extends Application {
         RunwayModel runway1Model = new RunwayModel(Airport.runway1);
         RunwayModel runway2Model = new RunwayModel(Airport.runway2);
         AirspaceModel airspaceModel = new AirspaceModel();
+        WaypointModel waypointModel = new WaypointModel();
 
         root.getChildren().addAll(airspaceModel.getFloor(), airspaceModel.getLeftWall(), airspaceModel.getRightWall(),
                 runway1Model.getRunwayRect(), runway2Model.getRunwayRect());
+
+        addWaypointModels(waypointModel.getLandingR1Models());
+        addWaypointModels(waypointModel.getLandingR2Models());
+        addWaypointModels(waypointModel.getHoldingPatternModels());
+        addWaypointModels(waypointModel.getDescentModels());
     }
 
     public void startUpdatingAirspace() {
@@ -81,6 +92,12 @@ public class Visualization extends Application {
             } else {
                 planeModel.updatePosition(plane);
             }
+        }
+    }
+
+    private void addWaypointModels(List<Sphere> waypointModels) {;
+        for (Sphere model: waypointModels) {
+            root.getChildren().add(model);
         }
     }
 
