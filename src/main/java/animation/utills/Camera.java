@@ -1,4 +1,4 @@
-package simulation;
+package animation.utills;
 
 import javafx.scene.PerspectiveCamera;
 

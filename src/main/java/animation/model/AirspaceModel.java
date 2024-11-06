@@ -1,4 +1,4 @@
-package simulation.model;
+package animation.model;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
@@ -20,7 +20,6 @@ public class AirspaceModel {
         setupLeftWall();
         setupRightWall();
     }
-
 
     private void setupFloor() {
         this.floor = createWall(10000 / 2, 10000 / 2);

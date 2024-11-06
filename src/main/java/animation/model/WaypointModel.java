@@ -1,4 +1,4 @@
-package simulation.model;
+package animation.model;
 
 import airport.Airport;
 import javafx.scene.paint.Color;

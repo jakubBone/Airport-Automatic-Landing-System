@@ -1,5 +1,6 @@
-package simulation;
+package animation;
 
+import animation.utills.SceneRenderer;
 import controller.AirTrafficController;
 import client.PlaneClient;
 import javafx.application.Application;
@@ -8,13 +9,12 @@ import server.AirportServer;
 
 import java.io.IOException;
 
-public class SimulationApp extends Application {
+public class SimulationLauncher extends Application {
     private AirTrafficController controller;
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.controller = new AirTrafficController();
 
-        // Start Server
         Thread serverThread = new Thread(() -> {
             AirportServer airportServer = new AirportServer(controller);
             try {
@@ -25,7 +25,6 @@ public class SimulationApp extends Application {
         });
         serverThread.isDaemon();
         serverThread.start();
-
 
         int numberOfClients = 50;
 
@@ -41,11 +40,9 @@ public class SimulationApp extends Application {
             }
         }).start();
 
-        // Start Visualization
-        Visualization visualization = new Visualization(controller);
+        SceneRenderer visualization = new SceneRenderer(controller);
         visualization.start(primaryStage);
     }
-
 
     public static void main(String[] args) {
         launch(args);
