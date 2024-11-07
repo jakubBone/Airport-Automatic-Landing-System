@@ -74,8 +74,6 @@ public class PlaneClient extends Client implements Runnable {
         }
     }
 
-
-
     private void processLanding() throws IOException, ClassNotFoundException {
         String message = messenger.receive(in);
         Runway runway = messenger.parse(message, Runway.class);
@@ -84,16 +82,22 @@ public class PlaneClient extends Client implements Runnable {
         log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getId(), runway.getId());
 
         while (!plane.isLanded()) {
+            messenger.send(plane.getFuelLevel(), out);
+            out.flush();
             if (plane.isOutOfFuel()) {
                 log.info("Plane [{}] is out of fuel. Collision", plane.getId());
-                messenger.send(0, out);
-                out.flush();
                 return;
             }
 
             plane.land(runway);
 
-            messenger.send(plane.getLocation(), out);
+            if(plane.getLocation() != null){
+                messenger.send(plane.getLocation(), out);
+                out.flush();
+            } else {
+                log.info("Plane [{}] disappeared from the radar", plane.getId());
+                break;
+            }
 
             if (plane.isLanded()) {
                 log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
