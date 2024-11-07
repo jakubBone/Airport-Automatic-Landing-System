@@ -76,23 +76,30 @@ public class PlaneHandler extends Thread {
         return true;
     }
 
-    private void managePlane(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException{
+    private void managePlane(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException {
         while (true) {
             if (plane.isDestroyed()) {
                 messenger.send(COLLISION, out);
                 return;
             }
-            String message = messenger.receive(in);
-            if(message.equals("OUT_OF_FUEL")){
-                handleOutOfFuel(plane);
-                return;
-            }
 
-            Location location = messenger.parse(message,Location.class);
+            String message = messenger.receive(in);
+
+            // Check if the message is numeric (fuel level) or not (Location)
+            if (isNumeric(message)) {
+                double fuelLevel = Double.parseDouble(message);
+                plane.setFuelLevel(fuelLevel);
+                if (fuelLevel <= 0) {
+                    handleOutOfFuel(plane);
+                    return;
+                }
+            }
+            message = messenger.receive(in);
+            Location location = messenger.parse(message, Location.class);
             plane.setLocation(location);
 
             if (isPlaneAtLandingAltitude(plane)) {
-                if(attemptLanding(plane, in, out)){
+                if (attemptLanding(plane, in, out)) {
                     break;
                 }
             } else {
@@ -153,6 +160,42 @@ public class PlaneHandler extends Thread {
         while (true) {
             String message = messenger.receive(in);
 
+            // Check if the message is numeric (fuel level) or not (Location)
+            if (isNumeric(message)) {
+                double fuelLevel = Double.parseDouble(message);
+                plane.setFuelLevel(fuelLevel);
+                if (fuelLevel <= 0) {
+                    handleOutOfFuel(plane);
+                    return;
+                }
+            }
+            message = messenger.receive(in);
+            Location location = messenger.parse(message, Location.class);
+            plane.setLocation(location);
+
+            log.info("Plane [{}] is landing", plane.getId());
+
+            if(controller.hasLandedOnRunway(plane, runway)){
+                log.info("Plane [{}] has successfully landed on runway [{}]", plane.getId(), runway.getId());
+                break;
+            }
+
+            if(controller.isRunwayCollision(plane)){
+                log.info("Runway collision detected for Plane [{}]:", plane.getId());
+                break;
+            }
+        }
+        completeLanding(plane, runway);
+    }
+
+    /*private void handleLanding(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException, ClassNotFoundException {
+        messenger.send(LAND, out);
+        messenger.send(runway, out);
+        log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
+
+        while (true) {
+            String message = messenger.receive(in);
+
             if(message.equals("OUT_OF_FUEL")){
                 break;
             } else {
@@ -173,7 +216,7 @@ public class PlaneHandler extends Thread {
             }
         }
         completeLanding(plane, runway);
-    }
+    }*/
 
     private void completeLanding(Plane plane, Runway runway) {
         try {
@@ -189,5 +232,10 @@ public class PlaneHandler extends Thread {
 
         controller.releaseRunway(runway);
         log.info("Runway [{}] released", runway.getId());
+    }
+
+    // Helper method to check if a string is numeric
+    private boolean isNumeric(String str) {
+        return str != null && str.matches("-?\\d+(\\.\\d+)?");
     }
 }

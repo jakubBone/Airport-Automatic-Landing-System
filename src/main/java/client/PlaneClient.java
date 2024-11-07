@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static handler.PlaneHandler.AirportInstruction;
-import static plane.Plane.FlightPhase.OUT_OF_FUEL;
 
 @Log4j2
 public class PlaneClient extends Client implements Runnable {
@@ -37,15 +36,16 @@ public class PlaneClient extends Client implements Runnable {
             messenger.send(plane, out);
 
             while (!isProcessCompleted) {
+                messenger.send(plane.getFuelLevel(), out);
+                out.flush();
                 if (plane.isOutOfFuel()) {
                     log.info("Plane [{}] is out of fuel. Collision", plane.getId());
-                    messenger.send(OUT_OF_FUEL, out);
-                    out.flush();
                     break;
                 }
 
                 if(plane.getLocation() != null){
                     messenger.send(plane.getLocation(), out);
+                    out.flush();
                 } else {
                     log.info("Plane [{}] disappeared from the radar", plane.getId());
                     break;
@@ -62,8 +62,6 @@ public class PlaneClient extends Client implements Runnable {
         }
     }
 
-
-
     private void processInstruction(AirportInstruction instruction) throws IOException, ClassNotFoundException{
         switch (instruction) {
             case DESCENT -> executeDescent();
@@ -76,6 +74,8 @@ public class PlaneClient extends Client implements Runnable {
         }
     }
 
+
+
     private void processLanding() throws IOException, ClassNotFoundException {
         String message = messenger.receive(in);
         Runway runway = messenger.parse(message, Runway.class);
@@ -86,7 +86,7 @@ public class PlaneClient extends Client implements Runnable {
         while (!plane.isLanded()) {
             if (plane.isOutOfFuel()) {
                 log.info("Plane [{}] is out of fuel. Collision", plane.getId());
-                messenger.send(OUT_OF_FUEL, out);
+                messenger.send(0, out);
                 out.flush();
                 return;
             }

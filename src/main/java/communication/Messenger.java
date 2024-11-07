@@ -1,9 +1,6 @@
 package communication;
 
-import client.PlaneClient;
 import com.google.gson.Gson;
-import handler.PlaneHandler;
-import plane.Plane;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,9 +13,9 @@ public class Messenger {
     }
 
     public void send(Object message, ObjectOutputStream out) throws IOException {
-        if (message instanceof Plane.FlightPhase) {
+        if (message instanceof Integer) {
             // Send the enum as a plain string
-            out.writeObject(((Plane.FlightPhase) message).toString());
+            out.writeObject(((Integer) message).toString());
         } else {
             // Serialize other objects as JSON
             String jsonMessage = gson.toJson(message);
@@ -35,5 +32,4 @@ public class Messenger {
     public <T> T parse(String jsonMessage, Class<T> type) {
         return gson.fromJson(jsonMessage, type);
     }
-
 }

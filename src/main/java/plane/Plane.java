@@ -24,7 +24,6 @@ public class Plane implements Serializable {
         DESCENDING,
         HOLDING,
         LANDING,
-        OUT_OF_FUEL
     }
     private FlightPhase flightPhase;
     private static final AtomicInteger idCounter = new AtomicInteger();
@@ -41,8 +40,7 @@ public class Plane implements Serializable {
     public Plane() {
         this.id = generateID();
         this.fuelConsumptionPerHour = 2000;
-        //this.fuelLevel = calcFuelForThreeHours();
-        this.fuelLevel = 2;
+        this.fuelLevel = calcFuelForThreeHours();
         this.flightPhase = DESCENDING;
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.location = selectInitialLocationExcludingCorridors();
@@ -96,7 +94,6 @@ public class Plane implements Serializable {
                 currentWaypointIndex++;
             }
         }
-        //burnFuel();
     }
 
     public boolean isAtLastWaypoint(){
@@ -114,17 +111,6 @@ public class Plane implements Serializable {
         location.setX(nextWaypoint.getX());
         location.setY(nextWaypoint.getY());
         location.setAltitude(nextWaypoint.getAltitude());
-        System.out.println(fuelLevel);
-        System.out.println(fuelLevel);
-        System.out.println(fuelLevel);
-        System.out.println(fuelLevel);
-        System.out.println(fuelLevel);
-        System.out.println(fuelLevel);
-        System.out.println(fuelLevel);
-        System.out.println(fuelLevel);
-        System.out.println(fuelLevel);
-        System.out.println(fuelLevel);
-        System.out.println(fuelLevel);
         burnFuel();
     }
 
