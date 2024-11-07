@@ -21,7 +21,6 @@ public class PlaneHandler extends Thread {
     public enum AirportInstruction {
         DESCENT, HOLD_PATTERN, LAND, FULL, COLLISION, OCCUPIED
     }
-
     private final Socket clientSocket;
     private final AirTrafficController controller;
     private final Airport airport;
@@ -84,7 +83,6 @@ public class PlaneHandler extends Thread {
                 return;
             }
             String message = messenger.receive(in);
-
             if(message.equals("OUT_OF_FUEL")){
                 handleOutOfFuel(plane);
                 return;

@@ -23,6 +23,7 @@ public class AirTrafficController {
         this.planes = new ArrayList<>();
         this.lock = new ReentrantLock();
     }
+
     public void registerPlane(Plane plane) {
         lock.lock();
         try {

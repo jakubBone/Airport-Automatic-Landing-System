@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static handler.PlaneHandler.AirportInstruction;
+import static plane.Plane.FlightPhase.OUT_OF_FUEL;
 
 @Log4j2
 public class PlaneClient extends Client implements Runnable {
@@ -38,7 +39,8 @@ public class PlaneClient extends Client implements Runnable {
             while (!isProcessCompleted) {
                 if (plane.isOutOfFuel()) {
                     log.info("Plane [{}] is out of fuel. Collision", plane.getId());
-                    messenger.send("OUT_OF_FUEL", out);
+                    messenger.send(OUT_OF_FUEL, out);
+                    out.flush();
                     break;
                 }
 
@@ -84,7 +86,8 @@ public class PlaneClient extends Client implements Runnable {
         while (!plane.isLanded()) {
             if (plane.isOutOfFuel()) {
                 log.info("Plane [{}] is out of fuel. Collision", plane.getId());
-                messenger.send("OUT_OF_FUEL", out);
+                messenger.send(OUT_OF_FUEL, out);
+                out.flush();
                 return;
             }
 
@@ -135,15 +138,14 @@ public class PlaneClient extends Client implements Runnable {
         isProcessCompleted = true;
     }
 
-
     public static void main(String[] args) throws IOException {
-        /*int numberOfClients = 5;
+        int numberOfClients = 5;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfClients);
 
         for (int i = 0; i < numberOfClients; i++) {
             PlaneClient client = new PlaneClient("localhost", 5000);
             executorService.execute(client);
         }
-        executorService.shutdown();*/
+        executorService.shutdown();
     }
 }
