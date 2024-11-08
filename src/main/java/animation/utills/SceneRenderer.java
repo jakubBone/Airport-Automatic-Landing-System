@@ -55,7 +55,7 @@ public class SceneRenderer extends Application {
         WaypointModel waypointModel = new WaypointModel();
 
         root.getChildren().addAll(airspaceModel.getFloor(), airspaceModel.getLeftWall(), airspaceModel.getRightWall(),
-                runway1Model.getRunwayRect(), runway2Model.getRunwayRect());
+                runway1Model.getRunwayRect(), runway2Model.getRunwayRect(), airspaceModel.getBox());
 
         addWaypointModels(waypointModel.getLandingR1Models());
         addWaypointModels(waypointModel.getLandingR2Models());

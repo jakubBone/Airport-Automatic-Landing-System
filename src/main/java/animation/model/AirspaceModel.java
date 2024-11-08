@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import lombok.Getter;
@@ -14,8 +15,14 @@ public class AirspaceModel {
     private Rectangle floor;
     private Rectangle leftWall;
     private Rectangle rightWall;
-
+    private Box box;
     public AirspaceModel() {
+        this.box = new Box(1000.0 / 2, 500.0 / 2, 10000.0 / 2);
+        this.box.setTranslateX(15500 / 2);
+        this.box.setTranslateY(5000 / 2);
+        this.box.setTranslateZ(25500/ 2);
+
+
         setupFloor();
         setupLeftWall();
         setupRightWall();
