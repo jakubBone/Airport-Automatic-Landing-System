@@ -46,6 +46,6 @@ public class PlaneModel {
                         "Y: " + (int) plane.getLocation().getY() + " / " +
                         "Z: " + (int) plane.getLocation().getAltitude()
         );*/
-        this.label.setText("Fuel level:" + (double) plane.getFuelLevel());
+        //this.label.setText("Fuel level:" + (double) plane.getFuelLevel());
     }
 }

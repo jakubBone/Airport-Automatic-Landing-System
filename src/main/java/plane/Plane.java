@@ -43,9 +43,9 @@ public class Plane implements Serializable {
         this.fuelLevel = calcFuelForThreeHours();
         this.flightPhase = DESCENDING;
         this.waypoints = WaypointGenerator.getDescentWaypoints();
-        this.location = selectInitialLocationExcludingCorridors();
-        //this.currentWaypointIndex = 158;
-        //this.location = waypoints.get(currentWaypointIndex);
+        //this.location = selectInitialLocationExcludingCorridors();
+        this.currentWaypointIndex = 300;
+        this.location = waypoints.get(currentWaypointIndex);
         this.isDestroyed = false;
         this.landed = false;
         this.isFirstMove = true;
