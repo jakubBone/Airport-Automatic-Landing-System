@@ -176,6 +176,7 @@ public class PlaneHandler extends Thread {
             log.info("Plane [{}] is landing", plane.getId());
 
             if(controller.hasLandedOnRunway(plane, runway)){
+                plane.setLanded(true);
                 log.info("Plane [{}] has successfully landed on runway [{}]", plane.getId(), runway.getId());
                 break;
             }

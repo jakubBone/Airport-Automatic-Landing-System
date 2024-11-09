@@ -13,8 +13,8 @@ public class WaypointGenerator implements Serializable {
     private static final int WAYPOINT_INTERVAL_DESCENT = 1000;
     private static final int WAYPOINT_INTERVAL_LAND = 500;
     private static final int LANDING_ALTITUDE = 1000;
-    private static final int INNER_MAX_BOUNDARY = 4000;
-    private static final int INNER_MIN_BOUNDARY = -4000;
+    private static final int INNER_MAX_BOUNDARY = 4500;
+    private static final int INNER_MIN_BOUNDARY = -4500;
     public  static final Location CORRIDOR_C1_WAYPOINT = new Location(-5000, 2000, 2000);
     public  static final Location CORRIDOR_C2_WAYPOINT = new Location(-5000, -2000, 2000);
 
@@ -40,19 +40,19 @@ public class WaypointGenerator implements Serializable {
 
             // Right side
             for (int y = MAX_AIRPORT_SIDE; y >= INNER_MIN_BOUNDARY; y -= WAYPOINT_INTERVAL_LAND) {
-                waypoints.add(new Location(MAX_AIRPORT_SIDE, y,altitude- altitudeDecrement));
+                waypoints.add(new Location(MAX_AIRPORT_SIDE, y,altitude - altitudeDecrement));
                 altitude -= altitudeDecrement;
             }
 
             // Left side
             for (int x = MAX_AIRPORT_SIDE; x >= INNER_MIN_BOUNDARY; x -= WAYPOINT_INTERVAL_LAND) {
-                waypoints.add(new Location(x, MIN_AIRPORT_SIDE,altitude- altitudeDecrement));
+                waypoints.add(new Location(x, MIN_AIRPORT_SIDE,altitude - altitudeDecrement));
                 altitude -= altitudeDecrement;
             }
 
             // Bottom side
             for (int y = MIN_AIRPORT_SIDE; y <= INNER_MAX_BOUNDARY; y += WAYPOINT_INTERVAL_LAND) {
-                waypoints.add(new Location(MIN_AIRPORT_SIDE, y,altitude- altitudeDecrement));
+                waypoints.add(new Location(MIN_AIRPORT_SIDE, y,altitude - altitudeDecrement));
                 altitude -= altitudeDecrement;
             }
         }
