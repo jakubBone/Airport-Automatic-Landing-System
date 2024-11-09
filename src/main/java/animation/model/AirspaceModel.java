@@ -17,15 +17,10 @@ public class AirspaceModel {
     private Rectangle rightWall;
     private Box box;
     public AirspaceModel() {
-        this.box = new Box(1000.0 / 2, 500.0 / 2, 10000.0 / 2);
-        this.box.setTranslateX(15500 / 2);
-        this.box.setTranslateY(5000 / 2);
-        this.box.setTranslateZ(25500/ 2);
-
-
         setupFloor();
         setupLeftWall();
         setupRightWall();
+        setupHanger();
     }
 
     private void setupFloor() {
@@ -53,6 +48,13 @@ public class AirspaceModel {
         this.rightWall.setTranslateX(5000 / 2);
         this.rightWall.setTranslateY(0);
         this.rightWall.setTranslateZ(-5000 / 2);
+    }
+
+    private void setupHanger(){
+        this.box = new Box(1000.0 / 2, 500.0 / 2, 10000.0 / 2);
+        this.box.setTranslateX(15500 / 2);
+        this.box.setTranslateY(5000 / 2);
+        this.box.setTranslateZ(25500/ 2);
     }
 
     private Rectangle createWall(int width, int height) {
