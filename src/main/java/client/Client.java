@@ -10,7 +10,7 @@ import java.net.Socket;
 @Log4j2
 public class Client {
     private int connectionAttempts = 0;
-    private Socket socket;
+    protected Socket socket;
     protected ObjectOutputStream out;
     protected ObjectInputStream in;
     private int port;

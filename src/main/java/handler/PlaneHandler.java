@@ -52,11 +52,11 @@ public class PlaneHandler extends Thread {
         } catch (IOException | ClassNotFoundException | LocationAcquisitionException ex ) {
             log.error("Error occurred while handling client request: {}", ex.getMessage(), ex);
         } finally {
-            try {
-                clientSocket.close();
+           /* try{
+            clientSocket.close();
             } catch (IOException ex) {
                 log.error("Failed to close client socket: {}", ex.getMessage(), ex);
-            }
+            }*/
         }
     }
 
@@ -79,10 +79,11 @@ public class PlaneHandler extends Thread {
     private void managePlane(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException {
         while (true) {
             if (plane.isDestroyed()) {
+                log.info("COLLISION detected for Plane [{}]" , plane.getId());
+                controller.getPlanes().remove(plane);
                 messenger.send(COLLISION, out);
                 return;
             }
-
             String message = messenger.receive(in);
 
             // Check if the message is numeric (fuel level) or not (Location)
@@ -158,6 +159,12 @@ public class PlaneHandler extends Thread {
         log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
 
         while (true) {
+            if (plane.isDestroyed()) {
+                log.info("COLLISION detected for Plane [{}]" , plane.getId());
+                messenger.send(COLLISION, out);
+                return;
+            }
+
             String message = messenger.receive(in);
 
             // Check if the message is numeric (fuel level) or not (Location)
@@ -188,36 +195,6 @@ public class PlaneHandler extends Thread {
         }
         completeLanding(plane, runway);
     }
-
-    /*private void handleLanding(Plane plane, Runway runway, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException, ClassNotFoundException {
-        messenger.send(LAND, out);
-        messenger.send(runway, out);
-        log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
-
-        while (true) {
-            String message = messenger.receive(in);
-
-            if(message.equals("OUT_OF_FUEL")){
-                break;
-            } else {
-                Location location = messenger.parse(message, Location.class);
-                plane.setLocation(location);
-            }
-
-            log.info("Plane [{}] is landing", plane.getId());
-
-            if(controller.hasLandedOnRunway(plane, runway)){
-                log.info("Plane [{}] has successfully landed on runway [{}]", plane.getId(), runway.getId());
-                break;
-            }
-
-            if(controller.isRunwayCollision(plane)){
-                log.info("Runway collision detected for Plane [{}]:", plane.getId());
-                break;
-            }
-        }
-        completeLanding(plane, runway);
-    }*/
 
     private void completeLanding(Plane plane, Runway runway) {
         try {

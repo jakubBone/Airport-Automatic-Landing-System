@@ -17,7 +17,6 @@ public class PlaneClient extends Client implements Runnable {
     private boolean isProcessCompleted;
     private Messenger messenger;
 
-
     public PlaneClient(String ip, int port) {
         super(ip, port);
         this.plane = new Plane();
@@ -53,6 +52,10 @@ public class PlaneClient extends Client implements Runnable {
                 String message = messenger.receive(in);
                 AirportInstruction instruction = messenger.parse(message, AirportInstruction.class);
                 processInstruction(instruction);
+
+                if(plane.isDestroyed()){
+                    break;
+                }
             }
         } catch (IOException | ClassNotFoundException ex) {
             log.error("PlaneClient [{}]: Communication failure: {}", plane.getId(), ex.getMessage());
@@ -138,6 +141,7 @@ public class PlaneClient extends Client implements Runnable {
 
     private void executeCollision() {
         log.info("COLLISION detected for Plane [{}]. Stopping communication", plane.getId());
+        plane.destroyPlane();
         disableReconnection();
         isProcessCompleted = true;
     }
