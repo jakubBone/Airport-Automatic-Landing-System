@@ -106,13 +106,10 @@ public class AirTrafficController {
 
                         planes.get(i).setDestroyed(true);
                         planes.get(j).setDestroyed(true);
-                        //planesToRemove.add(plane1);
-                        //planesToRemove.add(plane2);
 
                         log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getId(), plane2.getId());
                     }
                 }
-               // planes.removeAll(planesToRemove);
             }
         } finally {
             lock.unlock();
