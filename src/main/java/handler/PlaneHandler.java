@@ -52,11 +52,11 @@ public class PlaneHandler extends Thread {
         } catch (IOException | ClassNotFoundException | LocationAcquisitionException ex ) {
             log.error("Error occurred while handling client request: {}", ex.getMessage(), ex);
         } finally {
-           /* try{
-            clientSocket.close();
+            try {
+                clientSocket.close();
             } catch (IOException ex) {
                 log.error("Failed to close client socket: {}", ex.getMessage(), ex);
-            }*/
+            }
         }
     }
 
@@ -78,12 +78,7 @@ public class PlaneHandler extends Thread {
 
     private void managePlane(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException {
         while (true) {
-            if (plane.isDestroyed()) {
-                log.info("COLLISION detected for Plane [{}]" , plane.getId());
-                controller.getPlanes().remove(plane);
-                messenger.send(COLLISION, out);
-                return;
-            }
+            // paliwo
             String message = messenger.receive(in);
 
             // Check if the message is numeric (fuel level) or not (Location)
@@ -95,9 +90,17 @@ public class PlaneHandler extends Thread {
                     return;
                 }
             }
+            // lokacja
             message = messenger.receive(in);
             Location location = messenger.parse(message, Location.class);
             plane.setLocation(location);
+
+            if (plane.isDestroyed()) {
+                log.info("COLLISION detected for Plane [{}]" , plane.getId());
+                controller.getPlanes().remove(plane);
+                messenger.send(COLLISION, out);
+                return;
+            }
 
             if (isPlaneAtLandingAltitude(plane)) {
                 if (attemptLanding(plane, in, out)) {
@@ -159,15 +162,9 @@ public class PlaneHandler extends Thread {
         log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
 
         while (true) {
-            if (plane.isDestroyed()) {
-                log.info("COLLISION detected for Plane [{}]" , plane.getId());
-                messenger.send(COLLISION, out);
-                return;
-            }
-
             String message = messenger.receive(in);
 
-            // Check if the message is numeric (fuel level) or not (Location)
+            // Check if the message is numeric (fuel level)
             if (isNumeric(message)) {
                 double fuelLevel = Double.parseDouble(message);
                 plane.setFuelLevel(fuelLevel);
@@ -176,6 +173,7 @@ public class PlaneHandler extends Thread {
                     return;
                 }
             }
+
             message = messenger.receive(in);
             Location location = messenger.parse(message, Location.class);
             plane.setLocation(location);
