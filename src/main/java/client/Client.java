@@ -52,8 +52,4 @@ public class Client {
             log.error("Error occurred while closing resources: {}", ex.getMessage());
         }
     }
-
-    protected void disableReconnection() {
-        this.stopReconnection = true;
-    }
 }

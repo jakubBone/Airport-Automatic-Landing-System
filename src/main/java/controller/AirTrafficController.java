@@ -10,6 +10,8 @@ import java.util.ArrayList;
 
 import java.util.List;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -115,55 +117,6 @@ public class AirTrafficController {
             lock.unlock();
         }
     }
-
-    /*public synchronized void checkCollision() {
-        lock.lock();
-        List<Plane> planesToRemove = new ArrayList<>();
-        try{
-            for (int i = 0; i < planes.size(); i++) {
-                Plane plane1 = planes.get(i);
-                for (int j = i + 1; j < planes.size(); j++) {
-                    Plane plane2 = planes.get(j);
-                    if (plane1.getLocation().equals(plane2.getLocation()) &&
-                            plane1.getCurrentWaypointIndex() == plane2.getCurrentWaypointIndex()) {
-
-                        planes.get(i).setDestroyed(true);
-                        planes.get(j).setDestroyed(true);
-                        planesToRemove.add(plane1);
-                        planesToRemove.add(plane2);
-
-                        log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getId(), plane2.getId());
-                    }
-                }
-                planes.removeAll(planesToRemove);
-            }
-        } finally {
-            lock.unlock();
-        }
-    }*/
-
-    /*public synchronized void checkCollision() {
-        List<Plane> planesToRemove = new ArrayList<>();
-        lock.lock();
-        try{
-            for (int i = 0; i < planes.size(); i++) {
-                Plane plane1 = planes.get(i);
-                for (int j = i + 1; j < planes.size(); j++) {
-                    Plane plane2 = planes.get(j);
-                    if (plane1.getLocation().equals(plane2.getLocation()) &&
-                            plane1.getCurrentWaypointIndex() == plane2.getCurrentWaypointIndex()) {
-                        planesToRemove.add(plane1);
-                        planesToRemove.add(plane2);
-
-                        log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getId(), plane2.getId());
-                    }
-                }
-                planes.removeAll(planesToRemove);
-            }
-        } finally {
-            lock.unlock();
-        }
-    }*/
 
     public boolean isRunwayCollision(Plane plane) {
         return plane.getLocation().getAltitude() < 0;

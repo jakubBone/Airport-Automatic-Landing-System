@@ -60,46 +60,6 @@ public class WaypointGenerator implements Serializable {
         return waypoints;
     }
 
-    /*public static List<Location> getDescentWaypoints() {
-        List<Location> waypoints = new ArrayList<>();
-
-        int[] altitudes = {5000, 4000, 3000, 2000};
-
-        int altitudeLevel = 1000;
-        int waypointsPerLevel = 40;
-
-        int altitudeDecrement = altitudeLevel / waypointsPerLevel;
-
-       // 160 descending waypoints directing to landing level on 2000 meters
-        for (int altitude : altitudes) {
-            //  Top side
-            for (int x = MIN_AIRPORT_SIDE; x <= INNER_MAX_BOUNDARY; x += WAYPOINT_INTERVAL_DESCENT) {
-                waypoints.add(new Location(x, MAX_AIRPORT_SIDE, altitude - altitudeDecrement));
-                altitude -= altitudeDecrement;
-            }
-
-            // Right side
-            for (int y = MAX_AIRPORT_SIDE; y >= INNER_MIN_BOUNDARY; y -= WAYPOINT_INTERVAL_DESCENT) {
-                waypoints.add(new Location(MAX_AIRPORT_SIDE, y,altitude- altitudeDecrement));
-                altitude -= altitudeDecrement;
-            }
-
-            // Left side
-            for (int x = MAX_AIRPORT_SIDE; x >= INNER_MIN_BOUNDARY; x -= WAYPOINT_INTERVAL_DESCENT) {
-                waypoints.add(new Location(x, MIN_AIRPORT_SIDE,altitude- altitudeDecrement));
-                altitude -= altitudeDecrement;
-            }
-
-            // Bottom side
-            for (int y = MIN_AIRPORT_SIDE; y <= INNER_MAX_BOUNDARY; y += WAYPOINT_INTERVAL_DESCENT) {
-                waypoints.add(new Location(MIN_AIRPORT_SIDE, y,altitude- altitudeDecrement));
-                altitude -= altitudeDecrement;
-            }
-        }
-
-        return waypoints;
-    }*/
-
     public static List<Location> getHoldingPatternWaypoints() {
         List<Location> waypoints = new ArrayList<>();
 
@@ -115,6 +75,26 @@ public class WaypointGenerator implements Serializable {
         }
         for (int y = MIN_AIRPORT_SIDE; y <= INNER_MAX_BOUNDARY; y += WAYPOINT_INTERVAL_LAND) {
             waypoints.add(new Location(MIN_AIRPORT_SIDE, y, LANDING_ALTITUDE));
+        }
+
+        return waypoints;
+    }
+
+    public static List<Location> getAlternativeHoldingPatternWaypoints(int altitude) {
+        List<Location> waypoints = new ArrayList<>();
+
+        // 40 alternative holding pattern waypoints
+        for (int x = MIN_AIRPORT_SIDE; x <= INNER_MAX_BOUNDARY; x += WAYPOINT_INTERVAL_LAND) {
+            waypoints.add(new Location(x, MAX_AIRPORT_SIDE, altitude));
+        }
+        for (int y = MAX_AIRPORT_SIDE; y >= INNER_MIN_BOUNDARY; y -= WAYPOINT_INTERVAL_LAND) {
+            waypoints.add(new Location(MAX_AIRPORT_SIDE, y, altitude));
+        }
+        for (int x = MAX_AIRPORT_SIDE; x >= INNER_MIN_BOUNDARY; x -= WAYPOINT_INTERVAL_LAND) {
+            waypoints.add(new Location(x, MIN_AIRPORT_SIDE, altitude));
+        }
+        for (int y = MIN_AIRPORT_SIDE; y <= INNER_MAX_BOUNDARY; y += WAYPOINT_INTERVAL_LAND) {
+            waypoints.add(new Location(MIN_AIRPORT_SIDE, y, altitude));
         }
 
         return waypoints;

@@ -142,7 +142,6 @@ public class PlaneClient extends Client implements Runnable {
     private void executeCollision() {
         log.info("COLLISION detected for Plane [{}]. Stopping communication", plane.getId());
         plane.destroyPlane();
-        disableReconnection();
         isProcessCompleted = true;
     }
 
