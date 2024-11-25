@@ -19,7 +19,7 @@ import static handler.PlaneHandler.AirportInstruction.*;
 public class PlaneHandler extends Thread {
 
     public enum AirportInstruction {
-        DESCENT, HOLD_PATTERN, LAND, FULL, COLLISION, OCCUPIED
+        DESCENT, HOLD_PATTERN, ALTERNATIVE,  LAND, FULL, COLLISION, OCCUPIED
     }
     private final Socket clientSocket;
     private final AirTrafficController controller;
@@ -81,6 +81,45 @@ public class PlaneHandler extends Thread {
             // paliwo
             String message = messenger.receive(in);
 
+            if (isNumeric(message)) {
+                double fuelLevel = Double.parseDouble(message);
+                plane.setFuelLevel(fuelLevel);
+                if (fuelLevel <= 0) {
+                    handleOutOfFuel(plane);
+                    return;
+                }
+            }
+
+            message = messenger.receive(in);
+            Location location = messenger.parse(message, Location.class);
+            plane.setLocation(location);
+
+            if (plane.isDestroyed()) {
+                log.info("COLLISION detected for Plane [{}]" , plane.getId());
+                controller.getPlanes().remove(plane);
+                messenger.send(COLLISION, out);
+                return;
+            }
+
+            if(isApproachingHoldingEntrypoint(plane)){
+                if(isRoadClear()){
+                    attemptLandingOrHoldPattern(plane, in, out);
+                    break;
+                } else {
+                    holdAlternativePattern(plane, out);
+                }
+            } else {
+                handleDescent(plane, out);
+            }
+        }
+    }
+
+
+    /*private void managePlane(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException {
+        while (true) {
+            // paliwo
+            String message = messenger.receive(in);
+
             // Check if the message is numeric (fuel level) or not (Location)
             if (isNumeric(message)) {
                 double fuelLevel = Double.parseDouble(message);
@@ -90,7 +129,7 @@ public class PlaneHandler extends Thread {
                     return;
                 }
             }
-            // lokacja
+
             message = messenger.receive(in);
             Location location = messenger.parse(message, Location.class);
             plane.setLocation(location);
@@ -110,9 +149,23 @@ public class PlaneHandler extends Thread {
                 handleDescent(plane, out);
             }
         }
+    }*/
+
+    private boolean isApproachingHoldingEntrypoint(Plane plane){
+        Location lastDescentPoint = new Location(-5000, 4500, 1012);
+        return plane.getLocation() == lastDescentPoint;
     }
 
-    private boolean attemptLanding(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException, ClassNotFoundException {
+    private boolean isRoadClear(){
+        return controller.isHoldingPatternEntrypointClear();
+    }
+
+    private void holdAlternativePattern(Plane plane, ObjectOutputStream out) throws IOException {
+        log.info("Plane [{}] is holding alternative pattern", plane.getId());
+        messenger.send(ALTERNATIVE, out);
+    }
+
+    private boolean attemptLandingOrHoldPattern(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException, ClassNotFoundException {
         Runway runway = getRunwayIfPlaneAtCorridor(plane);
 
         if(runway != null && controller.isRunwayAvailable(runway)){
@@ -125,7 +178,6 @@ public class PlaneHandler extends Thread {
         messenger.send(HOLD_PATTERN, out);
         return false;
     }
-
 
     private boolean isPlaneAtLandingAltitude(Plane plane) {
         return plane.getLocation().getAltitude() <= 1000;

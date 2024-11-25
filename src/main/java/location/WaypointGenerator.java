@@ -100,27 +100,6 @@ public class WaypointGenerator implements Serializable {
         return waypoints;
     }
 
-    /*public static List<Location> getHoldingPatternWaypoints() {
-        List<Location> waypoints = new ArrayList<>();
-
-        // 40 holding pattern waypoints on landing level
-        for (int x = MIN_AIRPORT_SIDE; x <= INNER_MAX_BOUNDARY; x += WAYPOINT_INTERVAL_DESCENT) {
-            waypoints.add(new Location(x, MAX_AIRPORT_SIDE, LANDING_ALTITUDE));
-        }
-        for (int y = MAX_AIRPORT_SIDE; y >= INNER_MIN_BOUNDARY; y -= WAYPOINT_INTERVAL_DESCENT) {
-            waypoints.add(new Location(MAX_AIRPORT_SIDE, y, LANDING_ALTITUDE));
-        }
-        for (int x = MAX_AIRPORT_SIDE; x >= INNER_MIN_BOUNDARY; x -= WAYPOINT_INTERVAL_DESCENT) {
-            waypoints.add(new Location(x, MIN_AIRPORT_SIDE, LANDING_ALTITUDE));
-        }
-        for (int y = MIN_AIRPORT_SIDE; y <= INNER_MAX_BOUNDARY; y += WAYPOINT_INTERVAL_DESCENT) {
-            waypoints.add(new Location(MIN_AIRPORT_SIDE, y, LANDING_ALTITUDE));
-        }
-
-        return waypoints;
-    }*/
-
-
     public static List<Location> getLandingWaypoints(Location corridorEntry) {
         List<Location> waypoints = new ArrayList<>();
         int startX = -4500;

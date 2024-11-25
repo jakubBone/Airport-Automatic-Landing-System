@@ -10,8 +10,6 @@ import java.util.ArrayList;
 
 import java.util.List;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -58,6 +56,19 @@ public class AirTrafficController {
         }
     }
 
+    public boolean isHoldingPatternEntrypointClear() {
+        Location entryPoint = new Location(-5000, 5000, 1000);
+        lock.lock();
+        try {
+            for (Plane plane : planes) {
+                if (entryPoint.equals(plane.getLocation())) {
+                    return true;
+                }
+            }
+        } finally{
+            lock.unlock();
+        }
+    }
 
     public boolean isRunwayAvailable(Runway runway){
        lock.lock();

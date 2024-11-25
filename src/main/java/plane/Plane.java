@@ -67,6 +67,7 @@ public class Plane implements Serializable {
             currentWaypointIndex = 0;
         }
     }
+
     public void land(Runway runway){
         moveTowardsNextWaypoint();
         Location touchdownPoint = runway.getTouchdownPoint();
