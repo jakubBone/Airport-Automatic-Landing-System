@@ -56,20 +56,6 @@ public class AirTrafficController {
         }
     }
 
-    public boolean isHoldingPatternEntrypointClear() {
-        Location entryPoint = new Location(-5000, 5000, 1000);
-        lock.lock();
-        try {
-            for (Plane plane : planes) {
-                if (entryPoint.equals(plane.getLocation())) {
-                    return true;
-                }
-            }
-        } finally{
-            lock.unlock();
-        }
-    }
-
     public boolean isRunwayAvailable(Runway runway){
        lock.lock();
        try {
