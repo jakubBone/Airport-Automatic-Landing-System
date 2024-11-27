@@ -102,6 +102,10 @@ public class PlaneHandler extends Thread {
                 return;
             }
 
+            if(controller.isHoldingEntryOccupied()){
+                messenger.send(ALTERNATIVE, out);
+            }
+
             if (isPlaneAtLandingAltitude(plane)) {
                 if (prepareLanding(plane, in, out)) {
                     break;
