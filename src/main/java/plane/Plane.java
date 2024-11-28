@@ -45,7 +45,7 @@ public class Plane implements Serializable {
         this.flightPhase = DESCENDING;
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         //this.location = selectInitialLocationExcludingCorridors();
-        this.currentWaypointIndex = 300;
+        this.currentWaypointIndex = 310;
         this.location = waypoints.get(currentWaypointIndex);
         this.isDestroyed = false;
         this.landed = false;
@@ -70,14 +70,14 @@ public class Plane implements Serializable {
         }
     }
 
-    public void holdAlternative(){
+    /*public void holdAlternative(){
         isHoldingAlternativePattern = true;
         waypoints = WaypointGenerator.getAlternativeHoldingPatternWaypoints(4000);
         moveTowardsNextWaypoint();
         if (isAtLastWaypoint()) {
             currentWaypointIndex = 0;
         }
-    }
+    }*/
 
     public void land(Runway runway){
         moveTowardsNextWaypoint();

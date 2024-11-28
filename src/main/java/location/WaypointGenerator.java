@@ -10,17 +10,54 @@ import java.util.List;
 public class WaypointGenerator implements Serializable {
     private static final int MAX_AIRPORT_SIDE = 5000;
     private static final int MIN_AIRPORT_SIDE = -5000;
-    private static final int WAYPOINT_INTERVAL_DESCENT = 1000;
     private static final int WAYPOINT_INTERVAL_LAND = 500;
     private static final int LANDING_ALTITUDE = 1000;
     private static final int INNER_MAX_BOUNDARY = 4500;
     private static final int INNER_MIN_BOUNDARY = -4500;
-    public  static final Location CORRIDOR_C1_WAYPOINT = new Location(-5000, 2000, 2000);
-    public  static final Location CORRIDOR_C2_WAYPOINT = new Location(-5000, -2000, 2000);
 
+    public static List<Location> getDescentWaypoints() {
+        List<Location> waypoints = new ArrayList<>();
 
+        int[] altitudes = {5000, 4000, 3000, 2000};
 
-   public static List<Location> getDescentWaypoints() {
+        double altitudeLevel = 1000.0;
+        int waypointsPerLevel = 80;
+
+        // Precising decrement as double
+        double altitudeDecrement = altitudeLevel / waypointsPerLevel;
+
+        // 320 descending waypoints directing to landing level on 2000 meters
+        for (int initialAltitude : altitudes) {
+            double currentAltitude = initialAltitude;
+
+            // Top side
+            for (int x = MIN_AIRPORT_SIDE; x <= INNER_MAX_BOUNDARY; x += WAYPOINT_INTERVAL_LAND) {
+                waypoints.add(new Location(x, MAX_AIRPORT_SIDE, (int) Math.round(currentAltitude)));
+                currentAltitude -= altitudeDecrement;
+            }
+
+            // Right side
+            for (int y = MAX_AIRPORT_SIDE; y >= INNER_MIN_BOUNDARY; y -= WAYPOINT_INTERVAL_LAND) {
+                waypoints.add(new Location(MAX_AIRPORT_SIDE, y, (int) Math.round(currentAltitude)));
+                currentAltitude -= altitudeDecrement;
+            }
+
+            // Left side
+            for (int x = MAX_AIRPORT_SIDE; x >= INNER_MIN_BOUNDARY; x -= WAYPOINT_INTERVAL_LAND) {
+                waypoints.add(new Location(x, MIN_AIRPORT_SIDE, (int) Math.round(currentAltitude)));
+                currentAltitude -= altitudeDecrement;
+            }
+
+            // Bottom side
+            for (int y = MIN_AIRPORT_SIDE; y <= INNER_MAX_BOUNDARY; y += WAYPOINT_INTERVAL_LAND) {
+                waypoints.add(new Location(MIN_AIRPORT_SIDE, y, (int) Math.round(currentAltitude)));
+                currentAltitude -= altitudeDecrement;
+            }
+        }
+
+        return waypoints;
+    }
+    /*public static List<Location> getDescentWaypoints() {
         List<Location> waypoints = new ArrayList<>();
 
         int[] altitudes = {5000, 4000, 3000, 2000};
@@ -30,7 +67,7 @@ public class WaypointGenerator implements Serializable {
 
         int altitudeDecrement = altitudeLevel / waypointsPerLevel;
 
-       // 160 descending waypoints directing to landing level on 2000 meters
+       // 320 descending waypoints directing to landing level on 2000 meters
         for (int altitude : altitudes) {
             //  Top side
             for (int x = MIN_AIRPORT_SIDE; x <= INNER_MAX_BOUNDARY; x += WAYPOINT_INTERVAL_LAND) {
@@ -58,7 +95,7 @@ public class WaypointGenerator implements Serializable {
         }
 
         return waypoints;
-    }
+    }*/
 
     public static List<Location> getHoldingPatternWaypoints() {
         List<Location> waypoints = new ArrayList<>();

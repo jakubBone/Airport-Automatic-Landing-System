@@ -55,7 +55,7 @@ public class AirTrafficController {
             lock.unlock();
         }
     }
-    public boolean isHoldingEntryOccupied() {
+    /*public boolean isHoldingEntryOccupied() {
         lock.lock();
         Location waypoint = new Location(-5000, 5000, 1000);
         try {
@@ -68,7 +68,7 @@ public class AirTrafficController {
         } finally {
             lock.unlock();
         }
-    }
+    }*/
 
 
     public boolean isRunwayAvailable(Runway runway){
