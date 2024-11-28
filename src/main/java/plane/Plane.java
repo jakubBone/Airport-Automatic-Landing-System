@@ -23,6 +23,7 @@ public class Plane implements Serializable {
     public enum FlightPhase {
         DESCENDING,
         HOLDING,
+        ALTERNATIVE_HOLDING,
         LANDING,
     }
     private FlightPhase flightPhase;
@@ -36,7 +37,6 @@ public class Plane implements Serializable {
     private int currentWaypointIndex;
     private boolean isDestroyed;
     private boolean isFirstMove;
-    private boolean isHoldingAlternativePattern;
 
     public Plane() {
         this.id = generateID();
@@ -50,7 +50,6 @@ public class Plane implements Serializable {
         this.isDestroyed = false;
         this.landed = false;
         this.isFirstMove = true;
-        this.isHoldingAlternativePattern = false;
     }
 
     public void descend(){
@@ -63,21 +62,25 @@ public class Plane implements Serializable {
         }
     }
 
+
+
     public void hold(){
+        waypoints = WaypointGenerator.getHoldingPatternWaypoints();
         moveTowardsNextWaypoint();
         if (isAtLastWaypoint()) {
             currentWaypointIndex = 0;
         }
     }
 
-    /*public void holdAlternative(){
-        isHoldingAlternativePattern = true;
-        waypoints = WaypointGenerator.getAlternativeHoldingPatternWaypoints(4000);
+
+    // Jump 1 index up at last point to avoid crash
+    public void holdAlternative(){
+        waypoints = WaypointGenerator.getAlternativeHoldingPatternWaypoints(500);
         moveTowardsNextWaypoint();
         if (isAtLastWaypoint()) {
-            currentWaypointIndex = 0;
+            currentWaypointIndex = 1;
         }
-    }*/
+    }
 
     public void land(Runway runway){
         moveTowardsNextWaypoint();

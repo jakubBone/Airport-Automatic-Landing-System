@@ -69,7 +69,7 @@ public class PlaneClient extends Client implements Runnable {
         switch (instruction) {
             case DESCENT -> executeDescent();
             case HOLD_PATTERN -> executeHoldPattern();
-            //case ALTERNATIVE -> executeAlternative();
+            case ALTERNATIVE -> executeAlternative();
             case LAND -> executeLanding();
             case FULL -> executeFullAirspace();
             case OCCUPIED -> executeOccupiedLocation();
@@ -125,11 +125,10 @@ public class PlaneClient extends Client implements Runnable {
         plane.hold();
     }
 
-    /*private void executeAlternative() {
-        log.info("Plane [{}] instructed to HOLD_PATTERN", plane.getId());
+    private void executeAlternative() {
+        log.info("Plane [{}] instructed to HOLD_ALTERNATIVE_PATTERN", plane.getId());
         plane.holdAlternative();
-    }*/
-
+    }
 
     private void executeLanding() throws IOException, ClassNotFoundException {
         processLanding();

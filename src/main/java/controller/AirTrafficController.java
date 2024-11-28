@@ -55,22 +55,23 @@ public class AirTrafficController {
             lock.unlock();
         }
     }
-    /*public boolean isHoldingEntryOccupied() {
+
+    public boolean isCollisionRisk(Plane plane1) {
         lock.lock();
-        Location waypoint = new Location(-5000, 5000, 1000);
+        Location waypoint = new Location(-5000, 4000, 1000);
         try {
-            for (Plane plane : planes) {
-                if (waypoint.equals(plane.getLocation())) {
-                    return true;
+            for (Plane plane2 : planes) {
+                if(plane1.getId() != plane2.getId()){
+                    if (waypoint.equals(plane2.getLocation())) {
+                        return true;
+                    }
                 }
             }
             return false;
         } finally {
             lock.unlock();
         }
-    }*/
-
-
+    }
     public boolean isRunwayAvailable(Runway runway){
        lock.lock();
        try {
@@ -109,7 +110,6 @@ public class AirTrafficController {
 
     public synchronized void checkCollision() {
         lock.lock();
-        List<Plane> planesToRemove = new ArrayList<>();
         try{
             for (int i = 0; i < planes.size(); i++) {
                 Plane plane1 = planes.get(i);

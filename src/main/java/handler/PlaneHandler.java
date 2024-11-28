@@ -14,12 +14,13 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import static handler.PlaneHandler.AirportInstruction.*;
+import static plane.Plane.FlightPhase.*;
 
 @Log4j2
 public class PlaneHandler extends Thread {
 
     public enum AirportInstruction {
-        DESCENT, HOLD_PATTERN, ALTERNATIVE,  LAND, FULL, COLLISION, OCCUPIED
+        DESCENT, HOLD_PATTERN, ALTERNATIVE, LAND, FULL, COLLISION, OCCUPIED
     }
     private final Socket clientSocket;
     private final AirTrafficController controller;
@@ -72,13 +73,15 @@ public class PlaneHandler extends Thread {
             return false;
         }
         controller.registerPlane(plane);
+        //
+        plane.setFlightPhase(DESCENDING);
+        //
         log.info("Plane [{}] registered in airspace on [{}] / [{}] / [{}]", plane.getId(), plane.getLocation().getX(), plane.getLocation().getY(), plane.getLocation().getAltitude() );
         return true;
     }
 
     private void managePlane(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException {
         while (true) {
-            // paliwo
             String message = messenger.receive(in);
 
             // Check if the message is numeric (fuel level) or not (Location)
@@ -102,18 +105,49 @@ public class PlaneHandler extends Thread {
                 return;
             }
 
-            /*if(controller.isHoldingEntryOccupied()){
-                messenger.send(ALTERNATIVE, out);
-            }*/
+            if (plane.getFlightPhase().equals(HOLDING)) {
+                if (prepareLanding(plane, in, out)) {
+                    break;
+                }
+            }
 
-            if (isPlaneAtLandingAltitude(plane)) {
+            if(plane.getFlightPhase().equals(ALTERNATIVE_HOLDING)) {
+                if(plane.getLocation().equals(new Location(-5000, 4500, 4000))) {
+                    if(controller.isCollisionRisk(plane)) {
+                        //messenger.send(XXX, out);
+                        messenger.send(ALTERNATIVE, out);
+                    } else {
+                        messenger.send(HOLD_PATTERN, out);
+                        plane.setFlightPhase(HOLDING);
+                    }
+                } else {
+                    messenger.send(ALTERNATIVE, out);
+                }
+            }
+
+            if (plane.getFlightPhase().equals(DESCENDING)) {
+                if (isPlaneBeforeEnter(plane)) {
+                    if (controller.isCollisionRisk(plane)) {
+                        messenger.send(ALTERNATIVE, out);
+                        plane.setFlightPhase(ALTERNATIVE_HOLDING);
+                    } else {
+                        handleDescent(plane, out);
+                        plane.setFlightPhase(HOLDING);
+                    }
+                } else {
+                    handleDescent(plane, out);
+                }
+            }
+        }
+
+
+            /*if (isPlaneAtLandingAltitude(plane)) {
                 if (prepareLanding(plane, in, out)) {
                     break;
                 }
             } else {
                 handleDescent(plane, out);
-            }
-        }
+            }*/
     }
 
     private boolean prepareLanding(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, LocationAcquisitionException, ClassNotFoundException {
@@ -132,6 +166,13 @@ public class PlaneHandler extends Thread {
 
     private boolean isPlaneAtLandingAltitude(Plane plane) {
         return plane.getLocation().getAltitude() <= 1000;
+    }
+
+    /*private boolean isPlaneBeforeEnter(Plane plane) {
+        return plane.getLocation().equals(new Location(-5000, 4500, 1013));
+    }*/
+    private boolean isPlaneBeforeEnter(Plane plane) {
+        return plane.getLocation().getAltitude() == 1013;
     }
 
     private void handleDescent(Plane plane, ObjectOutputStream out) throws IOException {
