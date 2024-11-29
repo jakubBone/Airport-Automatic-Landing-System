@@ -16,6 +16,6 @@ public class RunwayModel {
         this.runwayRect.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
         this.runwayRect.setTranslateX(-1000);
         this.runwayRect.setTranslateY(0);
-        this.runwayRect.setTranslateZ((runway.getTouchdownPoint().getY() - 500)/ 2);
+        this.runwayRect.setTranslateZ((runway.getLandingPoint().getY() - 500)/ 2);
     }
 }

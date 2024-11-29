@@ -144,6 +144,6 @@ public class AirTrafficController {
     }
 
     public boolean hasLandedOnRunway(Plane plane, Runway runway){
-        return (plane.getLocation().equals(runway.getTouchdownPoint()));
+        return (plane.getLocation().equals(runway.getLandingPoint()));
     }
 }

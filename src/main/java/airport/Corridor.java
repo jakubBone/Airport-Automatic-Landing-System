@@ -8,10 +8,10 @@ import java.io.Serializable;
 @Getter
 public class Corridor implements Serializable {
     private String id;
-    private Location entryWaypoint;
+    private Location entryPoint;
 
-    public Corridor(String id, Location entryWaypoint) {
+    public Corridor(String id, Location entryPoint) {
         this.id = id;
-        this.entryWaypoint = entryWaypoint;
+        this.entryPoint = entryPoint;
     }
 }

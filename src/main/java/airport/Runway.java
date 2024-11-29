@@ -12,17 +12,18 @@ import java.io.Serializable;
 @Setter
 public class Runway implements Serializable {
     private String id;
-    private Location touchdownPoint;
+    private Location landingPoint;
     private Corridor corridor;
     private boolean isAvailable;
-    public int width;
-    public int height;
+    private int width;
+    private int height;
 
-    public Runway(String id, Location touchdownPoint, Corridor corridor, Boolean isAvailable) {
+
+    public Runway(String id, Location landingPoint, Corridor corridor) {
         this.id = id;
-        this.touchdownPoint = touchdownPoint;
+        this.landingPoint = landingPoint;
         this.corridor = corridor;
-        this.isAvailable = isAvailable;
+        this.isAvailable = true;
         this.width = 5000;
         this.height = 1000;
     }

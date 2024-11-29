@@ -125,8 +125,8 @@ public class FlightPhaseManager {
     }
 
     private Runway getRunwayIfPlaneAtCorridor(Plane plane) {
-        Location runway1Corridor = Airport.runway1.getCorridor().getEntryWaypoint();
-        Location runway2Corridor = Airport.runway2.getCorridor().getEntryWaypoint();
+        Location runway1Corridor = Airport.runway1.getCorridor().getEntryPoint();
+        Location runway2Corridor = Airport.runway2.getCorridor().getEntryPoint();
 
         Runway runway;
         if (plane.getLocation().equals(runway1Corridor)){
