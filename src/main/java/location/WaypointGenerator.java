@@ -57,45 +57,6 @@ public class WaypointGenerator implements Serializable {
 
         return waypoints;
     }
-    /*public static List<Location> getDescentWaypoints() {
-        List<Location> waypoints = new ArrayList<>();
-
-        int[] altitudes = {5000, 4000, 3000, 2000};
-
-        int altitudeLevel = 1000;
-        int waypointsPerLevel = 80;
-
-        int altitudeDecrement = altitudeLevel / waypointsPerLevel;
-
-       // 320 descending waypoints directing to landing level on 2000 meters
-        for (int altitude : altitudes) {
-            //  Top side
-            for (int x = MIN_AIRPORT_SIDE; x <= INNER_MAX_BOUNDARY; x += WAYPOINT_INTERVAL_LAND) {
-                waypoints.add(new Location(x, MAX_AIRPORT_SIDE, altitude - altitudeDecrement));
-                altitude -= altitudeDecrement;
-            }
-
-            // Right side
-            for (int y = MAX_AIRPORT_SIDE; y >= INNER_MIN_BOUNDARY; y -= WAYPOINT_INTERVAL_LAND) {
-                waypoints.add(new Location(MAX_AIRPORT_SIDE, y,altitude - altitudeDecrement));
-                altitude -= altitudeDecrement;
-            }
-
-            // Left side
-            for (int x = MAX_AIRPORT_SIDE; x >= INNER_MIN_BOUNDARY; x -= WAYPOINT_INTERVAL_LAND) {
-                waypoints.add(new Location(x, MIN_AIRPORT_SIDE,altitude - altitudeDecrement));
-                altitude -= altitudeDecrement;
-            }
-
-            // Bottom side
-            for (int y = MIN_AIRPORT_SIDE; y <= INNER_MAX_BOUNDARY; y += WAYPOINT_INTERVAL_LAND) {
-                waypoints.add(new Location(MIN_AIRPORT_SIDE, y,altitude - altitudeDecrement));
-                altitude -= altitudeDecrement;
-            }
-        }
-
-        return waypoints;
-    }*/
 
     public static List<Location> getHoldingPatternWaypoints() {
         List<Location> waypoints = new ArrayList<>();
@@ -117,21 +78,22 @@ public class WaypointGenerator implements Serializable {
         return waypoints;
     }
 
-    public static List<Location> getAlternativeHoldingPatternWaypoints(int altitude) {
+    public static List<Location> getAlternativeHoldingPatternWaypoints() {
         List<Location> waypoints = new ArrayList<>();
+        int alternativeAltitude = 500;
 
         // 40 alternative holding pattern waypoints
         for (int x = MIN_AIRPORT_SIDE; x <= INNER_MAX_BOUNDARY; x += WAYPOINT_INTERVAL_LAND) {
-            waypoints.add(new Location(x, MAX_AIRPORT_SIDE, altitude));
+            waypoints.add(new Location(x, MAX_AIRPORT_SIDE, alternativeAltitude));
         }
         for (int y = MAX_AIRPORT_SIDE; y >= INNER_MIN_BOUNDARY; y -= WAYPOINT_INTERVAL_LAND) {
-            waypoints.add(new Location(MAX_AIRPORT_SIDE, y, altitude));
+            waypoints.add(new Location(MAX_AIRPORT_SIDE, y, alternativeAltitude));
         }
         for (int x = MAX_AIRPORT_SIDE; x >= INNER_MIN_BOUNDARY; x -= WAYPOINT_INTERVAL_LAND) {
-            waypoints.add(new Location(x, MIN_AIRPORT_SIDE, altitude));
+            waypoints.add(new Location(x, MIN_AIRPORT_SIDE, alternativeAltitude));
         }
         for (int y = MIN_AIRPORT_SIDE; y <= INNER_MAX_BOUNDARY; y += WAYPOINT_INTERVAL_LAND) {
-            waypoints.add(new Location(MIN_AIRPORT_SIDE, y, altitude));
+            waypoints.add(new Location(MIN_AIRPORT_SIDE, y, alternativeAltitude));
         }
 
         return waypoints;
@@ -153,22 +115,5 @@ public class WaypointGenerator implements Serializable {
 
         return waypoints;
     }
-
-    /*public static List<Location> getLandingWaypoints(Location corridorEntry) {
-        List<Location> waypoints = new ArrayList<>();
-        int startX = 4000;
-        int endX = 1000 ;
-        int corridorY = corridorEntry.getY();
-
-        int altitudeDecrement = LANDING_ALTITUDE / 5;
-        int currentAltitude = corridorEntry.getAltitude();
-
-        for (int x = startX; x <= endX; x += WAYPOINT_INTERVAL_DESCENT) {
-            waypoints.add(new Location(x, corridorY, currentAltitude));
-            currentAltitude -= altitudeDecrement;
-        }
-
-        return waypoints;
-    }*/
 }
 

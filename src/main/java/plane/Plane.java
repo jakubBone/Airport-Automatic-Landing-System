@@ -44,8 +44,8 @@ public class Plane implements Serializable {
         this.fuelLevel = calcFuelForThreeHours();
         this.flightPhase = DESCENDING;
         this.waypoints = WaypointGenerator.getDescentWaypoints();
-        //this.location = selectInitialLocationExcludingCorridors();
-        this.currentWaypointIndex = 310;
+        this.location = selectInitialLocationExcludingCorridors();
+        //this.currentWaypointIndex = 310;
         this.location = waypoints.get(currentWaypointIndex);
         this.isDestroyed = false;
         this.landed = false;
@@ -75,7 +75,7 @@ public class Plane implements Serializable {
 
     // Jump 1 index up at last point to avoid crash
     public void holdAlternative(){
-        waypoints = WaypointGenerator.getAlternativeHoldingPatternWaypoints(500);
+        waypoints = WaypointGenerator.getAlternativeHoldingPatternWaypoints();
         moveTowardsNextWaypoint();
         if (isAtLastWaypoint()) {
             currentWaypointIndex = 1;

@@ -39,13 +39,5 @@ public class PlaneModel {
         this.label.setTranslateX(((plane.getLocation().getX() + 150)) / 2);
         this.label.setTranslateY(-((plane.getLocation().getAltitude() -150)) / 2);
         this.label.setTranslateZ((plane.getLocation().getY()) / 2);
-
-
-        /*this.label.setText(
-                "X: " + (int) plane.getLocation().getX() + " / " +
-                        "Y: " + (int) plane.getLocation().getY() + " / " +
-                        "Z: " + (int) plane.getLocation().getAltitude()
-        );*/
-        //this.label.setText("Fuel level:" + (double) plane.getFuelLevel());
     }
 }

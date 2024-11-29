@@ -60,6 +60,7 @@ public class SceneRenderer extends Application {
         addWaypointModels(waypointModel.getLandingR1Models());
         addWaypointModels(waypointModel.getLandingR2Models());
         addWaypointModels(waypointModel.getHoldingPatternModels());
+        addWaypointModels(waypointModel.getHoldingAlternativePatternModels());
         addWaypointModels(waypointModel.getDescentModels());
     }
 
