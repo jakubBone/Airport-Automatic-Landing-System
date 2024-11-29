@@ -104,7 +104,7 @@ public class PlaneHandler extends Thread {
             }
 
             if (plane.isLanded()) {
-                log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
+                log.info("Plane [{}] has successfully landed", plane.getId());
                 return;
             }
         }
@@ -122,3 +122,4 @@ public class PlaneHandler extends Thread {
         log.info("Plane [{}] is out of fuel. Disappeared from the radar ", plane.getId());
     }
 }
+
