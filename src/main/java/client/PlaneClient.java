@@ -32,31 +32,9 @@ public class PlaneClient extends Client implements Runnable {
                 return;
             }
 
-            messenger.send(plane, out);
+            sendInitialData();
+            handleInstructions();
 
-            while (!isProcessCompleted) {
-                messenger.send(plane.getFuelLevel(), out);
-                out.flush();
-                if (plane.isOutOfFuel()) {
-                    log.info("Plane [{}] is out of fuel. Collision", plane.getId());
-                    break;
-                }
-
-                if(plane.getLocation() != null){
-                    messenger.send(plane.getLocation(), out);
-                    out.flush();
-                } else {
-                    log.info("Plane [{}] disappeared from the radar", plane.getId());
-                    break;
-                }
-                String message = messenger.receive(in);
-                AirportInstruction instruction = messenger.parse(message, AirportInstruction.class);
-                processInstruction(instruction);
-
-                if(plane.isDestroyed()){
-                    break;
-                }
-            }
         } catch (IOException | ClassNotFoundException ex) {
             log.error("PlaneClient [{}]: Communication failure: {}", plane.getId(), ex.getMessage());
         } finally {
@@ -65,12 +43,50 @@ public class PlaneClient extends Client implements Runnable {
         }
     }
 
-    private void processInstruction(AirportInstruction instruction) throws IOException, ClassNotFoundException{
+    private void sendInitialData() throws IOException {
+        messenger.send(plane, out);
+    }
+
+    private void handleInstructions() throws IOException, ClassNotFoundException {
+        while (!isProcessCompleted) {
+            if(!sendFuelLevel() || !sendPlaneLocation()){
+                return;
+            }
+
+            processInstruction();
+
+            if(plane.isDestroyed()){
+                return;
+            }
+        }
+    }
+    private boolean sendFuelLevel() throws IOException {
+        messenger.send(plane.getFuelLevel(), out);
+        out.flush();
+
+        if (plane.isOutOfFuel()) {
+            log.info("Plane [{}] is out of fuel. Collision", plane.getId());
+            return false;
+        }
+        return true;
+    }
+
+    private boolean sendPlaneLocation() throws IOException {
+        if(plane.getLocation() == null) {
+            log.info("Plane [{}] disappeared from the radar", plane.getId());
+            return false;
+        }
+        messenger.send(plane.getLocation(), out);
+        out.flush();
+        return true;
+    }
+    private void processInstruction() throws IOException, ClassNotFoundException {
+        AirportInstruction instruction = messenger.receiveAndParse(in, AirportInstruction.class);
         switch (instruction) {
             case DESCENT -> executeDescent();
             case HOLD_PATTERN -> executeHoldPattern();
             case ALTERNATIVE -> executeAlternative();
-            case LAND -> executeLanding();
+            case LAND -> processLanding();
             case FULL -> executeFullAirspace();
             case OCCUPIED -> executeOccupiedLocation();
             case COLLISION -> executeCollision();
@@ -79,36 +95,25 @@ public class PlaneClient extends Client implements Runnable {
     }
 
     private void processLanding() throws IOException, ClassNotFoundException {
-        String message = messenger.receive(in);
-        Runway runway = messenger.parse(message, Runway.class);
-
+        Runway runway = messenger.receiveAndParse(in, Runway.class);
         plane.setLandingPhase(runway);
-        log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getId(), runway.getId());
 
-        while (true) {
-            messenger.send(plane.getFuelLevel(), out);
-            out.flush();
-            if (plane.isOutOfFuel()) {
-                log.info("Plane [{}] is out of fuel. Collision", plane.getId());
+        log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getId(), runway.getId());
+        while (!isProcessCompleted) {
+            if(!sendFuelLevel()){
                 return;
             }
 
             plane.land(runway);
 
-            if(plane.getLocation() != null){
-                messenger.send(plane.getLocation(), out);
-                out.flush();
-            } else {
-                log.info("Plane [{}] disappeared from the radar", plane.getId());
-                break;
-            }
-
-            if (plane.isLanded()) {
-                log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
+            if(!sendPlaneLocation()){
                 return;
             }
 
-            if(plane.getLocation().getAltitude() < 0){
+            if (plane.isLanded()) {
+                isProcessCompleted = true;
+                log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
+            } else if (plane.getLocation().getAltitude() < 0){
                 log.info("RUNWAY COLLISION detected for Plane [{}]", plane.getId());
                 return;
             }
@@ -128,11 +133,6 @@ public class PlaneClient extends Client implements Runnable {
     private void executeAlternative() {
         log.info("Plane [{}] instructed to HOLD_ALTERNATIVE_PATTERN", plane.getId());
         plane.holdAlternative();
-    }
-
-    private void executeLanding() throws IOException, ClassNotFoundException {
-        processLanding();
-        isProcessCompleted = true;
     }
 
     private void executeFullAirspace() {
