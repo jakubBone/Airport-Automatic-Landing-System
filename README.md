@@ -8,7 +8,7 @@ of airplanes in the airspace, managing fuel levels, and preventing collisions. I
 ## Project Structure
 The project now is divided into several key components:
 
-PlaneClient (Client): Represents an airplane and handles the airplane's movement, communication with the server, and fuel management.
+PlaneClient (Client): Represents an airplane and handles the airplane's movement, utills with the server, and fuel management.
 
 AirportServer (Server): Manages airplane connections, processes landing requests, and ensures safe landing by controlling runway availability.
 
@@ -16,7 +16,7 @@ AirSpace: Manages the airspace, including tracking airplanes, collision detectio
 
 AirTrafficController: Manages runway assignments and landing procedures.
 
-PlaneHandler: Handles communication between each PlaneClient and the AirportServer. 
+PlaneHandler: Handles utills between each PlaneClient and the AirportServer. 
 
 Runway: Represents a physical runway with a specific location at the airport.
 

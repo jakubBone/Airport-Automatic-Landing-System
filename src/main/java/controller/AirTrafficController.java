@@ -130,6 +130,15 @@ public class AirTrafficController {
         }
     }
 
+    public boolean isPlaneApproachingHoldingAltitude(Plane plane) {
+        int entryPoint = 1013;
+        return plane.getLocation().getAltitude() == entryPoint;
+    }
+    public boolean isPlaneLeavingAlternativeHolding(Plane plane) {
+        Location leavingWaypoint = new Location(-5000, 4500, 4000);
+        return plane.getLocation().equals(leavingWaypoint);
+    }
+
     public boolean isRunwayCollision(Plane plane) {
         return plane.getLocation().getAltitude() < 0;
     }

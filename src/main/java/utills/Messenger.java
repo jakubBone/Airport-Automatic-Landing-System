@@ -1,4 +1,4 @@
-package communication;
+package utills;
 
 import com.google.gson.Gson;
 
@@ -23,6 +23,11 @@ public class Messenger {
         }
         out.flush();
 
+    }
+
+    public <T> T receiveAndParse(ObjectInputStream in, Class<T> type) throws IOException, ClassNotFoundException {
+        String json = (String) in.readObject();
+        return gson.fromJson(json, type);
     }
 
     public String receive(ObjectInputStream in) throws IOException, ClassNotFoundException {

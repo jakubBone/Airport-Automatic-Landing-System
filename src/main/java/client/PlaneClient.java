@@ -1,7 +1,7 @@
 package client;
 
 import airport.Runway;
-import communication.Messenger;
+import utills.Messenger;
 import lombok.extern.log4j.Log4j2;
 import plane.Plane;
 
@@ -9,7 +9,7 @@ import java.io.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static handler.PlaneHandler.AirportInstruction;
+import static controller.PlaneHandler.AirportInstruction;
 
 @Log4j2
 public class PlaneClient extends Client implements Runnable {
@@ -85,7 +85,7 @@ public class PlaneClient extends Client implements Runnable {
         plane.setLandingPhase(runway);
         log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getId(), runway.getId());
 
-        while (!plane.isLanded()) {
+        while (true) {
             messenger.send(plane.getFuelLevel(), out);
             out.flush();
             if (plane.isOutOfFuel()) {

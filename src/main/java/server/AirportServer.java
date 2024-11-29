@@ -4,7 +4,7 @@ import controller.AirTrafficController;
 import airport.Airport;
 import controller.CollisionDetector;
 import lombok.extern.log4j.Log4j2;
-import handler.PlaneHandler;
+import controller.PlaneHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
