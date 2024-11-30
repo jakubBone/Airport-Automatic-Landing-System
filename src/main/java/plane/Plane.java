@@ -84,11 +84,11 @@ public class Plane implements Serializable {
 
     public void land(Runway runway){
         moveTowardsNextWaypoint();
-        Location touchdownPoint = runway.getLandingPoint();
+        Location landingPoint = runway.getLandingPoint();
         log.info("Plane [{}] is LANDING on runway [{}]", getId(), runway.getId());
 
         if(isAtLastWaypoint()) {
-            setLocation(touchdownPoint);
+            setLocation(landingPoint);
             landed = true;
         }
     }

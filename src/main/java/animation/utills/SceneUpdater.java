@@ -1,13 +1,16 @@
 package animation.utills;
 
+import airport.Airport;
 import animation.model.PlaneModel;
 import controller.AirTrafficController;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Group;
 import javafx.util.Duration;
+import location.Location;
 import plane.Plane;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,10 +43,18 @@ public class SceneUpdater {
                 root.getChildren().addAll(planeModel.getPlaneSphere(), planeModel.getLabel());
             }
 
-            if(plane.isLanded() || plane.isDestroyed()){
+            if (plane.isDestroyed()) {
                 root.getChildren().removeAll(planeModel.getPlaneSphere(), planeModel.getLabel());
             } else {
                 planeModel.updatePosition(plane);
+            }
+
+            if (plane.isLanded()) {
+                PlaneModel finalPlaneModel = planeModel;
+                new Timeline(new KeyFrame(Duration.millis(1000), ev -> {
+                    root.getChildren().removeAll(finalPlaneModel.getPlaneSphere(), finalPlaneModel.getLabel());
+                    planeMap.remove(plane.getId());
+                })).play();
             }
         }
     }

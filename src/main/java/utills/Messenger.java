@@ -29,12 +29,4 @@ public class Messenger {
         String json = (String) in.readObject();
         return gson.fromJson(json, type);
     }
-
-    public String receive(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        return (String) in.readObject();
-    }
-
-    public <T> T parse(String jsonMessage, Class<T> type) {
-        return gson.fromJson(jsonMessage, type);
-    }
 }

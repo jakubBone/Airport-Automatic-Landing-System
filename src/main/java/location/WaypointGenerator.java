@@ -102,7 +102,7 @@ public class WaypointGenerator implements Serializable {
     public static List<Location> getLandingWaypoints(Location corridorEntry) {
         List<Location> waypoints = new ArrayList<>();
         int startX = -4500;
-        int endX = 500 ;
+        int endX = 500;
         int corridorY = corridorEntry.getY();
 
         int altitudeDecrement = LANDING_ALTITUDE / 10;
