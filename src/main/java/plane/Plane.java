@@ -101,6 +101,30 @@ public class Plane implements Serializable {
     }
 
     private void moveTowardsNextWaypoint() {
+        if (currentWaypointIndex < waypoints.size()) {
+            Location nextWaypoint = waypoints.get(currentWaypointIndex);
+            moveTowards(nextWaypoint);
+            log.info("Plane [{}] is moving to waypoint {}: [{}, {}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY(), nextWaypoint.getAltitude());
+
+            if (hasReachedWaypoint(nextWaypoint)) {
+                currentWaypointIndex++;
+            }
+        }
+    }
+
+    /*private void moveTowardsNextWaypoint() {
+        if (currentWaypointIndex < waypoints.size()) {
+            Location nextWaypoint = waypoints.get(currentWaypointIndex);
+            moveTowards(nextWaypoint);
+            log.info("Plane [{}] is moving to waypoint {}: [{}, {}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY(), nextWaypoint.getAltitude());
+
+            if (hasReachedWaypoint(nextWaypoint)) {
+                currentWaypointIndex = (currentWaypointIndex + 1) % waypoints.size(); // Zapętlenie
+            }
+        }
+    }*/
+
+    /*private void moveTowardsNextWaypoint() {
         if (currentWaypointIndex <= waypoints.size()) {
             Location nextWaypoint = waypoints.get(currentWaypointIndex);
             moveTowards(nextWaypoint);
@@ -109,7 +133,7 @@ public class Plane implements Serializable {
                 currentWaypointIndex++;
             }
         }
-    }
+    }*/
 
     public boolean isAtLastWaypoint(){
         return currentWaypointIndex == waypoints.size();

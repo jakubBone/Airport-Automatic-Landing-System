@@ -15,91 +15,68 @@ public class WaypointGenerator implements Serializable {
     private static final int INNER_MAX_BOUNDARY = 4500;
     private static final int INNER_MIN_BOUNDARY = -4500;
 
+    public static List<Location> generateCircularTrajectory(int centerX, int centerY, int radius, int altitude, int totalWaypoints) {
+        List<Location> waypoints = new ArrayList<>();
+        double angleStep = 360.0 / totalWaypoints; // Kąt między kolejnymi punktami
+
+        for (int i = 0; i < totalWaypoints; i++) {
+            double radians = Math.toRadians(i * angleStep);
+            int x = centerX + (int) (radius * Math.cos(radians));
+            int y = centerY + (int) (radius * Math.sin(radians));
+            waypoints.add(new Location(x, y, altitude));
+        }
+        return waypoints;
+    }
+
     public static List<Location> getDescentWaypoints() {
         List<Location> waypoints = new ArrayList<>();
+        int radius = 5000; // Stały promień okręgu
+        int totalWaypoints = 320; // Całkowita liczba waypointów
+        int startAltitude = 5000; // Początkowa wysokość
+        int endAltitude = 1000; // Końcowa wysokość
+        double altitudeDecrement = (double) (startAltitude - endAltitude) / totalWaypoints; // Obniżenie na waypoint
 
-        int[] altitudes = {5000, 4000, 3000, 2000};
+        double angleStep = 360.0 / 80; // 80 waypointów na pełne okrążenie
 
-        double altitudeLevel = 1000.0;
-        int waypointsPerLevel = 80;
+        double currentAltitude = startAltitude;
 
-        // Precising decrement as double
-        double altitudeDecrement = altitudeLevel / waypointsPerLevel;
+        for (int i = 0; i < totalWaypoints; i++) {
+            double radians = Math.toRadians((i % 80) * angleStep); // Powtarzanie kąta co 80 waypointów
+            int x = (int) (radius * Math.cos(radians));
+            int y = (int) (radius * Math.sin(radians));
+            waypoints.add(new Location(x, y, (int) Math.round(currentAltitude)));
 
-        // 320 descending waypoints directing to landing level on 2000 meters
-        for (int initialAltitude : altitudes) {
-            double currentAltitude = initialAltitude;
-
-            // Top side
-            for (int x = MIN_AIRPORT_SIDE; x <= INNER_MAX_BOUNDARY; x += WAYPOINT_INTERVAL_LAND) {
-                waypoints.add(new Location(x, MAX_AIRPORT_SIDE, (int) Math.round(currentAltitude)));
-                currentAltitude -= altitudeDecrement;
-            }
-
-            // Right side
-            for (int y = MAX_AIRPORT_SIDE; y >= INNER_MIN_BOUNDARY; y -= WAYPOINT_INTERVAL_LAND) {
-                waypoints.add(new Location(MAX_AIRPORT_SIDE, y, (int) Math.round(currentAltitude)));
-                currentAltitude -= altitudeDecrement;
-            }
-
-            // Left side
-            for (int x = MAX_AIRPORT_SIDE; x >= INNER_MIN_BOUNDARY; x -= WAYPOINT_INTERVAL_LAND) {
-                waypoints.add(new Location(x, MIN_AIRPORT_SIDE, (int) Math.round(currentAltitude)));
-                currentAltitude -= altitudeDecrement;
-            }
-
-            // Bottom side
-            for (int y = MIN_AIRPORT_SIDE; y <= INNER_MAX_BOUNDARY; y += WAYPOINT_INTERVAL_LAND) {
-                waypoints.add(new Location(MIN_AIRPORT_SIDE, y, (int) Math.round(currentAltitude)));
-                currentAltitude -= altitudeDecrement;
-            }
+            currentAltitude -= altitudeDecrement; // Zmniejsz wysokość dla kolejnego waypointa
         }
-
         return waypoints;
     }
 
     public static List<Location> getHoldingPatternWaypoints() {
-        List<Location> waypoints = new ArrayList<>();
-
-        // 40 holding pattern waypoints on landing level
-        for (int x = MIN_AIRPORT_SIDE; x <= INNER_MAX_BOUNDARY; x += WAYPOINT_INTERVAL_LAND) {
-            waypoints.add(new Location(x, MAX_AIRPORT_SIDE, LANDING_ALTITUDE));
-        }
-        for (int y = MAX_AIRPORT_SIDE; y >= INNER_MIN_BOUNDARY; y -= WAYPOINT_INTERVAL_LAND) {
-            waypoints.add(new Location(MAX_AIRPORT_SIDE, y, LANDING_ALTITUDE));
-        }
-        for (int x = MAX_AIRPORT_SIDE; x >= INNER_MIN_BOUNDARY; x -= WAYPOINT_INTERVAL_LAND) {
-            waypoints.add(new Location(x, MIN_AIRPORT_SIDE, LANDING_ALTITUDE));
-        }
-        for (int y = MIN_AIRPORT_SIDE; y <= INNER_MAX_BOUNDARY; y += WAYPOINT_INTERVAL_LAND) {
-            waypoints.add(new Location(MIN_AIRPORT_SIDE, y, LANDING_ALTITUDE));
-        }
-
-        return waypoints;
+        int radius = 5000; // Promień okręgu
+        int altitude = 1000; // Stała wysokość dla holding
+        return generateCircularTrajectory(0, 0, radius, altitude, 80); // 80 waypointów
     }
 
     public static List<Location> getAlternativeHoldingPatternWaypoints() {
-        List<Location> waypoints = new ArrayList<>();
-        int alternativeAltitude = 500;
-
-        // 40 alternative holding pattern waypoints
-        for (int x = MIN_AIRPORT_SIDE; x <= INNER_MAX_BOUNDARY; x += WAYPOINT_INTERVAL_LAND) {
-            waypoints.add(new Location(x, MAX_AIRPORT_SIDE, alternativeAltitude));
-        }
-        for (int y = MAX_AIRPORT_SIDE; y >= INNER_MIN_BOUNDARY; y -= WAYPOINT_INTERVAL_LAND) {
-            waypoints.add(new Location(MAX_AIRPORT_SIDE, y, alternativeAltitude));
-        }
-        for (int x = MAX_AIRPORT_SIDE; x >= INNER_MIN_BOUNDARY; x -= WAYPOINT_INTERVAL_LAND) {
-            waypoints.add(new Location(x, MIN_AIRPORT_SIDE, alternativeAltitude));
-        }
-        for (int y = MIN_AIRPORT_SIDE; y <= INNER_MAX_BOUNDARY; y += WAYPOINT_INTERVAL_LAND) {
-            waypoints.add(new Location(MIN_AIRPORT_SIDE, y, alternativeAltitude));
-        }
-
-        return waypoints;
+        return generateCircularTrajectory(0, 0, 5000, 500, 80); // 80 punktów
     }
 
     public static List<Location> getLandingWaypoints(Location corridorEntry) {
+        List<Location> waypoints = new ArrayList<>();
+        int startX = -4500;
+        int endX = 500;
+        int totalWaypoints = 10; // 10 waypointów
+        int altitudeDecrement = corridorEntry.getAltitude() / totalWaypoints;
+        int altitude = corridorEntry.getAltitude();
+
+        for (int x = startX; x <= endX; x += (endX - startX) / totalWaypoints) {
+            waypoints.add(new Location(x, corridorEntry.getY(), altitude));
+            altitude -= altitudeDecrement;
+        }
+        return waypoints;
+    }
+
+    /*public static List<Location> getLandingWaypoints(Location corridorEntry) {
         List<Location> waypoints = new ArrayList<>();
         int startX = -4500;
         int endX = 500;
@@ -114,6 +91,6 @@ public class WaypointGenerator implements Serializable {
         }
 
         return waypoints;
-    }
+    }*/
 }
 

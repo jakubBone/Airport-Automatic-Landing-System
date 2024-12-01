@@ -11,8 +11,8 @@ public class Airport {
     public static Runway runway2;
 
     public Airport() {
-        this.runway1 = createRunway("R-1", "C-1", new Location(500, -2000, 0), new Location(-5000, -2000, 1000));
-        this.runway2 = createRunway("R-2", "C-2", new Location(500, 1000, 0), new Location(-5000, 1000, 1000));
+        this.runway1 = createRunway("R-1", "C-1", new Location(500, -1167, 0), new Location(-4861, -1167, 1000));
+        this.runway2 = createRunway("R-1", "C-1", new Location(500, 1167, 0), new Location(-4861, 1167, 1000));
     }
 
     private Runway createRunway(String runwayId, String corridorId, Location landingPoint, Location entryPoint) {

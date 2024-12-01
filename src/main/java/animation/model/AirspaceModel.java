@@ -51,10 +51,10 @@ public class AirspaceModel {
     }
 
     private void setupHanger(){
-        this.box = new Box(1000.0 / 2, 500.0 / 2, 10000.0 / 2);
+        this.box = new Box(1000.0 / 2, 500.0 / 2, 8000.0 / 2);
         this.box.setTranslateX(15500 / 2);
         this.box.setTranslateY(5000 / 2);
-        this.box.setTranslateZ(25500/ 2);
+        this.box.setTranslateZ(26500/ 2);
     }
 
     private Rectangle createWall(int width, int height) {
