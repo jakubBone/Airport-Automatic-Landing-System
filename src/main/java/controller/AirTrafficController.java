@@ -58,7 +58,7 @@ public class AirTrafficController {
 
     public boolean isCollisionRisk(Plane plane1) {
         lock.lock();
-        Location waypoint = new Location(-5000, 4000, 1000);
+        Location waypoint = new Location(5000, -1000, 1000);
         try {
             for (Plane plane2 : planes) {
                 if(plane1.getId() != plane2.getId()){
@@ -72,6 +72,7 @@ public class AirTrafficController {
             lock.unlock();
         }
     }
+
     public boolean isRunwayAvailable(Runway runway){
        lock.lock();
        try {
@@ -131,8 +132,8 @@ public class AirTrafficController {
     }
 
     public boolean isPlaneApproachingHoldingAltitude(Plane plane) {
-        int entryPoint = 1013;
-        return plane.getLocation().getAltitude() == entryPoint;
+        int entryPointAltitude = 1013;
+        return plane.getLocation().getAltitude() == entryPointAltitude;
     }
     public boolean isPlaneLeavingAlternativeHolding(Plane plane) {
         Location leavingWaypoint = new Location(-5000, 4500, 4000);

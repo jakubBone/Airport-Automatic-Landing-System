@@ -41,7 +41,7 @@ public class FlightPhaseManager {
     }
 
     private void handleDescent(Plane plane, ObjectOutputStream out) throws IOException {
-        if (controller.isPlaneApproachingHoldingAltitude(plane)) {
+        if (controller.isPlaneApproachingHoldingAltitude(plane)) { /// 1013
             if (controller.isCollisionRisk(plane)) {
                 applyAlternativeHolding(plane, out);
             } else {

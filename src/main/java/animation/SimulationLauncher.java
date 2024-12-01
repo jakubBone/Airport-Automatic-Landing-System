@@ -26,14 +26,14 @@ public class SimulationLauncher extends Application {
         serverThread.isDaemon();
         serverThread.start();
 
-        int numberOfClients = 1;
+        int numberOfClients = 1000;
 
         new Thread(() -> {
             for (int i = 0; i < numberOfClients; i++) {
                 PlaneClient client = new PlaneClient("localhost", 5000);
                 new Thread(client).start();
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(4000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
