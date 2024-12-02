@@ -1,16 +1,13 @@
 package animation.utills;
 
-import airport.Airport;
 import animation.model.PlaneModel;
 import controller.AirTrafficController;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Group;
 import javafx.util.Duration;
-import location.Location;
-import plane.Plane;
 
-import java.util.ArrayList;
+import plane.Plane;
 import java.util.List;
 import java.util.Map;
 

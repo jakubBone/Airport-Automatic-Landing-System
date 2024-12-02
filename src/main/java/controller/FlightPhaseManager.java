@@ -80,7 +80,12 @@ public class FlightPhaseManager {
 
         if (controller.hasLandedOnRunway(plane, availableRunway)) {
             plane.setLanded(true);
-            completeLanding(plane, availableRunway);
+            try{
+                Thread.sleep(500);
+            } catch (InterruptedException ex){
+                ex.getMessage();
+            }
+            controller.removePlaneFromSpace(plane);
             log.info("Plane [{}] has successfully landed on runway [{}]", plane.getId(), availableRunway.getId());
             return;
         }
@@ -90,7 +95,10 @@ public class FlightPhaseManager {
             log.info("Runway collision detected for Plane [{}]:", plane.getId());
             return;
         }
+
+        controller.releaseRunwayIfPlaneAtSecondEntryPoint(plane, availableRunway);
     }
+
 
     private void applyDescending(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);

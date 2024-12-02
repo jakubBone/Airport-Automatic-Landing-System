@@ -91,6 +91,7 @@ public class AirTrafficController {
        }
     }
 
+
     public void releaseRunway(Runway runway){
        lock.lock();
        try {
@@ -98,6 +99,12 @@ public class AirTrafficController {
        } finally {
           lock.unlock();
        }
+    }
+
+    public void releaseRunwayIfPlaneAtSecondEntryPoint(Plane plane, Runway runway){
+        if(plane.getLocation().equals(runway.getCorridor().getSecondEntryPoint())){
+            releaseRunway(runway);
+        }
     }
 
     public void removePlaneFromSpace(Plane plane) {
