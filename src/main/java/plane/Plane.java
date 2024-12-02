@@ -75,6 +75,9 @@ public class Plane implements Serializable {
 
     // Jump 1 index up at last point to avoid crash
     public void holdAlternative(){
+        if(ALTERNATIVE_HOLDING == flightPhase){
+            currentWaypointIndex++;
+        }
         waypoints = WaypointGenerator.getAlternativeHoldingPatternWaypoints();
         moveTowardsNextWaypoint();
         if (isAtLastWaypoint()) {
@@ -95,10 +98,16 @@ public class Plane implements Serializable {
 
     public void setLandingPhase(Runway runway) {
         this.flightPhase = FlightPhase.LANDING;
+        this.waypoints = WaypointGenerator.getLandingWaypoints(runway);
+        currentWaypointIndex = 0;
+    }
+
+    /*public void setLandingPhase(Runway runway) {
+        this.flightPhase = FlightPhase.LANDING;
         Location entryPoint = runway.getCorridor().getEntryPoint();
         this.waypoints = WaypointGenerator.getLandingWaypoints(entryPoint);
         currentWaypointIndex = 0;
-    }
+    }*/
 
     private void moveTowardsNextWaypoint() {
         if (currentWaypointIndex < waypoints.size()) {
