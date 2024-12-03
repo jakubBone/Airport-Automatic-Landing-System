@@ -12,7 +12,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import static controller.PlaneHandler.AirportInstruction.*;
-import static plane.Plane.FlightPhase.*;
+import static plane.PlanePhase.FlightPhase.DESCENDING;
 
 @Log4j2
 public class PlaneHandler extends Thread {
@@ -80,16 +80,18 @@ public class PlaneHandler extends Thread {
         controller.registerPlane(plane);
 
 
-        log.info("Plane [{}] registered in airspace on [{}] / [{}] / [{}]", plane.getId(), plane.getLocation().getX(), plane.getLocation().getY(), plane.getLocation().getAltitude());
+        log.info("Plane [{}] registered in airspace on [{}] / [{}] / [{}]", plane.getId(), plane.getNavigator().getLocation().getX(), plane.getNavigator().getLocation().getY(), plane.getNavigator().getLocation().getAltitude());
         return true;
     }
 
     private void managePlane(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException {
-        plane.setFlightPhase(DESCENDING);
+        /*plane.getPhase().setFlightPhase(DESCENDING);
+        plane.setPhase(DESCENDING);*/
+        plane.getPhase().setPhase(DESCENDING);
 
         while (true) {
             double fuelLevel = messenger.receiveAndParse(in, Double.class);
-            plane.setFuelLevel(fuelLevel);
+            plane.getFuelManager().setFuelLevel(fuelLevel);
             if (fuelLevel <= 0) {
                 handleOutOfFuel(plane);
                 return;

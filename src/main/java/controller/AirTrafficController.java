@@ -43,10 +43,10 @@ public class AirTrafficController {
 
     public boolean isLocationOccupied(Plane plane1) {
         lock.lock();
-        Location plane1Location = plane1.getLocation();
+        Location plane1Location = plane1.getNavigator().getLocation();
         try {
             for (Plane plane2 : planes) {
-                if (plane2.getLocation().equals(plane1Location)) {
+                if (plane2.getNavigator().getLocation().equals(plane1Location)) {
                  return true;
              }
             }
@@ -62,7 +62,7 @@ public class AirTrafficController {
         try {
             for (Plane plane2 : planes) {
                 if(plane1.getId() != plane2.getId()){
-                    if (waypoint.equals(plane2.getLocation())) {
+                    if (waypoint.equals(plane2.getNavigator().getLocation())) {
                         return true;
                     }
                 }
@@ -102,7 +102,7 @@ public class AirTrafficController {
     }
 
     public void releaseRunwayIfPlaneAtSecondEntryPoint(Plane plane, Runway runway){
-        if(plane.getLocation().equals(runway.getCorridor().getSecondEntryPoint())){
+        if(plane.getNavigator().getLocation().equals(runway.getCorridor().getSecondEntryPoint())){
             releaseRunway(runway);
         }
     }
@@ -123,8 +123,8 @@ public class AirTrafficController {
                 Plane plane1 = planes.get(i);
                 for (int j = i + 1; j < planes.size(); j++) {
                     Plane plane2 = planes.get(j);
-                    if (plane1.getLocation().equals(plane2.getLocation()) &&
-                            plane1.getCurrentWaypointIndex() == plane2.getCurrentWaypointIndex()) {
+                    if (plane1.getNavigator().getLocation().equals(plane2.getNavigator().getLocation()) &&
+                            plane1.getNavigator().getCurrentIndex() == plane2.getNavigator().getCurrentIndex()) {
 
                         planes.get(i).setDestroyed(true);
                         planes.get(j).setDestroyed(true);
@@ -140,18 +140,18 @@ public class AirTrafficController {
 
     public boolean isPlaneApproachingHoldingAltitude(Plane plane) {
         int entryPointAltitude = 1013;
-        return plane.getLocation().getAltitude() == entryPointAltitude;
+        return plane.getNavigator().getLocation().getAltitude() == entryPointAltitude;
     }
     public boolean isPlaneLeavingAlternativeHolding(Plane plane) {
         Location leavingWaypoint = new Location(-5000, 4500, 4000);
-        return plane.getLocation().equals(leavingWaypoint);
+        return plane.getNavigator().getLocation().equals(leavingWaypoint);
     }
 
     public boolean isRunwayCollision(Plane plane) {
-        return plane.getLocation().getAltitude() < 0;
+        return plane.getNavigator().getLocation().getAltitude() < 0;
     }
 
     public boolean hasLandedOnRunway(Plane plane, Runway runway){
-        return (plane.getLocation().equals(runway.getLandingPoint()));
+        return (plane.getNavigator().getLocation().equals(runway.getLandingPoint()));
     }
 }

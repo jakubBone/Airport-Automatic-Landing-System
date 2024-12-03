@@ -9,164 +9,78 @@ import lombok.extern.log4j.Log4j2;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
-import static plane.Plane.FlightPhase.*;
+import static plane.PlanePhase.FlightPhase.*;
 
 @Log4j2
 @Getter
 @Setter
 public class Plane implements Serializable {
-
-    public enum FlightPhase {
-        DESCENDING,
-        HOLDING,
-        ALTERNATIVE_HOLDING,
-        LANDING,
-    }
-    private FlightPhase flightPhase;
     private static final AtomicInteger idCounter = new AtomicInteger();
     private int id;
-    private double fuelConsumptionPerHour;
-    private double fuelLevel;
     private boolean landed;
-    private Location location;
     private List <Location> waypoints;
-    private int currentWaypointIndex;
     private boolean isDestroyed;
-    private boolean isFirstMove;
+    private FuelManager fuelManager;
+    private Navigator navigator;
+    private PlanePhase phase;
 
     public Plane() {
         this.id = generateID();
-        this.fuelConsumptionPerHour = 2000;
-        this.fuelLevel = calcFuelForThreeHours();
-        this.flightPhase = DESCENDING;
-        this.waypoints = WaypointGenerator.getDescentWaypoints();
-        //this.location = selectInitialLocationExcludingCorridors();
-        this.currentWaypointIndex = 310;
-        this.location = waypoints.get(currentWaypointIndex);
+        this.phase = new PlanePhase();
+        this.fuelManager = new FuelManager();
+        this.navigator = new Navigator(fuelManager);
         this.isDestroyed = false;
         this.landed = false;
-        this.isFirstMove = true;
     }
 
     public void descend(){
-        moveTowardsNextWaypoint();
-        isFirstMove = false;
-        if (isAtLastWaypoint()) {
-            flightPhase = FlightPhase.HOLDING;
-            waypoints = WaypointGenerator.getHoldingPatternWaypoints();
-            currentWaypointIndex = 0;
+        navigator.moveTowardsNextWaypoint(id);
+        navigator.setFirstMove(false);
+        if (navigator.isAtLastWaypoint()) {
+            phase.changePhase(HOLDING);
+            navigator.setWaypoints(WaypointGenerator.getHoldingPatternWaypoints());
+            navigator.setCurrentIndex(0);
         }
     }
 
     public void hold(){
-        waypoints = WaypointGenerator.getHoldingPatternWaypoints();
-        moveTowardsNextWaypoint();
-        if (isAtLastWaypoint()) {
-            currentWaypointIndex = 0;
+        navigator.moveTowardsNextWaypoint(id);
+        if (navigator.isAtLastWaypoint()) {
+            navigator.setCurrentIndex(0);
         }
     }
 
     public void holdAlternative(){
-        waypoints = WaypointGenerator.getAlternativeHoldingPatternWaypoints();
-        moveTowardsNextWaypoint();
-        if (isAtLastWaypoint()) {
+        navigator.setWaypoints(WaypointGenerator.getAlternativeHoldingPatternWaypoints());
+        navigator.moveTowardsNextWaypoint(id);
+        if (navigator.isAtLastWaypoint()) {
             // Jump 1 index up at last point to avoid crash
-            currentWaypointIndex = 1;
+            navigator.setCurrentIndex(1);
         }
     }
 
     public void land(Runway runway){
-        moveTowardsNextWaypoint();
-        Location landingPoint = runway.getLandingPoint();
+        navigator.moveTowardsNextWaypoint(id);
         log.info("Plane [{}] is LANDING on runway [{}]", getId(), runway.getId());
-
-        if(isAtLastWaypoint()) {
-            setLocation(landingPoint);
+        if(navigator.isAtLastWaypoint()) {
+            navigator.setLocation(runway.getLandingPoint());
             landed = true;
         }
     }
 
     public void setLandingPhase(Runway runway) {
-        this.flightPhase = FlightPhase.LANDING;
-        this.waypoints = WaypointGenerator.getLandingWaypoints(runway);
-        currentWaypointIndex = 0;
-    }
-
-    private void moveTowardsNextWaypoint() {
-        if (currentWaypointIndex < waypoints.size()) {
-            Location nextWaypoint = waypoints.get(currentWaypointIndex);
-            moveTowards(nextWaypoint);
-            log.info("Plane [{}] is moving to waypoint {}: [{}, {}, {}]", id, currentWaypointIndex, nextWaypoint.getX(), nextWaypoint.getY(), nextWaypoint.getAltitude());
-
-            if (hasReachedWaypoint(nextWaypoint)) {
-                currentWaypointIndex++;
-            }
-        }
-    }
-
-    public boolean isAtLastWaypoint(){
-        return currentWaypointIndex == waypoints.size();
-    }
-
-    public void moveTowards(Location nextWaypoint) {
-        if(!isFirstMove){
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        location.setX(nextWaypoint.getX());
-        location.setY(nextWaypoint.getY());
-        location.setAltitude(nextWaypoint.getAltitude());
-        burnFuel();
-    }
-
-    public boolean hasReachedWaypoint(Location waypoint) {
-        return location.getX() == waypoint.getX() && location.getY() == waypoint.getY()
-                && location.getAltitude() == waypoint.getAltitude();
+        phase.changePhase(LANDING);
+        navigator.setWaypoints(WaypointGenerator.getLandingWaypoints(runway));
+        navigator.setCurrentIndex(0);
     }
 
     public static int generateID() {
         return idCounter.incrementAndGet();
     }
 
-    public Location selectInitialLocationExcludingCorridors() {
-        Random random = new Random();
-
-        List<Location> waypointsToSpawn = waypoints.stream()
-                .filter(wp -> wp.getAltitude() >= 2000 && wp.getAltitude() <= 5000)
-                .collect(Collectors.toList());
-
-
-        currentWaypointIndex = random.nextInt(waypointsToSpawn.size());
-        Location initialWaypoint = waypointsToSpawn.get(currentWaypointIndex);
-
-        return new Location(
-                initialWaypoint.getX(),
-                initialWaypoint.getY(),
-                initialWaypoint.getAltitude()
-        );
-    }
-
-    public void burnFuel() {
-        double fuelConsumptionPerSec = fuelConsumptionPerHour / 3600;
-        fuelLevel -= fuelConsumptionPerSec;
-    }
-
-    public double calcFuelForThreeHours() {
-        return (fuelConsumptionPerHour * 3);
-    }
-
-    public boolean isOutOfFuel() {
-        return fuelLevel <= 0;
-    }
     public void destroyPlane() {
         this.isDestroyed = true;
     }
-
 }

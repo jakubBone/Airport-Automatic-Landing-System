@@ -2,14 +2,18 @@ package client;
 
 import airport.Runway;
 import controller.PlaneHandler;
+import location.WaypointGenerator;
 import lombok.Getter;
 import plane.Plane;
+import plane.PlanePhase;
 import utills.Messenger;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
+import static plane.PlanePhase.FlightPhase.LANDING;
 
 @Log4j2
 @Getter
@@ -63,7 +67,7 @@ public class PlaneInstructionHandler {
             if (plane.isLanded()) {
                 isProcessCompleted = true;
                 log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
-            } else if (plane.getLocation().getAltitude() < 0){
+            } else if (plane.getNavigator().getLocation().getAltitude() < 0){
                 log.info("RUNWAY COLLISION detected for Plane [{}]", plane.getId());
                 return;
             }

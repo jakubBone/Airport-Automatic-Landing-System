@@ -32,12 +32,12 @@ public class PlaneModel {
     }
 
     public void updatePosition(Plane plane) {
-        this.planeSphere.setTranslateX((plane.getLocation().getX()) / 2);
-        this.planeSphere.setTranslateY(-(plane.getLocation().getAltitude()) / 2);
-        this.planeSphere.setTranslateZ((plane.getLocation().getY()) / 2);
+        this.planeSphere.setTranslateX((plane.getNavigator().getLocation().getX()) / 2);
+        this.planeSphere.setTranslateY(-(plane.getNavigator().getLocation().getAltitude()) / 2);
+        this.planeSphere.setTranslateZ((plane.getNavigator().getLocation().getY()) / 2);
 
-        this.label.setTranslateX(((plane.getLocation().getX() + 150)) / 2);
-        this.label.setTranslateY(-((plane.getLocation().getAltitude() -150)) / 2);
-        this.label.setTranslateZ((plane.getLocation().getY()) / 2);
+        this.label.setTranslateX(((plane.getNavigator().getLocation().getX() + 150)) / 2);
+        this.label.setTranslateY(-((plane.getNavigator().getLocation().getAltitude() -150)) / 2);
+        this.label.setTranslateZ((plane.getNavigator().getLocation().getY()) / 2);
     }
 }
