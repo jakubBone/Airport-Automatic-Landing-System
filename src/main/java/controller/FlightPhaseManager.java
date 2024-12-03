@@ -13,7 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import static controller.PlaneHandler.AirportInstruction.*;
-import static plane.PlanePhase.FlightPhase.*;
+import static plane.Plane.FlightPhase.*;
 
 @Log4j2
 public class FlightPhaseManager {
@@ -31,12 +31,12 @@ public class FlightPhaseManager {
 
     public void processFlightPhase(Plane plane, Location location, ObjectInputStream in, ObjectOutputStream out) throws LocationAcquisitionException, IOException, ClassNotFoundException {
         plane.getNavigator().setLocation(location);
-        switch (plane.getPhase().getPhase()) {
+        switch (plane.getPhase()) {
             case DESCENDING -> handleDescent(plane, out);
             case HOLDING -> handleHolding(plane, out);
             case ALTERNATIVE_HOLDING -> handleAlternativeHolding(plane, out);
             case LANDING -> handleLanding(plane);
-            default -> log.warn("Unknown flight phase for Plane [{}]: {}", plane.getId(), plane.getPhase().getPhase());
+            default -> log.warn("Unknown flight phase for Plane [{}]: {}", plane.getId(), plane.getPhase());
         }
     }
 
@@ -102,31 +102,31 @@ public class FlightPhaseManager {
 
     private void applyDescending(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);
-        plane.getPhase().setPhase(DESCENDING);
+        plane.setPhase(DESCENDING);
         log.info("Plane [{}] is descending", plane.getId());
     }
 
     private void descentAndApplyHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);
-        plane.getPhase().setPhase(HOLDING);
+        plane.setPhase(HOLDING);
         log.info("Plane [{}] is entering holding pattern", plane.getId());
     }
 
     private void applyHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(HOLD_PATTERN, out);
-        plane.getPhase().setPhase(HOLDING);
+        plane.setPhase(HOLDING);
         log.info("Plane [{}] is holding pattern", plane.getId());
     }
 
     private void applyAlternativeHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(ALTERNATIVE, out);
-        plane.getPhase().setPhase(ALTERNATIVE_HOLDING);
+        plane.setPhase(ALTERNATIVE_HOLDING);
         log.info("Plane [{}] is holding alternative pattern", plane.getId());
     }
 
     private void applyLanding(Plane plane, Runway runway, ObjectOutputStream out) throws IOException {
         controller.assignRunway(runway);
-        plane.getPhase().setPhase(LANDING);
+        plane.setPhase(LANDING);
         messenger.send(LAND, out);
         messenger.send(runway, out);
         log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());

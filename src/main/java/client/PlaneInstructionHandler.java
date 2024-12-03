@@ -2,10 +2,8 @@ package client;
 
 import airport.Runway;
 import controller.PlaneHandler;
-import location.WaypointGenerator;
 import lombok.Getter;
 import plane.Plane;
-import plane.PlanePhase;
 import utills.Messenger;
 import lombok.extern.log4j.Log4j2;
 
@@ -13,7 +11,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import static plane.PlanePhase.FlightPhase.LANDING;
 
 @Log4j2
 @Getter

@@ -11,12 +11,16 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static plane.PlanePhase.FlightPhase.*;
-
 @Log4j2
 @Getter
 @Setter
 public class Plane implements Serializable {
+    public enum FlightPhase {
+        DESCENDING,
+        HOLDING,
+        ALTERNATIVE_HOLDING,
+        LANDING
+    }
     private static final AtomicInteger idCounter = new AtomicInteger();
     private int id;
     private boolean landed;
@@ -24,11 +28,11 @@ public class Plane implements Serializable {
     private boolean isDestroyed;
     private FuelManager fuelManager;
     private Navigator navigator;
-    private PlanePhase phase;
+    private FlightPhase phase;
 
     public Plane() {
         this.id = generateID();
-        this.phase = new PlanePhase();
+        this.phase = FlightPhase.DESCENDING;
         this.fuelManager = new FuelManager();
         this.navigator = new Navigator(fuelManager);
         this.isDestroyed = false;
@@ -39,7 +43,7 @@ public class Plane implements Serializable {
         navigator.moveTowardsNextWaypoint(id);
         navigator.setFirstMove(false);
         if (navigator.isAtLastWaypoint()) {
-            phase.changePhase(HOLDING);
+            setPhase(FlightPhase.HOLDING);
             navigator.setWaypoints(WaypointGenerator.getHoldingPatternWaypoints());
             navigator.setCurrentIndex(0);
         }
@@ -71,7 +75,7 @@ public class Plane implements Serializable {
     }
 
     public void setLandingPhase(Runway runway) {
-        phase.changePhase(LANDING);
+        setPhase(FlightPhase.LANDING);
         navigator.setWaypoints(WaypointGenerator.getLandingWaypoints(runway));
         navigator.setCurrentIndex(0);
     }

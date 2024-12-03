@@ -12,7 +12,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import static controller.PlaneHandler.AirportInstruction.*;
-import static plane.PlanePhase.FlightPhase.DESCENDING;
+import static plane.Plane.FlightPhase.DESCENDING;
 
 @Log4j2
 public class PlaneHandler extends Thread {
@@ -87,7 +87,7 @@ public class PlaneHandler extends Thread {
     private void managePlane(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException {
         /*plane.getPhase().setFlightPhase(DESCENDING);
         plane.setPhase(DESCENDING);*/
-        plane.getPhase().setPhase(DESCENDING);
+        plane.setPhase(DESCENDING);
 
         while (true) {
             double fuelLevel = messenger.receiveAndParse(in, Double.class);
