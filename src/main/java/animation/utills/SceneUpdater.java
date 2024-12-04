@@ -7,6 +7,7 @@ import javafx.animation.Timeline;
 import javafx.scene.Group;
 import javafx.util.Duration;
 
+import location.Location;
 import plane.Plane;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,8 @@ public class SceneUpdater {
             if (plane.isDestroyed()) {
                 root.getChildren().removeAll(planeModel.getPlaneSphere(), planeModel.getLabel());
             } else {
-                planeModel.updatePosition(plane);
+                Location nextWaypoint = plane.getNavigator().getLocation();
+                planeModel.animateToNextWaypoint(nextWaypoint); // Animate smooth movement
             }
 
             if (plane.isLanded()) {

@@ -1,10 +1,14 @@
 package animation.model;
 
+import javafx.animation.TranslateTransition;
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
+import location.Location;
 import lombok.Getter;
 import plane.Plane;
 
@@ -32,12 +36,29 @@ public class PlaneModel {
     }
 
     public void updatePosition(Plane plane) {
-        this.planeSphere.setTranslateX((plane.getNavigator().getLocation().getX()) / 2);
-        this.planeSphere.setTranslateY(-(plane.getNavigator().getLocation().getAltitude()) / 2);
-        this.planeSphere.setTranslateZ((plane.getNavigator().getLocation().getY()) / 2);
+        this.planeSphere.setTranslateX((plane.getNavigator().getLocation().getX()) / 2.0);
+        this.planeSphere.setTranslateY(-(plane.getNavigator().getLocation().getAltitude()) / 2.0);
+        this.planeSphere.setTranslateZ((plane.getNavigator().getLocation().getY()) / 2.0);
 
-        this.label.setTranslateX(((plane.getNavigator().getLocation().getX() + 150)) / 2);
-        this.label.setTranslateY(-((plane.getNavigator().getLocation().getAltitude() -150)) / 2);
-        this.label.setTranslateZ((plane.getNavigator().getLocation().getY()) / 2);
+        this.label.setTranslateX(((plane.getNavigator().getLocation().getX() + 150)) / 2.0);
+        this.label.setTranslateY(-((plane.getNavigator().getLocation().getAltitude() -150)) / 2.0);
+        this.label.setTranslateZ((plane.getNavigator().getLocation().getY()) / 2.0);
+    }
+
+    public void animateToNextWaypoint(Location nextLocation) {
+        double toX = nextLocation.getX() / 2.0;
+        double toY = -nextLocation.getAltitude() / 2.0;
+        double toZ = nextLocation.getY() / 2.0;
+        animatePlane(this.planeSphere, toX, toY, toZ);
+    }
+
+    public void animatePlane(Node plane, double toX, double toY, double toZ) {
+        TranslateTransition transition = new TranslateTransition();
+        transition.setDuration(Duration.seconds(1));
+        transition.setNode(plane);
+        transition.setToX(toX);
+        transition.setToY(toY);
+        transition.setToZ(toZ);
+        transition.play();
     }
 }

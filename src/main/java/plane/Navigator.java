@@ -3,6 +3,8 @@ package plane;
 import location.Location;
 
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import location.WaypointGenerator;
 import lombok.Getter;
@@ -23,9 +25,9 @@ public class Navigator {
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.fuelManager = fuelManager;
         this.isFirstMove = true;
-        this.currentIndex = 310;
-        this.location = waypoints.get(currentIndex);
-        //spawnPlane();
+        //this.currentIndex = 310;
+        //this.location = waypoints.get(currentIndex);
+        spawnPlane();
     }
 
     public void moveTowardsNextWaypoint(int id) {
@@ -52,16 +54,15 @@ public class Navigator {
         this.location = location;
     }
 
-    /*public void spawnPlane() {
+    public void spawnPlane() {
         List<Location> waypointsToSpawn = waypoints.stream()
                 .filter(wp -> wp.getAltitude() >= 2000 && wp.getAltitude() <= 5000)
                 .collect(Collectors.toList());
 
         Random random = new Random();
         this.currentIndex = random.nextInt(waypointsToSpawn.size());
-        //this.currentIndex = random.nextInt(waypointsToSpawn.size());
         Location initialWaypoint = waypointsToSpawn.get(currentIndex);
         this.location = initialWaypoint;
 
-    }*/
+    }
 }

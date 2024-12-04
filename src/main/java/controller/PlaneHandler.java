@@ -85,8 +85,6 @@ public class PlaneHandler extends Thread {
     }
 
     private void managePlane(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException {
-        /*plane.getPhase().setFlightPhase(DESCENDING);
-        plane.setPhase(DESCENDING);*/
         plane.setPhase(DESCENDING);
 
         while (true) {
