@@ -18,7 +18,6 @@ public class Runway implements Serializable {
     private int width;
     private int height;
 
-
     public Runway(String id, Location landingPoint, Corridor corridor) {
         this.id = id;
         this.landingPoint = landingPoint;

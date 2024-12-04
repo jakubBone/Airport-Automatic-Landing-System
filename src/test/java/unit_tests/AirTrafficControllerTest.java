@@ -65,13 +65,13 @@ class AirTrafficControllerTest {
 
 
         for (int i = 0; i < 10; i++){
-            incomingPlanes.get(i).setLocation(new Location(5000, 5000, 4000));
+            incomingPlanes.get(i).getNavigator().setLocation(new Location(5000, 5000, 4000));
         }
 
         Plane plane1 = new Plane();
-        plane1.setLocation(new Location(5000, 5000, 4000));
+        plane1.getNavigator().setLocation(new Location(5000, 5000, 4000));
         Plane plane2 = new Plane();
-        plane2.setLocation(new Location(4000, 4000, 3000));
+        plane2.getNavigator().setLocation(new Location(4000, 4000, 3000));
 
         assertTrue(controller.isLocationOccupied(plane1));
     }
@@ -80,8 +80,7 @@ class AirTrafficControllerTest {
     @DisplayName("Should return true when runway is available")
     void testIsRunwayAvailable(){
         // Runway set as available
-        Runway runway = new Runway("R-1", new Location(1000, -2000, 0), new Corridor( "C-1", new Location(1000, -2000, 0)));
-
+        Runway runway = new Runway("R-1", new Location(500, 1000, 0), new Corridor("C-1", new Location(-5000, 3000, 1000), new Location(-3000, 1000, 700)));
         assertTrue(controller.isRunwayAvailable(runway));
     }
 
@@ -89,7 +88,7 @@ class AirTrafficControllerTest {
     @DisplayName("Should return false when runway is unavailable")
     void testIsRunwayUnavailable(){
         // Runway set as unavailable
-        Runway runway = new Runway("R-2", new Location(1000, 2000, 0), new Corridor( "C-1", new Location(1000, 2000, 0)));
+        Runway runway = new Runway("R-2", new Location(500, -2000, 0), new Corridor( "C-1", new Location(-5000, 0, 1000), new Location(-3000, -2000, 700)));
 
         assertFalse(controller.isRunwayAvailable(runway));
     }
@@ -97,7 +96,7 @@ class AirTrafficControllerTest {
     @Test
     @DisplayName("Should return false when runway is occupied")
     void testAssignRunway(){
-        Runway runway = new Runway("R-1", new Location(1000, 2000, 0), new Corridor( "C-1", new Location(1000, 2000, 0)));
+        Runway runway = new Runway("R-1", new Location(1500, 1000, 0), new Corridor( "C-1", new Location(1000, 2000, 0), new Location(-3000, 1000, 700)));
 
         controller.assignRunway(runway);
 
@@ -107,7 +106,7 @@ class AirTrafficControllerTest {
     @Test
     @DisplayName("Should return true when runway is occupied")
     void testReleaseRunway(){
-        Runway runway = new Runway("R-1", new Location(1000, 2000, 0), new Corridor( "C-1", new Location(1000, 2000, 0)));
+        Runway runway = new Runway("R-1", new Location(500, 1000, 0), new Corridor( "C-1", new Location(1000, 2000, 0), new Location(-3000, 1000, 700)));
         controller.releaseRunway(runway);
 
         assertTrue(runway.isAvailable());
@@ -129,11 +128,11 @@ class AirTrafficControllerTest {
     @DisplayName("Should return true when collided planes removed from the airspace")
     void testIfCollidedPlanesRemoved(){
         Plane plane1 = new Plane();
-        plane1.setLocation(new Location(5000, 5000, 4000));
-        plane1.setCurrentWaypointIndex(20);
+        plane1.getNavigator().setLocation(new Location(5000, 5000, 4000));
+        plane1.getNavigator().setCurrentIndex(20);
         Plane plane2 = new Plane();
-        plane2.setLocation(new Location(5000, 5000, 4000));
-        plane2.setCurrentWaypointIndex(20);
+        plane2.getNavigator().setLocation(new Location(5000, 5000, 4000));
+        plane2.getNavigator().setCurrentIndex(20);
 
         controller.registerPlane(plane1);
         controller.registerPlane(plane2);
@@ -147,7 +146,7 @@ class AirTrafficControllerTest {
     @DisplayName("Should return true when planes altitude is under 0")
     void testIsRunwayCollsion(){
         Plane plane1 = new Plane();
-        plane1.setLocation(new Location(5000, 5000, - 10));
+        plane1.getNavigator().setLocation(new Location(5000, 5000, - 10));
 
         assertTrue(controller.isRunwayCollision(plane1));
     }
@@ -156,8 +155,8 @@ class AirTrafficControllerTest {
     @DisplayName("Should return true when planes has landed")
     void testHasLandedOnRunway(){
         Plane plane1 = new Plane();
-        plane1.setLocation(new Location(1000, -2000, 0));
-        Runway runway = new Runway("R-1", new Location(1000, -2000, 0), new Corridor( "C-1", new Location(1000, -2000, 0)));
+        plane1.getNavigator().setLocation(new Location(1000, -2000, 0));
+        Runway runway = new Runway("R-1", new Location(500, 1000, 0), new Corridor( "C-1", new Location(1000, 2000, 0), new Location(-3000, 1000, 700)));
 
         assertTrue(controller.hasLandedOnRunway(plane1, runway));
     }
