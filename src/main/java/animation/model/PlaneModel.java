@@ -59,6 +59,11 @@ public class PlaneModel {
         transition.setToX(toX);
         transition.setToY(toY);
         transition.setToZ(toZ);
+        transition.setOnFinished(event -> {
+            label.setTranslateX(toX + 75);
+            label.setTranslateY(toY - 75);
+            label.setTranslateZ(toZ);
+        });
         transition.play();
     }
 }

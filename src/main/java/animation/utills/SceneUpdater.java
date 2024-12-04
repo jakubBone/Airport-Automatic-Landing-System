@@ -45,7 +45,7 @@ public class SceneUpdater {
                 root.getChildren().removeAll(planeModel.getPlaneSphere(), planeModel.getLabel());
             } else {
                 Location nextWaypoint = plane.getNavigator().getLocation();
-                planeModel.animateToNextWaypoint(nextWaypoint); // Animate smooth movement
+                planeModel.animateToNextWaypoint(nextWaypoint); // Animation smooth movement
             }
 
             if (plane.isLanded()) {

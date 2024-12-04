@@ -45,11 +45,12 @@ public class Navigator {
     public void updateLocation(Location location, int id) {
         if(!isFirstMove){
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
         }
+        this.isFirstMove = false;
         log.info("Plane [{}] is moving to waypoint {}: [{}, {}, {}]", id, currentIndex, location.getX(), location.getY(), location.getAltitude());
         this.location = location;
     }

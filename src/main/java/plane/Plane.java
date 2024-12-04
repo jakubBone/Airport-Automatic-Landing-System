@@ -41,7 +41,6 @@ public class Plane implements Serializable {
 
     public void descend(){
         navigator.moveTowardsNextWaypoint(id);
-        navigator.setFirstMove(false);
         if (navigator.isAtLastWaypoint()) {
             setPhase(FlightPhase.HOLDING);
             navigator.setWaypoints(WaypointGenerator.getHoldingPatternWaypoints());
