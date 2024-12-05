@@ -25,9 +25,9 @@ public class Navigator {
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.fuelManager = fuelManager;
         this.isFirstMove = true;
-        //this.currentIndex = 310;
-        //this.location = waypoints.get(currentIndex);
-        spawnPlane();
+        this.currentIndex = 310;
+        this.location = waypoints.get(currentIndex);
+        //spawnPlane();
     }
 
     public void moveTowardsNextWaypoint(int id) {
