@@ -35,6 +35,24 @@ public class SceneRenderer extends Application {
     public void start(Stage primaryStage) throws Exception {
         Scene scene = new Scene(root, 800, 600, Color.BLACK);
         Camera camera = new Camera();
+        scene.setCamera(camera.getCamera());
+
+        // Key press event handling
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case W -> camera.zoom(-200);   // Zoom in
+                case S -> camera.zoom(200);    // Zoom out
+                case A -> camera.pan(-200, 0); // Pan left
+                case D -> camera.pan(200, 0);  // Pan right
+                case Q -> camera.pan(0, -200); // Pan upward
+                case E -> camera.pan(0, 200);  // Pan downward
+                case UP -> camera.rotate(-5, 0);   // Rotate upward
+                case DOWN -> camera.rotate(5, 0);  // Rotate downward
+                case LEFT -> camera.rotate(0, -5); // Rotate left
+                case RIGHT -> camera.rotate(0, 5); // Rotate right
+            }
+        });
+
         SceneUpdater updater = new SceneUpdater(root, controller, planeMap);
 
         setupStaticElements(scene, camera);
@@ -47,20 +65,22 @@ public class SceneRenderer extends Application {
     }
 
     public void setupStaticElements(Scene scene, Camera camera){
-        scene.setCamera(camera.getCamera());
+
 
         RunwayModel runway1Model = new RunwayModel(Airport.runway1);
         RunwayModel runway2Model = new RunwayModel(Airport.runway2);
         AirspaceModel airspaceModel = new AirspaceModel();
         WaypointModel waypointModel = new WaypointModel();
 
+
+
         root.getChildren().addAll(airspaceModel.getFloor(), airspaceModel.getLeftWall(), airspaceModel.getRightWall(),
-                runway1Model.getRunwayRect(), runway2Model.getRunwayRect(), airspaceModel.getBox());
-        addWaypointModels(waypointModel.getLandingR1Models());
-        addWaypointModels(waypointModel.getLandingR2Models());
-        addWaypointModels(waypointModel.getHoldingPatternModels());
-        addWaypointModels(waypointModel.getHoldingAlternativePatternModels());
-        addWaypointModels(waypointModel.getDescentModels());
+                runway1Model.getRunwayRect(), runway2Model.getRunwayRect());
+        //addWaypointModels(waypointModel.getLandingR1Models());
+        //addWaypointModels(waypointModel.getLandingR2Models());
+        //addWaypointModels(waypointModel.getHoldingPatternModels());
+        //addWaypointModels(waypointModel.getHoldingAlternativePatternModels());
+        //addWaypointModels(waypointModel.getDescentModels());
     }
 
     private void addWaypointModels(List<Sphere> waypointModels) {;

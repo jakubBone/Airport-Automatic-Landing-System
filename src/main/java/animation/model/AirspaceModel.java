@@ -72,7 +72,8 @@ public class AirspaceModel {
 
     private void addGrid(Canvas canvas, int width, int height, int spacing){
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setStroke(Color.GREEN);
+        gc.setLineWidth(2);
+        gc.setStroke(Color.BLACK);
 
         for (int y = 0; y <= height; y += spacing / 2) {
             gc.strokeLine(0, y, width, y);

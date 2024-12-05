@@ -5,6 +5,7 @@ import controller.AirTrafficController;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Group;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import location.Location;
@@ -39,6 +40,12 @@ public class SceneUpdater {
                 planeModel = new PlaneModel(plane);
                 planeMap.put(plane.getId(), planeModel);
                 root.getChildren().addAll(planeModel.getPlaneSphere(), planeModel.getLabel());
+            }
+
+            if(plane.getPhase().equals(Plane.FlightPhase.HOLDING)){
+                planeModel.setPlaneColour(Color.ORANGE);
+            } else if(plane.getPhase().equals(Plane.FlightPhase.LANDING)){
+                planeModel.setPlaneColour(Color.YELLOW);
             }
 
             if (plane.isDestroyed()) {

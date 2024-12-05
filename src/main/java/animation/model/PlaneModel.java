@@ -16,6 +16,7 @@ import plane.Plane;
 public class PlaneModel {
     private Sphere planeSphere;
     private Text label;
+    private PhongMaterial material;
 
     public PlaneModel(Plane plane) {
         createPlane();
@@ -24,8 +25,13 @@ public class PlaneModel {
     }
 
     public void createPlane() {
-        PhongMaterial material = new PhongMaterial(Color.WHITE);
+        this.material = new PhongMaterial(Color.WHITE);
         this.planeSphere = new Sphere(50);
+        this.planeSphere.setMaterial(material);
+    }
+
+    public void setPlaneColour(Color colour) {
+        this.material = new PhongMaterial(colour);
         this.planeSphere.setMaterial(material);
     }
 
