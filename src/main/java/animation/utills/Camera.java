@@ -15,7 +15,7 @@ public class Camera {
 
     public Camera() {
         this.camera = new PerspectiveCamera();
-        this.translate = new Translate(-4000, -2500, -20000);
+        this.translate = new Translate(0, -5000, -15000);
         this.rotateX = new Rotate(25, Rotate.X_AXIS);
         this.rotateY = new Rotate(0, Rotate.Y_AXIS);
 

@@ -8,6 +8,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Sphere;
+import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import animation.model.AirspaceModel;
 import animation.model.PlaneModel;
@@ -34,6 +35,8 @@ public class SceneRenderer extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Scene scene = new Scene(root, 800, 600, Color.BLACK);
+        root.getTransforms().add(new Scale(0.5, 0.5, 0.5)); // Zmniejsza skalę całej sceny o połowę
+
         Camera camera = new Camera();
         scene.setCamera(camera.getCamera());
 

@@ -15,46 +15,37 @@ public class AirspaceModel {
     private Rectangle floor;
     private Rectangle leftWall;
     private Rectangle rightWall;
-    private Box box;
     public AirspaceModel() {
         setupFloor();
         setupLeftWall();
         setupRightWall();
-        setupHanger();
     }
 
     private void setupFloor() {
-        this.floor = createWall(10000 / 2, 10000 / 2);
+        this.floor = createWall(5000, 5000);
         this.floor.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
-        this.floor.setTranslateX(- 5000 / 2);
+        this.floor.setTranslateX(- 2500);
         this.floor.setTranslateY(0);
-        this.floor.setTranslateZ(- 5000 / 2) ;
+        this.floor.setTranslateZ(- 2500) ;
     }
 
     private void setupLeftWall() {
-        this.leftWall = createWall(10000 / 2, 5000 / 2);
+        this.leftWall = createWall(5000, 2500);
 
         this.leftWall.getTransforms().add(new Rotate(180, Rotate.X_AXIS));
-        this.leftWall.setTranslateX(-5000 / 2);
+        this.leftWall.setTranslateX(-2500);
         this.leftWall.setTranslateY(0);
-        this.leftWall.setTranslateZ(5000 / 2);
+        this.leftWall.setTranslateZ(2500);
     }
 
     private void setupRightWall() {
-        this.rightWall = createWall(5000 / 2, 10000 / 2);
+        this.rightWall = createWall(2500, 5000);
 
         this.rightWall.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
         this.rightWall.getTransforms().add(new Rotate(270, Rotate.Y_AXIS));
-        this.rightWall.setTranslateX(5000 / 2);
+        this.rightWall.setTranslateX(2500);
         this.rightWall.setTranslateY(0);
-        this.rightWall.setTranslateZ(-5000 / 2);
-    }
-
-    private void setupHanger(){
-        this.box = new Box(1000.0 / 2, 500.0 / 2, 8000.0 / 2);
-        this.box.setTranslateX(15500 / 2);
-        this.box.setTranslateY(5000 / 2);
-        this.box.setTranslateZ(26500/ 2);
+        this.rightWall.setTranslateZ(-2500);
     }
 
     private Rectangle createWall(int width, int height) {
