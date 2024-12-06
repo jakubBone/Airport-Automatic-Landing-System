@@ -30,7 +30,7 @@ public class Navigator {
         //spawnPlane();
     }
 
-    public void moveTowardsNextWaypoint(int id) {
+    public void move(int id) {
         if (currentIndex < waypoints.size()) {
             updateLocation(waypoints.get(currentIndex), id);
             currentIndex++;

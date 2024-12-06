@@ -18,7 +18,7 @@ public class Plane implements Serializable {
     public enum FlightPhase {
         DESCENDING,
         HOLDING,
-        ALTERNATIVE_HOLDING,
+        REDIRECTING,
         LANDING
     }
     private static final AtomicInteger idCounter = new AtomicInteger();
@@ -40,7 +40,7 @@ public class Plane implements Serializable {
     }
 
     public void descend(){
-        navigator.moveTowardsNextWaypoint(id);
+        navigator.move(id);
         if (navigator.isAtLastWaypoint()) {
             setPhase(FlightPhase.HOLDING);
             navigator.setWaypoints(WaypointGenerator.getHoldingPatternWaypoints());
@@ -49,15 +49,15 @@ public class Plane implements Serializable {
     }
 
     public void hold(){
-        navigator.moveTowardsNextWaypoint(id);
+        navigator.move(id);
         if (navigator.isAtLastWaypoint()) {
             navigator.setCurrentIndex(0);
         }
     }
 
     public void holdAlternative(){
-        navigator.setWaypoints(WaypointGenerator.getAlternativeHoldingPatternWaypoints());
-        navigator.moveTowardsNextWaypoint(id);
+        navigator.setWaypoints(WaypointGenerator.getRedirectionWaypoints());
+        navigator.move(id);
         if (navigator.isAtLastWaypoint()) {
             // Jump 1 index up at last point to avoid crash
             navigator.setCurrentIndex(1);
@@ -65,7 +65,7 @@ public class Plane implements Serializable {
     }
 
     public void land(Runway runway){
-        navigator.moveTowardsNextWaypoint(id);
+        navigator.move(id);
         log.info("Plane [{}] is LANDING on runway [{}]", getId(), runway.getId());
         if(navigator.isAtLastWaypoint()) {
             navigator.setLocation(runway.getLandingPoint());

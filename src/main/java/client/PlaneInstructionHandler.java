@@ -35,7 +35,7 @@ public class PlaneInstructionHandler {
         switch (instruction) {
             case DESCENT -> executeDescent();
             case HOLD_PATTERN -> executeHoldPattern();
-            case ALTERNATIVE -> executeAlternative();
+            case REDIRECT -> executeRedirection();
             case LAND -> processLanding();
             case FULL -> executeFullAirspace();
             case OCCUPIED -> executeOccupiedLocation();
@@ -81,8 +81,8 @@ public class PlaneInstructionHandler {
         plane.hold();
     }
 
-    private void executeAlternative() {
-        log.info("Plane [{}] instructed to HOLD_ALTERNATIVE_PATTERN", plane.getId());
+    private void executeRedirection() {
+        log.info("Plane [{}] instructed to REDIRECT", plane.getId());
         plane.holdAlternative();
     }
 

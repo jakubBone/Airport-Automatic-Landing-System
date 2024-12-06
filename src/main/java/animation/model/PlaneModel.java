@@ -20,7 +20,7 @@ public class PlaneModel {
 
     public PlaneModel(Plane plane) {
         createPlane();
-        createLabel(plane);
+        createLabel();
         updatePosition(plane);
     }
 
@@ -35,7 +35,7 @@ public class PlaneModel {
         this.planeSphere.setMaterial(material);
     }
 
-    public void createLabel(Plane plane) {
+    public void createLabel() {
         this.label = new Text();
         this.label.setFont(new Font(100));
         this.label.setFill(Color.MAGENTA);

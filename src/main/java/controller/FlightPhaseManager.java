@@ -34,33 +34,33 @@ public class FlightPhaseManager {
         switch (plane.getPhase()) {
             case DESCENDING -> handleDescent(plane, out);
             case HOLDING -> handleHolding(plane, out);
-            case ALTERNATIVE_HOLDING -> handleAlternativeHolding(plane, out);
+            case REDIRECTING -> handleRedirection(plane, out);
             case LANDING -> handleLanding(plane);
             default -> log.warn("Unknown flight phase for Plane [{}]: {}", plane.getId(), plane.getPhase());
         }
     }
 
     private void handleDescent(Plane plane, ObjectOutputStream out) throws IOException {
-        if (controller.isPlaneApproachingHoldingAltitude(plane)) { /// 1013
+        if (controller.isPlaneApproachingHoldingAltitude(plane)) {
             if (controller.isCollisionRisk(plane)) {
-                applyAlternativeHolding(plane, out);
+                applyRedirection(plane, out);
             } else {
-                descentAndApplyHolding(plane, out);
+                enterHolding(plane, out);
             }
         } else {
             applyDescending(plane, out);
         }
     }
 
-    private void handleAlternativeHolding(Plane plane, ObjectOutputStream out) throws IOException {
-        if(controller.isPlaneLeavingAlternativeHolding(plane)) {
+    private void handleRedirection(Plane plane, ObjectOutputStream out) throws IOException {
+        if(controller.isPlaneApproachHoldingEntry(plane)) {
             if(controller.isCollisionRisk(plane)) {
-                applyAlternativeHolding(plane, out);
+                applyRedirection(plane, out);
             } else {
-                descentAndApplyHolding(plane, out);
+                enterHolding(plane, out);
             }
         } else {
-            applyAlternativeHolding(plane, out);
+            applyRedirection(plane, out);
         }
     }
 
@@ -106,7 +106,7 @@ public class FlightPhaseManager {
         log.info("Plane [{}] is descending", plane.getId());
     }
 
-    private void descentAndApplyHolding(Plane plane, ObjectOutputStream out) throws IOException {
+    private void enterHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);
         plane.setPhase(HOLDING);
         log.info("Plane [{}] is entering holding pattern", plane.getId());
@@ -118,10 +118,10 @@ public class FlightPhaseManager {
         log.info("Plane [{}] is holding pattern", plane.getId());
     }
 
-    private void applyAlternativeHolding(Plane plane, ObjectOutputStream out) throws IOException {
-        messenger.send(ALTERNATIVE, out);
-        plane.setPhase(ALTERNATIVE_HOLDING);
-        log.info("Plane [{}] is holding alternative pattern", plane.getId());
+    private void applyRedirection(Plane plane, ObjectOutputStream out) throws IOException {
+        messenger.send(REDIRECT, out);
+        plane.setPhase(REDIRECTING);
+        log.info("Plane [{}] redirected is holding alternative pattern", plane.getId());
     }
 
     private void applyLanding(Plane plane, Runway runway, ObjectOutputStream out) throws IOException {

@@ -33,7 +33,7 @@ public class WaypointModel {
         this.landingWaypointsR1 = WaypointGenerator.getLandingWaypoints(Airport.runway1);
         this.landingWaypointsR2 = WaypointGenerator.getLandingWaypoints(Airport.runway2);
         this.holdingPatternWaypoints = WaypointGenerator.getHoldingPatternWaypoints();
-        this.holdingAlternativePatternWaypoints = WaypointGenerator.getAlternativeHoldingPatternWaypoints();
+        this.holdingAlternativePatternWaypoints = WaypointGenerator.getRedirectionWaypoints();
         this.descentWaypoints = WaypointGenerator.getDescentWaypoints();
     }
 
@@ -58,10 +58,10 @@ public class WaypointModel {
             material.setDiffuseColor(color);
             waypointModel.setMaterial(material);
 
-            waypointModel.setTranslateX((waypoint.getX()) / 2);
-            waypointModel.setTranslateY(-(waypoint.getAltitude()) / 2);
+            waypointModel.setTranslateX((waypoint.getX()) / 2.0);
+            waypointModel.setTranslateY(-(waypoint.getAltitude()) / 2.0);
 
-            waypointModel.setTranslateZ((waypoint.getY()) / 2);
+            waypointModel.setTranslateZ((waypoint.getY()) / 2.0);
             models.add(waypointModel);
         }
     }

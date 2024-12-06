@@ -19,7 +19,7 @@ public class WaypointGenerator implements Serializable {
         return generateHoldingWaypoints(altitude);
     }
 
-    public static List<Location> getAlternativeHoldingPatternWaypoints() {
+    public static List<Location> getRedirectionWaypoints() {
         int altitude = 1200;
         return generateHoldingWaypoints(altitude);
     }
@@ -34,7 +34,7 @@ public class WaypointGenerator implements Serializable {
         int totalWaypoints = 320;
         int startAltitude = 5000;
         int endAltitude = 1000;
-        double altitudeDecrement = (double) (startAltitude - endAltitude) / totalWaypoints; // Obniżenie na waypoint
+        double altitudeDecrement = (double) (startAltitude - endAltitude) / totalWaypoints;
 
         double angleStep = 360.0 / 80;
 

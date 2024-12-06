@@ -142,7 +142,7 @@ public class AirTrafficController {
         int entryPointAltitude = 1013;
         return plane.getNavigator().getLocation().getAltitude() == entryPointAltitude;
     }
-    public boolean isPlaneLeavingAlternativeHolding(Plane plane) {
+    public boolean isPlaneApproachHoldingEntry(Plane plane) {
         Location leavingWaypoint = new Location(-5000, 4500, 4000);
         return plane.getNavigator().getLocation().equals(leavingWaypoint);
     }
