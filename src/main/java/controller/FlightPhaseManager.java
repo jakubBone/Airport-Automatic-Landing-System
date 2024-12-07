@@ -2,7 +2,6 @@ package controller;
 
 import airport.Airport;
 import airport.Runway;
-import exceptions.LocationAcquisitionException;
 import location.Location;
 import lombok.extern.log4j.Log4j2;
 import plane.Plane;
@@ -29,7 +28,7 @@ public class FlightPhaseManager {
         this.messenger = messenger;
     }
 
-    public void processFlightPhase(Plane plane, Location location, ObjectInputStream in, ObjectOutputStream out) throws LocationAcquisitionException, IOException, ClassNotFoundException {
+    public void processFlightPhase(Plane plane, Location location, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
         plane.getNavigator().setLocation(location);
         switch (plane.getPhase()) {
             case DESCENDING -> handleDescent(plane, out);
@@ -75,7 +74,7 @@ public class FlightPhaseManager {
         }
     }
 
-    private void handleLanding(Plane plane) throws IOException, LocationAcquisitionException, ClassNotFoundException {
+    private void handleLanding(Plane plane) throws IOException, ClassNotFoundException {
         log.info("Plane [{}] is landing", plane.getId());
 
         if (controller.hasLandedOnRunway(plane, availableRunway)) {

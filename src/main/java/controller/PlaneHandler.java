@@ -2,7 +2,6 @@ package controller;
 
 import airport.Airport;
 import utills.Messenger;
-import exceptions.LocationAcquisitionException;
 import location.Location;
 import lombok.extern.log4j.Log4j2;
 import plane.Plane;
@@ -44,7 +43,7 @@ public class PlaneHandler extends Thread {
 
         } catch (EOFException | SocketException ex) {
             log.warn("Connection to client lost. Client disconnected: {}", ex.getMessage());
-        } catch (IOException | ClassNotFoundException | LocationAcquisitionException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             log.error("Error occurred while handling client request: {}", ex.getMessage(), ex);
         } finally {
             try {
@@ -55,7 +54,7 @@ public class PlaneHandler extends Thread {
         }
     }
 
-    public void handleClient(ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException {
+    public void handleClient(ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
         Plane plane = messenger.receiveAndParse(in, Plane.class);
 
         if (!isPlaneRegistered(plane, out)) {
@@ -84,7 +83,7 @@ public class PlaneHandler extends Thread {
         return true;
     }
 
-    private void managePlane(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException, LocationAcquisitionException {
+    private void managePlane(Plane plane, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
         plane.setPhase(DESCENDING);
 
         while (true) {
