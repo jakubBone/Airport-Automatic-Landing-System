@@ -18,7 +18,7 @@ public class Plane implements Serializable {
     public enum FlightPhase {
         DESCENDING,
         HOLDING,
-        REDIRECTING,
+        STANDING_BY,
         LANDING
     }
     private static final AtomicInteger idCounter = new AtomicInteger();
@@ -55,8 +55,8 @@ public class Plane implements Serializable {
         }
     }
 
-    public void holdAlternative(){
-        navigator.setWaypoints(WaypointGenerator.getRedirectionWaypoints());
+    public void standby(){
+        navigator.setWaypoints(WaypointGenerator.getStandbyWaypoints());
         navigator.move(id);
         if (navigator.isAtLastWaypoint()) {
             // Jump 1 index up at last point to avoid crash

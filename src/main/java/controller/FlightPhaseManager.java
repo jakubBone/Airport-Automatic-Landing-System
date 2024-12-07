@@ -34,7 +34,7 @@ public class FlightPhaseManager {
         switch (plane.getPhase()) {
             case DESCENDING -> handleDescent(plane, out);
             case HOLDING -> handleHolding(plane, out);
-            case REDIRECTING -> handleRedirection(plane, out);
+            case STANDING_BY -> handleStandby(plane, out);
             case LANDING -> handleLanding(plane);
             default -> log.warn("Unknown flight phase for Plane [{}]: {}", plane.getId(), plane.getPhase());
         }
@@ -43,7 +43,7 @@ public class FlightPhaseManager {
     private void handleDescent(Plane plane, ObjectOutputStream out) throws IOException {
         if (controller.isPlaneApproachingHoldingAltitude(plane)) {
             if (controller.isCollisionRisk(plane)) {
-                applyRedirection(plane, out);
+                applyStandby(plane, out);
             } else {
                 enterHolding(plane, out);
             }
@@ -52,15 +52,15 @@ public class FlightPhaseManager {
         }
     }
 
-    private void handleRedirection(Plane plane, ObjectOutputStream out) throws IOException {
+    private void handleStandby(Plane plane, ObjectOutputStream out) throws IOException {
         if(controller.isPlaneApproachHoldingEntry(plane)) {
             if(controller.isCollisionRisk(plane)) {
-                applyRedirection(plane, out);
+                applyStandby(plane, out);
             } else {
                 enterHolding(plane, out);
             }
         } else {
-            applyRedirection(plane, out);
+            applyStandby(plane, out);
         }
     }
 
@@ -118,10 +118,10 @@ public class FlightPhaseManager {
         log.info("Plane [{}] is holding pattern", plane.getId());
     }
 
-    private void applyRedirection(Plane plane, ObjectOutputStream out) throws IOException {
-        messenger.send(REDIRECT, out);
-        plane.setPhase(REDIRECTING);
-        log.info("Plane [{}] redirected is holding alternative pattern", plane.getId());
+    private void applyStandby(Plane plane, ObjectOutputStream out) throws IOException {
+        messenger.send(STANDBY, out);
+        plane.setPhase(STANDING_BY);
+        log.info("Plane [{}] redirected to standby pattern", plane.getId());
     }
 
     private void applyLanding(Plane plane, Runway runway, ObjectOutputStream out) throws IOException {

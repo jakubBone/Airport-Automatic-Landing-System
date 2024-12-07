@@ -33,7 +33,7 @@ public class WaypointModel {
         this.landingWaypointsR1 = WaypointGenerator.getLandingWaypoints(Airport.runway1);
         this.landingWaypointsR2 = WaypointGenerator.getLandingWaypoints(Airport.runway2);
         this.holdingPatternWaypoints = WaypointGenerator.getHoldingPatternWaypoints();
-        this.holdingAlternativePatternWaypoints = WaypointGenerator.getRedirectionWaypoints();
+        this.holdingAlternativePatternWaypoints = WaypointGenerator.getStandbyWaypoints();
         this.descentWaypoints = WaypointGenerator.getDescentWaypoints();
     }
 
