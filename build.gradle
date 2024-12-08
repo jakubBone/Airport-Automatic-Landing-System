@@ -2,6 +2,7 @@ plugins {
     id 'application'
     id 'java'
     id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'nu.studer.jooq' version '9.0'
 }
 
 group 'org.example'
@@ -30,8 +31,41 @@ dependencies {
     implementation 'org.openjfx:javafx-controls:21.0.4'
     implementation 'org.openjfx:javafx-fxml:21.0.4'
     implementation 'org.openjfx:javafx-graphics:21.0.4'
-    
+
+    // JOOQ
+    implementation 'org.jooq:jooq:3.19.15'
+    jooqGenerator 'org.postgresql:postgresql:42.5.4'
 }
+
+jooq {
+    version = '3.19.15'
+    configurations {
+        main {
+            generationTool {
+                jdbc {
+                    driver = 'org.postgresql.Driver'
+                    url = 'jdbc:postgresql://localhost:5432/airport_system'
+                    user = 'airport'
+                    password = 'plane123'
+                }
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = 'org.jooq.meta.postgres.PostgresDatabase'
+                        includes = '.*'
+                        excludes = ''
+                        inputSchema = 'public'
+                    }
+                    target {
+                        packageName = 'jooq'
+                        directory = 'src/main/java/generated'
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 application {
     mainClass = 'simulation.SimulationApp'
