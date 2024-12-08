@@ -30,6 +30,7 @@ dependencies {
     implementation 'org.openjfx:javafx-controls:21.0.4'
     implementation 'org.openjfx:javafx-fxml:21.0.4'
     implementation 'org.openjfx:javafx-graphics:21.0.4'
+    
 }
 
 application {
