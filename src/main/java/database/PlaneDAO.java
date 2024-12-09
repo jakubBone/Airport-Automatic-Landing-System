@@ -15,9 +15,9 @@ public class PlaneDAO {
 
     public void registerPlaneInDB(Plane plane){
         CONTEXT.insertInto(table("planes"),
-                    field("id"),
+                    field("flight_number"),
                     field("start_time"))
-                .values(plane.getId(),
+                .values(plane.getFlightNumber(),
                     LocalDateTime.now())
                 .execute();
     }
@@ -25,7 +25,7 @@ public class PlaneDAO {
     public void registerLandingInDB(Plane plane){
         CONTEXT.update(table("planes"))
                 .set(field("land_time"), LocalDateTime.now())
-                .where(field("id").eq(plane.getId()))
+                .where(field("flight_number").eq(plane.getFlightNumber()))
                 .execute();
     }
 }

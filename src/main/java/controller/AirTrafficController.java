@@ -3,12 +3,9 @@ package controller;
 import airport.Airport;
 import airport.Runway;
 import database.AirportDatabase;
-import database.PlaneDAO;
 import location.Location;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 import plane.Plane;
 
 import java.sql.SQLException;
@@ -70,7 +67,7 @@ public class AirTrafficController {
         Location waypoint = new Location(5000, -1000, 1000);
         try {
             for (Plane plane2 : planes) {
-                if(plane1.getId() != plane2.getId()){
+                if(plane1.getFlightNumber() != plane2.getFlightNumber()){
                     if (waypoint.equals(plane2.getNavigator().getLocation())) {
                         return true;
                     }
@@ -127,6 +124,7 @@ public class AirTrafficController {
 
     public synchronized void checkCollision() {
         lock.lock();
+        String [] collidedID = new String[2];
         try{
             for (int i = 0; i < planes.size(); i++) {
                 Plane plane1 = planes.get(i);
@@ -135,10 +133,15 @@ public class AirTrafficController {
                     if (plane1.getNavigator().getLocation().equals(plane2.getNavigator().getLocation()) &&
                             plane1.getNavigator().getCurrentIndex() == plane2.getNavigator().getCurrentIndex()) {
 
+                        collidedID[0] = plane1.getFlightNumber();
+                        collidedID[1] = plane2.getFlightNumber();
+                        database.getCollisionDAO().registerCollisionToDB(collidedID);
+
                         planes.get(i).setDestroyed(true);
                         planes.get(j).setDestroyed(true);
 
-                        log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getId(), plane2.getId());
+
+                        log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getFlightNumber(), plane2.getFlightNumber());
                     }
                 }
             }

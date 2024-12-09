@@ -35,31 +35,45 @@ public class PlanesRecord extends UpdatableRecordImpl<PlanesRecord> {
     }
 
     /**
+     * Setter for <code>public.planes.flight_number</code>.
+     */
+    public void setFlightNumber(String value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>public.planes.flight_number</code>.
+     */
+    public String getFlightNumber() {
+        return (String) get(1);
+    }
+
+    /**
      * Setter for <code>public.planes.start_time</code>.
      */
     public void setStartTime(LocalDateTime value) {
-        set(1, value);
+        set(2, value);
     }
 
     /**
      * Getter for <code>public.planes.start_time</code>.
      */
     public LocalDateTime getStartTime() {
-        return (LocalDateTime) get(1);
+        return (LocalDateTime) get(2);
     }
 
     /**
      * Setter for <code>public.planes.land_time</code>.
      */
     public void setLandTime(LocalDateTime value) {
-        set(2, value);
+        set(3, value);
     }
 
     /**
      * Getter for <code>public.planes.land_time</code>.
      */
     public LocalDateTime getLandTime() {
-        return (LocalDateTime) get(2);
+        return (LocalDateTime) get(3);
     }
 
     // -------------------------------------------------------------------------
@@ -85,10 +99,11 @@ public class PlanesRecord extends UpdatableRecordImpl<PlanesRecord> {
     /**
      * Create a detached, initialised PlanesRecord
      */
-    public PlanesRecord(Integer id, LocalDateTime startTime, LocalDateTime landTime) {
+    public PlanesRecord(Integer id, String flightNumber, LocalDateTime startTime, LocalDateTime landTime) {
         super(Planes.PLANES);
 
         setId(id);
+        setFlightNumber(flightNumber);
         setStartTime(startTime);
         setLandTime(landTime);
         resetChangedOnNotNull();

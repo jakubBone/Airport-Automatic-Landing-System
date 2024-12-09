@@ -25,7 +25,7 @@ public class SceneRenderer extends Application {
     Camera camera;
     private Airport airport;
     private final AirTrafficController controller;
-    private Map<Integer, PlaneModel> planeMap;
+    private Map<String, PlaneModel> planeMap;
 
     public SceneRenderer(AirTrafficController controller) {
         this.group = new SmartGroup(0.5, 0.5, 0.5);

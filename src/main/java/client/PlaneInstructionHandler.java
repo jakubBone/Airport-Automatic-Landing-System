@@ -40,7 +40,7 @@ public class PlaneInstructionHandler {
             case FULL -> executeFullAirspace();
             case OCCUPIED -> executeOccupiedLocation();
             case COLLISION -> executeCollision();
-            default -> log.warn("Unknown instruction for Plane [{}]: [{}]", plane.getId(), instruction);
+            default -> log.warn("Unknown instruction for Plane [{}]: [{}]", plane.getFlightNumber(), instruction);
         }
     }
 
@@ -48,7 +48,7 @@ public class PlaneInstructionHandler {
         Runway runway = messenger.receiveAndParse(in, Runway.class);
         plane.setLandingPhase(runway);
 
-        log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getId(), runway.getId());
+        log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getFlightNumber(), runway.getId());
         while (!isProcessCompleted) {
 
             if(!communicationService.sendFuelLevel()){
@@ -63,38 +63,38 @@ public class PlaneInstructionHandler {
 
             if (plane.isLanded()) {
                 isProcessCompleted = true;
-                log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
+                log.info("Plane [{}] has successfully landed on runway {{}]", plane.getFlightNumber(), runway.getId());
             }
         }
     }
 
     private void executeDescent() {
-        log.info("Plane [{}] instructed to DESCENT", plane.getId());
+        log.info("Plane [{}] instructed to DESCENT", plane.getFlightNumber());
         plane.descend();
     }
 
     private void executeHoldPattern() {
-        log.info("Plane [{}] instructed to HOLD_PATTERN", plane.getId());
+        log.info("Plane [{}] instructed to HOLD_PATTERN", plane.getFlightNumber());
         plane.hold();
     }
 
     private void executeStandby() {
-        log.info("Plane [{}] instructed to STANDBY", plane.getId());
+        log.info("Plane [{}] instructed to STANDBY", plane.getFlightNumber());
         plane.standby();
     }
 
     private void executeFullAirspace() {
-        log.info("Airspace is FULL. Plane [{}] instructed to find an alternative airport. Stopping communication", plane.getId());
+        log.info("Airspace is FULL. Plane [{}] instructed to find an alternative airport. Stopping communication", plane.getFlightNumber());
         isProcessCompleted = true;
     }
 
     private void executeOccupiedLocation() {
-        log.info("Initial location OCCUPIED. Plane [{}] cannot be registered in the location. Stopping communication", plane.getId());
+        log.info("Initial location OCCUPIED. Plane [{}] cannot be registered in the location. Stopping communication", plane.getFlightNumber());
         isProcessCompleted = true;
     }
 
     private void executeCollision() {
-        log.info("COLLISION detected for Plane [{}]. Stopping communication", plane.getId());
+        log.info("COLLISION detected for Plane [{}]. Stopping communication", plane.getFlightNumber());
         plane.destroyPlane();
         isProcessCompleted = true;
     }

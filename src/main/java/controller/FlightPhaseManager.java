@@ -35,7 +35,7 @@ public class FlightPhaseManager {
             case HOLDING -> handleHolding(plane, out);
             case STANDING_BY -> handleStandby(plane, out);
             case LANDING -> handleLanding(plane);
-            default -> log.warn("Unknown flight phase for Plane [{}]: {}", plane.getId(), plane.getPhase());
+            default -> log.warn("Unknown flight phase for Plane [{}]: {}", plane.getFlightNumber(), plane.getPhase());
         }
     }
 
@@ -75,7 +75,7 @@ public class FlightPhaseManager {
     }
 
     private void handleLanding(Plane plane) throws IOException, ClassNotFoundException {
-        log.info("Plane [{}] is landing", plane.getId());
+        log.info("Plane [{}] is landing", plane.getFlightNumber());
 
         if (controller.hasLandedOnRunway(plane, availableRunway)) {
             plane.setLanded(true);
@@ -85,7 +85,7 @@ public class FlightPhaseManager {
                 ex.getMessage();
             }
             controller.removePlaneFromSpace(plane);
-            log.info("Plane [{}] has successfully landed on runway [{}]", plane.getId(), availableRunway.getId());
+            log.info("Plane [{}] has successfully landed on runway [{}]", plane.getFlightNumber(), availableRunway.getId());
             return;
         }
         controller.releaseRunwayIfPlaneAtSecondEntryPoint(plane, availableRunway);
@@ -95,25 +95,25 @@ public class FlightPhaseManager {
     private void applyDescending(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);
         plane.setPhase(DESCENDING);
-        log.info("Plane [{}] is descending", plane.getId());
+        log.info("Plane [{}] is descending", plane.getFlightNumber());
     }
 
     private void enterHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);
         plane.setPhase(HOLDING);
-        log.info("Plane [{}] is entering holding pattern", plane.getId());
+        log.info("Plane [{}] is entering holding pattern", plane.getFlightNumber());
     }
 
     private void applyHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(HOLD_PATTERN, out);
         plane.setPhase(HOLDING);
-        log.info("Plane [{}] is holding pattern", plane.getId());
+        log.info("Plane [{}] is holding pattern", plane.getFlightNumber());
     }
 
     private void applyStandby(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(STANDBY, out);
         plane.setPhase(STANDING_BY);
-        log.info("Plane [{}] redirected to standby pattern", plane.getId());
+        log.info("Plane [{}] redirected to standby pattern", plane.getFlightNumber());
     }
 
     private void applyLanding(Plane plane, Runway runway, ObjectOutputStream out) throws IOException {
@@ -121,7 +121,7 @@ public class FlightPhaseManager {
         plane.setPhase(LANDING);
         messenger.send(LAND, out);
         messenger.send(runway, out);
-        log.info("Plane [{}] cleared for landing on runway [{}]", plane.getId(), runway.getId());
+        log.info("Plane [{}] cleared for landing on runway [{}]", plane.getFlightNumber(), runway.getId());
     }
 
     private Runway getRunwayIfPlaneAtCorridor(Plane plane) {
@@ -147,7 +147,7 @@ public class FlightPhaseManager {
         }
 
         controller.removePlaneFromSpace(plane);
-        log.info("Plane [{}] removed from airspace", plane.getId());
+        log.info("Plane [{}] removed from airspace", plane.getFlightNumber());
         controller.releaseRunway(runway);
         log.info("Runway [{}] released", runway.getId());
     }

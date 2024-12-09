@@ -25,12 +25,12 @@ public class Navigator {
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.fuelManager = fuelManager;
         this.isFirstMove = true;
-        this.currentIndex = 310;
+        this.currentIndex = 319;
         this.location = waypoints.get(currentIndex);
         //spawnPlane();
     }
 
-    public void move(int id) {
+    public void move(String id) {
         if (currentIndex < waypoints.size()) {
             updateLocation(waypoints.get(currentIndex), id);
             currentIndex++;
@@ -42,7 +42,7 @@ public class Navigator {
         return currentIndex == waypoints.size();
     }
 
-    public void updateLocation(Location location, int id) {
+    public void updateLocation(Location location, String id) {
         if(!isFirstMove){
             try {
                 Thread.sleep(500);

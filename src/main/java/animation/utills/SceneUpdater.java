@@ -16,9 +16,9 @@ import java.util.Map;
 public class SceneUpdater {
     private final Group root;
     private AirTrafficController controller;
-    private Map<Integer, PlaneModel> planeMap;
+    private Map<String, PlaneModel> planeMap;
 
-    public SceneUpdater(Group root, AirTrafficController controller, Map<Integer, PlaneModel> planeMap) {
+    public SceneUpdater(Group root, AirTrafficController controller, Map<String, PlaneModel> planeMap) {
         this.root = root;
         this.controller = controller;
         this.planeMap = planeMap;
@@ -34,11 +34,11 @@ public class SceneUpdater {
         List<Plane> activePlanes = controller.getPlanes();
 
         for (Plane plane : activePlanes) {
-            PlaneModel planeModel = planeMap.get(plane.getId());
+            PlaneModel planeModel = planeMap.get(plane.getFlightNumber());
 
             if (planeModel == null) {
                 planeModel = new PlaneModel(plane);
-                planeMap.put(plane.getId(), planeModel);
+                planeMap.put(plane.getFlightNumber(), planeModel);
                 root.getChildren().addAll(planeModel.getPlaneSphere(), planeModel.getLabel());
             }
 
@@ -59,7 +59,7 @@ public class SceneUpdater {
                 PlaneModel finalPlaneModel = planeModel;
                 new Timeline(new KeyFrame(Duration.millis(1000), ev -> {
                     root.getChildren().removeAll(finalPlaneModel.getPlaneSphere(), finalPlaneModel.getLabel());
-                    planeMap.remove(plane.getId());
+                    planeMap.remove(plane.getFlightNumber());
                 })).play();
             }
         }

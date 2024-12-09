@@ -5,8 +5,10 @@ import lombok.extern.log4j.Log4j2;
 import plane.Plane;
 
 import java.io.*;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 @Log4j2
@@ -18,9 +20,9 @@ public class PlaneClient extends Client implements Runnable {
 
     public PlaneClient(String ip, int port) {
         super(ip, port);
-        this.plane = new Plane();
+        this.plane = new Plane(generateFlightNumber());
         this.messenger = new Messenger();
-        log.info("PlaneClient created for Plane [{}] at IP: {}, Port: {}", plane.getId(), ip, port);
+        log.info("PlaneClient created for Plane [{}] at IP: {}, Port: {}", plane.getFlightNumber(), ip, port);
     }
 
     @Override
@@ -36,9 +38,9 @@ public class PlaneClient extends Client implements Runnable {
             handleInstructions();
 
         } catch (IOException | ClassNotFoundException ex) {
-            log.error("PlaneClient [{}]: Communication failure: {}", plane.getId(), ex.getMessage());
+            log.error("PlaneClient [{}]: Communication failure: {}", plane.getFlightNumber(), ex.getMessage());
         } finally {
-            log.info("Plane [{}] exited communication", plane.getId());
+            log.info("Plane [{}] exited communication", plane.getFlightNumber());
             stopConnection();
         }
     }
@@ -61,6 +63,17 @@ public class PlaneClient extends Client implements Runnable {
             }
         }
     }
+
+    public String generateFlightNumber() {
+        String[] airlineCodes = {"MH", "AA", "BA", "LH", "AF", "EK", "QR", "KL", "UA", "DL"};
+
+        String code = airlineCodes[ThreadLocalRandom.current().nextInt(airlineCodes.length)];
+
+        int number = ThreadLocalRandom.current().nextInt(100, 999);
+
+        return code + number;
+    }
+
 
     public static void main(String[] args) throws IOException {
         int numberOfClients = 5;

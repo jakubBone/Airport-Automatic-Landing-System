@@ -28,7 +28,7 @@ public class PlaneCommunicationService {
         out.flush();
 
         if (plane.getFuelManager().isOutOfFuel()) {
-            log.info("Plane [{}] is out of fuel. Collision", plane.getId());
+            log.info("Plane [{}] is out of fuel. Collision", plane.getFlightNumber());
             return false;
         }
         return true;
@@ -36,7 +36,7 @@ public class PlaneCommunicationService {
 
     public boolean sendPlaneLocation() throws IOException {
         if(plane.getNavigator().getLocation() == null) {
-            log.info("Plane [{}] disappeared from the radar", plane.getId());
+            log.info("Plane [{}] disappeared from the radar", plane.getFlightNumber());
             return false;
         }
         messenger.send(plane.getNavigator().getLocation(), out);

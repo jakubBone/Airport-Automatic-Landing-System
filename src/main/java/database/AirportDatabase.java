@@ -13,13 +13,16 @@ public class AirportDatabase {
     private DSLContext context;
     private DatabaseSchema schema;
     private PlaneDAO planeDAO;
+    private CollisionDAO collisionDAO;
     private ConnectionPool pool;
 
     public AirportDatabase() throws SQLException {
         this.conn = new DatabaseConnection("airport", "plane123", "airport_system", 5432);
         this.context = DSL.using(conn.getConnection());
         this.planeDAO = new PlaneDAO(context);
+        this.collisionDAO = new CollisionDAO(context);
         this.schema = new DatabaseSchema(context);
         this.pool = new ConnectionPool(10, 100, conn);
     }
+
 }

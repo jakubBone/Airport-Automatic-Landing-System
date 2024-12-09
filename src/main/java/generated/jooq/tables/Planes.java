@@ -57,6 +57,11 @@ public class Planes extends TableImpl<PlanesRecord> {
     public final TableField<PlanesRecord, Integer> ID = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "");
 
     /**
+     * The column <code>public.planes.flight_number</code>.
+     */
+    public final TableField<PlanesRecord, String> FLIGHT_NUMBER = createField(DSL.name("flight_number"), SQLDataType.VARCHAR, this, "");
+
+    /**
      * The column <code>public.planes.start_time</code>.
      */
     public final TableField<PlanesRecord, LocalDateTime> START_TIME = createField(DSL.name("start_time"), SQLDataType.LOCALDATETIME(1).nullable(false), this, "");
