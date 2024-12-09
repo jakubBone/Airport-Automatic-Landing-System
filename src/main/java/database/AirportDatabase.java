@@ -1,11 +1,13 @@
 package database;
 
 import connection_pool.ConnectionPool;
+import lombok.Getter;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
 import java.sql.SQLException;
 
+@Getter
 public class AirportDatabase {
     private DSLContext context;
     private DatabaseConnection conn;
@@ -18,5 +20,4 @@ public class AirportDatabase {
         this.pool = new ConnectionPool(10, 100, conn);
         this.schema = new DatabaseSchema(context);
     }
-
 }

@@ -4,6 +4,7 @@ import controller.AirTrafficController;
 import server.AirportServer;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -11,10 +12,17 @@ import java.util.logging.Logger;
 
 public class ServerLoadTest {
     static final Logger logger = Logger.getLogger(ClientLoadTest.class.getName());
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException {
         AirTrafficController controller = new AirTrafficController();
 
-        AirportServer airportServer = new AirportServer(controller);
+        AirportServer airportServer = null;
+        try {
+            airportServer = new AirportServer(controller);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        airportServer = new AirportServer(controller);
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override

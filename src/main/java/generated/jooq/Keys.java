@@ -4,7 +4,9 @@
 package jooq;
 
 
+import jooq.tables.Collisions;
 import jooq.tables.Planes;
+import jooq.tables.records.CollisionsRecord;
 import jooq.tables.records.PlanesRecord;
 
 import org.jooq.TableField;
@@ -24,5 +26,6 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<CollisionsRecord> PK_COLLISIONS = Internal.createUniqueKey(Collisions.COLLISIONS, DSL.name("PK_COLLISIONS"), new TableField[] { Collisions.COLLISIONS.ID }, true);
     public static final UniqueKey<PlanesRecord> PK_PLANES = Internal.createUniqueKey(Planes.PLANES, DSL.name("PK_PLANES"), new TableField[] { Planes.PLANES.ID }, true);
 }

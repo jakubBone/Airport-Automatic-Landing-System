@@ -7,6 +7,7 @@ package jooq;
 import java.util.Arrays;
 import java.util.List;
 
+import jooq.tables.Collisions;
 import jooq.tables.Planes;
 
 import org.jooq.Catalog;
@@ -26,6 +27,11 @@ public class Public extends SchemaImpl {
      * The reference instance of <code>public</code>
      */
     public static final Public PUBLIC = new Public();
+
+    /**
+     * The table <code>public.collisions</code>.
+     */
+    public final Collisions COLLISIONS = Collisions.COLLISIONS;
 
     /**
      * The table <code>public.planes</code>.
@@ -48,6 +54,7 @@ public class Public extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
+            Collisions.COLLISIONS,
             Planes.PLANES
         );
     }

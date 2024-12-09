@@ -29,7 +29,7 @@ public class DatabaseSchema {
     }
 
     public void clearTables(){
-        CONTEXT.truncate("planes").execute()
-        CONTEXT.truncate("collisions").execute()
+        CONTEXT.truncate("planes").execute();
+        CONTEXT.truncate("collisions").execute();
     }
 }

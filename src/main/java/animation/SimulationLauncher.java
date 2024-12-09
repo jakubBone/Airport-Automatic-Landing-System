@@ -3,7 +3,6 @@ package animation;
 import animation.utills.SceneRenderer;
 import controller.AirTrafficController;
 import client.PlaneClient;
-import database.AirportDatabase;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import server.AirportServer;
@@ -18,15 +17,12 @@ public class SimulationLauncher extends Application {
         this.controller = new AirTrafficController();
 
         Thread serverThread = new Thread(() -> {
+            AirportServer airportServer = null;
             try {
-                AirportDatabase database = new AirportDatabase();
+                airportServer = new AirportServer(controller);
+                airportServer.startServer(5000);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
-            }
-
-            AirportServer airportServer = new AirportServer(controller);
-            try {
-                airportServer.startServer(5000);
             } catch (IOException e) {
                 e.printStackTrace();
             }

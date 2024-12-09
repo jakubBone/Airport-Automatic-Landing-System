@@ -4,6 +4,7 @@
 package jooq;
 
 
+import jooq.tables.Collisions;
 import jooq.tables.Planes;
 
 
@@ -12,6 +13,11 @@ import jooq.tables.Planes;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
+
+    /**
+     * The table <code>public.collisions</code>.
+     */
+    public static final Collisions COLLISIONS = Collisions.COLLISIONS;
 
     /**
      * The table <code>public.planes</code>.
