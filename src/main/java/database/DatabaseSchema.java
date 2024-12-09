@@ -9,6 +9,7 @@ public class DatabaseSchema {
 
     public DatabaseSchema(DSLContext dsl) {
         this.CONTEXT = dsl;
+        createTables();
     }
 
     public void createTables() {
@@ -23,7 +24,12 @@ public class DatabaseSchema {
                 .column("id", SQLDataType.INTEGER.identity(true))
                 .column("involved_planes", SQLDataType.INTEGER.getArrayDataType())
                 .column("collision_time", SQLDataType.LOCALDATETIME(1))
-                .constraints(DSL.constraint("PK_PLANES").primaryKey("id"))
+                .constraints(DSL.constraint("PK_COLLISIONS").primaryKey("id"))
                 .execute();
+    }
+
+    public void clearTables(){
+        CONTEXT.truncate("planes").execute()
+        CONTEXT.truncate("collisions").execute()
     }
 }

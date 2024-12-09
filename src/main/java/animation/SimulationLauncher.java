@@ -3,19 +3,27 @@ package animation;
 import animation.utills.SceneRenderer;
 import controller.AirTrafficController;
 import client.PlaneClient;
+import database.AirportDatabase;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import server.AirportServer;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class SimulationLauncher extends Application {
     private AirTrafficController controller;
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws Exception, SQLException {
         this.controller = new AirTrafficController();
 
         Thread serverThread = new Thread(() -> {
+            try {
+                AirportDatabase database = new AirportDatabase();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
             AirportServer airportServer = new AirportServer(controller);
             try {
                 airportServer.startServer(5000);
