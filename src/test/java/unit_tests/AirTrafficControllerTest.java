@@ -143,15 +143,6 @@ class AirTrafficControllerTest {
     }
 
     @Test
-    @DisplayName("Should return true when planes altitude is under 0")
-    void testIsRunwayCollsion(){
-        Plane plane1 = new Plane();
-        plane1.getNavigator().setLocation(new Location(5000, 5000, - 10));
-
-        assertTrue(controller.isRunwayCollision(plane1));
-    }
-
-    @Test
     @DisplayName("Should return true when planes has landed")
     void testHasLandedOnRunway(){
         Plane plane1 = new Plane();

@@ -64,9 +64,6 @@ public class PlaneInstructionHandler {
             if (plane.isLanded()) {
                 isProcessCompleted = true;
                 log.info("Plane [{}] has successfully landed on runway {{}]", plane.getId(), runway.getId());
-            } else if (plane.getNavigator().getLocation().getAltitude() < 0){
-                log.info("RUNWAY COLLISION detected for Plane [{}]", plane.getId());
-                return;
             }
         }
     }

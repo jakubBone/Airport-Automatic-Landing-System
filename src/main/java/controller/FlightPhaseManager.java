@@ -88,13 +88,6 @@ public class FlightPhaseManager {
             log.info("Plane [{}] has successfully landed on runway [{}]", plane.getId(), availableRunway.getId());
             return;
         }
-
-        if (controller.isRunwayCollision(plane)) {
-            completeLanding(plane, availableRunway);
-            log.info("Runway collision detected for Plane [{}]:", plane.getId());
-            return;
-        }
-
         controller.releaseRunwayIfPlaneAtSecondEntryPoint(plane, availableRunway);
     }
 

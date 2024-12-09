@@ -36,6 +36,7 @@ dependencies {
     implementation 'org.jooq:jooq:3.19.15'
     jooqGenerator 'org.postgresql:postgresql:42.5.4'
 
+    // ConnectionPool
     implementation files('libs/connection-pool-1.0/connection-pool.jar')
 }
 

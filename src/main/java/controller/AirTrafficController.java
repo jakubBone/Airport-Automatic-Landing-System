@@ -147,10 +147,6 @@ public class AirTrafficController {
         return plane.getNavigator().getLocation().equals(leavingWaypoint);
     }
 
-    public boolean isRunwayCollision(Plane plane) {
-        return plane.getNavigator().getLocation().getAltitude() < 0;
-    }
-
     public boolean hasLandedOnRunway(Plane plane, Runway runway){
         return (plane.getNavigator().getLocation().equals(runway.getLandingPoint()));
     }
