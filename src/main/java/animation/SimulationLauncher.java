@@ -3,6 +3,8 @@ package animation;
 import animation.utills.SceneRenderer;
 import controller.AirTrafficController;
 import client.PlaneClient;
+import database.AirportDatabase;
+import database.DatabaseSchema;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import server.AirportServer;
@@ -12,12 +14,14 @@ import java.sql.SQLException;
 
 public class SimulationLauncher extends Application {
     private AirTrafficController controller;
+    private AirportServer airportServer;
+    private AirportDatabase database;
     @Override
     public void start(Stage primaryStage) throws Exception, SQLException {
-        this.controller = new AirTrafficController();
-
+        this.database = new AirportDatabase();
+        this.controller = new AirTrafficController(database);
+        this.airportServer = null;
         Thread serverThread = new Thread(() -> {
-            AirportServer airportServer = null;
             try {
                 airportServer = new AirportServer(controller);
                 airportServer.startServer(5000);
@@ -27,7 +31,7 @@ public class SimulationLauncher extends Application {
                 e.printStackTrace();
             }
         });
-        serverThread.isDaemon();
+        //serverThread.isDaemon();
         serverThread.start();
 
         int numberOfClients = 100;
@@ -46,6 +50,7 @@ public class SimulationLauncher extends Application {
 
         SceneRenderer visualization = new SceneRenderer(controller);
         visualization.start(primaryStage);
+
     }
 
     public static void main(String[] args) {

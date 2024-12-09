@@ -2,10 +2,16 @@ package controller;
 
 import airport.Airport;
 import airport.Runway;
+import database.AirportDatabase;
+import database.PlaneDAO;
 import location.Location;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import plane.Plane;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -18,16 +24,19 @@ import java.util.concurrent.locks.ReentrantLock;
 public class AirTrafficController {
     private List<Plane> planes;
     private Lock lock;
+    private AirportDatabase database;
 
-    public AirTrafficController() {
+    public AirTrafficController(AirportDatabase database) throws SQLException {
         this.planes = new ArrayList<>();
         this.lock = new ReentrantLock();
+        this.database = database;
     }
 
     public void registerPlane(Plane plane) {
         lock.lock();
         try {
             planes.add(plane);
+            database.getPlaneDAO().registerPlaneInDB(plane);
         } finally {
             lock.unlock();
         }
@@ -148,6 +157,11 @@ public class AirTrafficController {
     }
 
     public boolean hasLandedOnRunway(Plane plane, Runway runway){
-        return (plane.getNavigator().getLocation().equals(runway.getLandingPoint()));
+        boolean hasLanded = false;
+        if(plane.getNavigator().getLocation().equals(runway.getLandingPoint())){
+            hasLanded = true;
+            database.getPlaneDAO().registerLandingInDB(plane);
+        }
+        return hasLanded;
     }
 }

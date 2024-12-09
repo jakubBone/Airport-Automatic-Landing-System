@@ -27,15 +27,13 @@ public class PlaneHandler extends Thread {
     private final Airport airport;
     private Messenger messenger;
     private FlightPhaseManager flightPhaseManager;
-    private AirportDatabase database;
 
-    public PlaneHandler(Socket clientSocket, AirTrafficController controller, Airport airport, AirportDatabase database) {
+    public PlaneHandler(Socket clientSocket, AirTrafficController controller, Airport airport) {
         this.clientSocket = clientSocket;
         this.controller = controller;
         this.airport = airport;
         this.messenger = new Messenger();
         this.flightPhaseManager = new FlightPhaseManager(controller, airport, messenger);
-        this.database = database;
     }
 
     @Override
@@ -50,7 +48,6 @@ public class PlaneHandler extends Thread {
         } catch (IOException | ClassNotFoundException ex) {
             log.error("Error occurred while handling client request: {}", ex.getMessage(), ex);
         } finally {
-            database.getSchema().clearTables();
             try {
                 clientSocket.close();
             } catch (IOException ex) {
