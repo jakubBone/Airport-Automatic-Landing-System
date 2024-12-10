@@ -41,7 +41,7 @@ public class FlightPhaseManager {
 
     private void handleDescent(Plane plane, ObjectOutputStream out) throws IOException {
         if (controller.isPlaneApproachingHoldingAltitude(plane)) {
-            if (controller.isCollisionRisk(plane)) {
+            if (controller.isHoldingCollisionRisk(plane)) {
                 applyStandby(plane, out);
             } else {
                 enterHolding(plane, out);
@@ -53,7 +53,7 @@ public class FlightPhaseManager {
 
     private void handleStandby(Plane plane, ObjectOutputStream out) throws IOException {
         if(controller.isPlaneApproachHoldingEntry(plane)) {
-            if(controller.isCollisionRisk(plane)) {
+            if(controller.isHoldingCollisionRisk(plane)) {
                 applyStandby(plane, out);
             } else {
                 enterHolding(plane, out);

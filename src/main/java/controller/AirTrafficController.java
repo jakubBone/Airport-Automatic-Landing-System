@@ -62,7 +62,7 @@ public class AirTrafficController {
         }
     }
 
-    public boolean isCollisionRisk(Plane plane1) {
+    public boolean isHoldingCollisionRisk(Plane plane1) {
         lock.lock();
         Location waypoint = new Location(5000, -1000, 1000);
         try {
@@ -130,8 +130,7 @@ public class AirTrafficController {
                 Plane plane1 = planes.get(i);
                 for (int j = i + 1; j < planes.size(); j++) {
                     Plane plane2 = planes.get(j);
-                    if (plane1.getNavigator().getLocation().equals(plane2.getNavigator().getLocation()) &&
-                            plane1.getNavigator().getCurrentIndex() == plane2.getNavigator().getCurrentIndex()) {
+                    if (arePlanesToClose(plane1.getNavigator().getLocation(), plane2.getNavigator().getLocation())) {
 
                         collidedID[0] = plane1.getFlightNumber();
                         collidedID[1] = plane2.getFlightNumber();
@@ -147,6 +146,13 @@ public class AirTrafficController {
         } finally {
             lock.unlock();
         }
+    }
+
+    private boolean arePlanesToClose(Location loc1, Location loc2) {
+        double distance = Math.sqrt(Math.pow(loc1.getX() - loc2.getX(), 2)
+                + Math.pow(loc1.getY() - loc2.getY(), 2)
+                + Math.pow(loc1.getAltitude() - loc2.getAltitude(), 2));
+        return distance < 10;
     }
 
     public boolean isPlaneApproachingHoldingAltitude(Plane plane) {

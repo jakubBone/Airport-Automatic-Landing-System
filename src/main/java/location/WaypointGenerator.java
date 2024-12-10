@@ -20,7 +20,7 @@ public class WaypointGenerator implements Serializable {
     }
 
     public static List<Location> getStandbyWaypoints() {
-        int altitude = 2000;
+        int altitude = 1200;
         return generateHoldingWaypoints(altitude);
     }
 

@@ -14,6 +14,7 @@ import plane.Plane;
 
 @Getter
 public class PlaneModel {
+
     private Sphere planeSphere;
     private Text label;
     private PhongMaterial material;
@@ -67,8 +68,8 @@ public class PlaneModel {
         transition.setToZ(toZ);
         transition.setOnFinished(event -> {
             label.setTranslateX(toX + 75);
-            label.setTranslateY(toY - 75);
-            label.setTranslateZ(toZ);
+            label.setTranslateY(toY + 75);
+            label.setTranslateZ(toZ + 75);
         });
         transition.play();
     }

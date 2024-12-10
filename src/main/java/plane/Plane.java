@@ -67,7 +67,7 @@ public class Plane implements Serializable {
         navigator.move(flightNumber);
         if (navigator.isAtLastWaypoint()) {
             // Jump 1 index up at last point to avoid crash
-            navigator.setCurrentIndex(1);
+            navigator.setCurrentIndex(0);
         }
     }
 

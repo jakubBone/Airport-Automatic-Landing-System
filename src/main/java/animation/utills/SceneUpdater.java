@@ -12,6 +12,7 @@ import location.Location;
 import plane.Plane;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SceneUpdater {
     private final Group root;
@@ -25,7 +26,7 @@ public class SceneUpdater {
     }
 
     public void start() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), event -> updateAirspace()));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> updateAirspace()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
@@ -33,7 +34,47 @@ public class SceneUpdater {
     private void updateAirspace() {
         List<Plane> activePlanes = controller.getPlanes();
 
+        // Create a map of active planes for easier lookup by flight number
+        Map<String, Plane> activePlanesMap = activePlanes.stream()
+                .collect(Collectors.toMap(Plane::getFlightNumber, plane -> plane));
+
+        // Iterate through the existing plane models in planeMap
+        planeMap.entrySet().removeIf(entry -> {
+            String flightNumber = entry.getKey();
+            PlaneModel planeModel = entry.getValue();
+
+            // If the flight number is no longer in activePlanes, remove the model from the scene
+            if (!activePlanesMap.containsKey(flightNumber)) {
+                root.getChildren().removeAll(planeModel.getPlaneSphere(), planeModel.getLabel());
+                return true; // Usuń z mapy planeMap
+            }
+            return false;
+        });
+
+        // Add new planes that do not already have models
         for (Plane plane : activePlanes) {
+            if (!planeMap.containsKey(plane.getFlightNumber())) {
+                PlaneModel planeModel = new PlaneModel(plane);
+                planeMap.put(plane.getFlightNumber(), planeModel);
+                root.getChildren().addAll(planeModel.getPlaneSphere(), planeModel.getLabel());
+            }
+
+
+            // Update the position of existing planes
+            PlaneModel planeModel = planeMap.get(plane.getFlightNumber());
+
+            if(plane.getPhase().equals(Plane.FlightPhase.HOLDING)){
+                planeModel.setPlaneColour(Color.ORANGE);
+            } else if(plane.getPhase().equals(Plane.FlightPhase.LANDING)){
+                planeModel.setPlaneColour(Color.YELLOW);
+            }
+            Location nextWaypoint = plane.getNavigator().getLocation();
+            planeModel.animateToNextWaypoint(nextWaypoint);
+        }
+    }
+
+        //List<Plane> activePlanes = controller.getPlanes();
+        /*for (Plane plane : activePlanes) {
             PlaneModel planeModel = planeMap.get(plane.getFlightNumber());
 
             if (planeModel == null) {
@@ -62,6 +103,5 @@ public class SceneUpdater {
                     planeMap.remove(plane.getFlightNumber());
                 })).play();
             }
-        }
-    }
+        }*/
 }
