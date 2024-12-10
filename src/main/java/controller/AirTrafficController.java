@@ -122,7 +122,7 @@ public class AirTrafficController {
         }
     }
 
-    public synchronized void checkCollision() {
+    public void checkCollision() {
         lock.lock();
         String [] collidedID = new String[2];
         try{

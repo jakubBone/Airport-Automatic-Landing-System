@@ -27,6 +27,7 @@ public class Plane implements Serializable {
     private FuelManager fuelManager;
     private Navigator navigator;
     private FlightPhase phase;
+    private Runway assignedRunway;
 
     public Plane(String flightNumber) {
         this.flightNumber = flightNumber;
@@ -35,6 +36,7 @@ public class Plane implements Serializable {
         this.navigator = new Navigator(fuelManager);
         this.isDestroyed = false;
         this.landed = false;
+        this.assignedRunway = null;
     }
 
     /*public Plane() {
@@ -72,6 +74,7 @@ public class Plane implements Serializable {
     }
 
     public void land(Runway runway){
+        assignedRunway = runway;
         navigator.move(flightNumber);
         log.info("Plane [{}] is LANDING on runway [{}]", getFlightNumber(), runway.getId());
         if(navigator.isAtLastWaypoint()) {

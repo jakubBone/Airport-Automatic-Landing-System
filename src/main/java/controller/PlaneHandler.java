@@ -111,6 +111,9 @@ public class PlaneHandler extends Thread {
 
     public void handleCollision(Plane plane, ObjectOutputStream out) throws IOException {
         log.info("COLLISION detected for Plane [{}]", plane.getFlightNumber());
+        if(plane.getAssignedRunway() != null){
+            controller.releaseRunway(plane.getAssignedRunway());
+        }
         controller.getPlanes().remove(plane);
         messenger.send(COLLISION, out);
     }

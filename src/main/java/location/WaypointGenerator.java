@@ -112,7 +112,7 @@ public class WaypointGenerator implements Serializable {
         int totalWaypoints = 10;
         int altitudeDecrement = altitude / totalWaypoints;
 
-        int arcCenterY = "R-2".equals(runway.getId()) ? -500 : 2500;
+        int arcCenterY = "R-2".equals(runway.getId()) ? 0 : 3000;
         List<Location> arc4 = generateArc(-3500, arcCenterY, 1500, 180, 270, altitude, altitudeDecrement);
         for(Location waypoint: arc4){
             waypoints.add(waypoint);
