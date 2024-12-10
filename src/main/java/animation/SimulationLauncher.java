@@ -31,10 +31,11 @@ public class SimulationLauncher extends Application {
                 e.printStackTrace();
             }
         });
-        //serverThread.isDaemon();
+
+        serverThread.isDaemon();
         serverThread.start();
 
-        int numberOfClients = 100;
+        int numberOfClients = 1000;
 
         new Thread(() -> {
             for (int i = 0; i < numberOfClients; i++) {

@@ -37,15 +37,15 @@ public class CollisionsRecord extends UpdatableRecordImpl<CollisionsRecord> {
     /**
      * Setter for <code>public.collisions.involved_planes</code>.
      */
-    public void setInvolvedPlanes(Integer[] value) {
+    public void setInvolvedPlanes(String[] value) {
         set(1, value);
     }
 
     /**
      * Getter for <code>public.collisions.involved_planes</code>.
      */
-    public Integer[] getInvolvedPlanes() {
-        return (Integer[]) get(1);
+    public String[] getInvolvedPlanes() {
+        return (String[]) get(1);
     }
 
     /**
@@ -85,7 +85,7 @@ public class CollisionsRecord extends UpdatableRecordImpl<CollisionsRecord> {
     /**
      * Create a detached, initialised CollisionsRecord
      */
-    public CollisionsRecord(Integer id, Integer[] involvedPlanes, LocalDateTime collisionTime) {
+    public CollisionsRecord(Integer id, String[] involvedPlanes, LocalDateTime collisionTime) {
         super(Collisions.COLLISIONS);
 
         setId(id);

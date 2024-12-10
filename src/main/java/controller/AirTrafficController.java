@@ -67,7 +67,7 @@ public class AirTrafficController {
         Location waypoint = new Location(5000, -1000, 1000);
         try {
             for (Plane plane2 : planes) {
-                if(plane1.getFlightNumber() != plane2.getFlightNumber()){
+                if(!plane1.getFlightNumber().equals(plane2.getFlightNumber())){
                     if (waypoint.equals(plane2.getNavigator().getLocation())) {
                         return true;
                     }
@@ -139,7 +139,6 @@ public class AirTrafficController {
 
                         planes.get(i).setDestroyed(true);
                         planes.get(j).setDestroyed(true);
-
 
                         log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getFlightNumber(), plane2.getFlightNumber());
                     }

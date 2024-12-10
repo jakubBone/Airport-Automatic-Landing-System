@@ -4,8 +4,6 @@ import controller.AirTrafficController;
 import airport.Airport;
 import controller.CollisionDetector;
 import database.AirportDatabase;
-import database.DatabaseSchema;
-import database.PlaneDAO;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import controller.PlaneHandler;

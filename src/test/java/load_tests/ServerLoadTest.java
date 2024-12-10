@@ -1,6 +1,7 @@
 package load_tests;
 
 import controller.AirTrafficController;
+import database.AirportDatabase;
 import server.AirportServer;
 
 import java.io.IOException;
@@ -13,7 +14,8 @@ import java.util.logging.Logger;
 public class ServerLoadTest {
     static final Logger logger = Logger.getLogger(ClientLoadTest.class.getName());
     public static void main(String[] args) throws IOException, SQLException {
-        AirTrafficController controller = new AirTrafficController();
+        AirportDatabase airportDatabase = new AirportDatabase();
+        AirTrafficController controller = new AirTrafficController(airportDatabase);
 
         AirportServer airportServer = null;
         try {

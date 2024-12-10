@@ -9,7 +9,6 @@ import lombok.extern.log4j.Log4j2;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Log4j2
 @Getter
@@ -21,7 +20,6 @@ public class Plane implements Serializable {
         STANDING_BY,
         LANDING
     }
-    private static final AtomicInteger idCounter = new AtomicInteger();
     private String flightNumber;
     private boolean landed;
     private List <Location> waypoints;

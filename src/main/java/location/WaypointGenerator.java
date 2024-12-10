@@ -20,7 +20,7 @@ public class WaypointGenerator implements Serializable {
     }
 
     public static List<Location> getStandbyWaypoints() {
-        int altitude = 1200;
+        int altitude = 2000;
         return generateHoldingWaypoints(altitude);
     }
 
@@ -127,7 +127,7 @@ public class WaypointGenerator implements Serializable {
 
         altitude = 0;
         // Add waypoints along the runway
-        for (int x = 100; x <= 3000; x += 250) {
+        for (int x = 500; x <= 3000; x += 250) {
             waypoints.add(new Location(x, runway.getLandingPoint().getY(), altitude));
         }
 

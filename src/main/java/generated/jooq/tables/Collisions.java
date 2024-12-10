@@ -59,7 +59,7 @@ public class Collisions extends TableImpl<CollisionsRecord> {
     /**
      * The column <code>public.collisions.involved_planes</code>.
      */
-    public final TableField<CollisionsRecord, Integer[]> INVOLVED_PLANES = createField(DSL.name("involved_planes"), SQLDataType.INTEGER.array(), this, "");
+    public final TableField<CollisionsRecord, String[]> INVOLVED_PLANES = createField(DSL.name("involved_planes"), SQLDataType.VARCHAR.array(), this, "");
 
     /**
      * The column <code>public.collisions.collision_time</code>.
