@@ -25,7 +25,7 @@ public class SceneUpdater {
     }
 
     public void start() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> updateAirspace()));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), event -> updateAirspace()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
@@ -40,13 +40,14 @@ public class SceneUpdater {
                 root.getChildren().addAll(planeModel.getPlaneSphere(), planeModel.getLabel());
             }
 
+            planeModel = planesMap.get(plane.getFlightNumber());
+
             if (plane.getPhase().equals(Plane.FlightPhase.HOLDING)) {
                 planeModel.setPlaneColour(Color.ORANGE);
             } else if (plane.getPhase().equals(Plane.FlightPhase.LANDING)) {
                 planeModel.setPlaneColour(Color.YELLOW);
             }
 
-            planeModel = planesMap.get(plane.getFlightNumber());
             Location nextWaypoint = plane.getNavigator().getLocation();
             planeModel.animateToNextWaypoint(nextWaypoint);
         }

@@ -25,10 +25,10 @@ public class Navigator extends Observable {
     public Navigator(FuelManager fuelManager) {
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.fuelManager = fuelManager;
-        //this.currentIndex = 316;
-        //this.location = waypoints.get(currentIndex);
+        this.currentIndex = 316;
+        this.location = waypoints.get(currentIndex);
         this.isFirstMove = true;
-        spawnPlane();
+        //spawnPlane();
     }
 
     public void move(String id) {
@@ -46,7 +46,7 @@ public class Navigator extends Observable {
     public void updateLocation(Location location, String id) {
         if(!isFirstMove){
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
