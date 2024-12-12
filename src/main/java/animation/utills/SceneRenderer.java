@@ -25,7 +25,6 @@ public class SceneRenderer extends Application {
     Camera camera;
     private Airport airport;
     private final AirTrafficController controller;
-    private Map<String, PlaneModel> planeMap;
 
     public SceneRenderer(AirTrafficController controller) {
         this.group = new SmartGroup(0.5, 0.5, 0.5);
@@ -33,14 +32,13 @@ public class SceneRenderer extends Application {
         this.camera = new Camera();
         this.airport = new Airport();
         this.controller = controller;
-        this.planeMap = new HashMap<>();
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         scene.setCamera(camera.getCamera());
 
-        SceneUpdater updater = new SceneUpdater(group, controller, planeMap);
+        SceneUpdater updater = new SceneUpdater(group, controller);
 
         setupStaticElements();
         setupRotationHandler();

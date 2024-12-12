@@ -10,19 +10,20 @@ import javafx.util.Duration;
 
 import location.Location;
 import plane.Plane;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class SceneUpdater {
     private final Group root;
     private AirTrafficController controller;
-    private Map<String, PlaneModel> planeMap;
+    private final Map<String, PlaneModel> planeMap;
 
-    public SceneUpdater(Group root, AirTrafficController controller, Map<String, PlaneModel> planeMap) {
+    public SceneUpdater(Group root, AirTrafficController controller) {
         this.root = root;
         this.controller = controller;
-        this.planeMap = planeMap;
+        this.planeMap =  new HashMap<>();
     }
 
     public void start() {
@@ -32,9 +33,74 @@ public class SceneUpdater {
     }
 
     private void updateAirspace() {
-        List<Plane> activePlanes = controller.getPlanes();
+        List<Plane> planes = controller.getPlanes();
 
-        // Create a map of active planes for easier lookup by flight number
+        for(Plane plane: planes){
+            if (!planeMap.containsKey(plane.getFlightNumber())) {
+                PlaneModel planeModel = new PlaneModel(plane);
+                planeMap.put(plane.getFlightNumber(), planeModel);
+                root.getChildren().addAll(planeModel.getPlaneSphere(), planeModel.getLabel());
+
+            }
+
+            PlaneModel planeModel = planeMap.get(plane.getFlightNumber());
+
+            if(plane.getPhase().equals(Plane.FlightPhase.HOLDING)){
+                planeModel.setPlaneColour(Color.ORANGE);
+            } else if(plane.getPhase().equals(Plane.FlightPhase.LANDING)){
+                planeModel.setPlaneColour(Color.YELLOW);
+            }
+
+            if (!planeMap.containsKey(plane.getFlightNumber())) {
+                root.getChildren().addAll(planeModel.getPlaneSphere(), planeModel.getLabel());
+            }
+
+            Location nextWaypoint = plane.getNavigator().getLocation();
+            planeModel.animateToNextWaypoint(nextWaypoint);
+        }
+
+        for(Plane plane: planes){
+            planeMap.entrySet().removeIf(entry -> {
+                String flightNumber = entry.getKey();
+                PlaneModel planeModel = entry.getValue();
+
+                // If the flight number is no longer in activePlanes, remove the model from the scene
+                if (!planeMap.containsKey(flightNumber)) {
+                    root.getChildren().removeAll(planeModel.getPlaneSphere(), planeModel.getLabel());
+                    return true;
+                }
+                return false;
+            });
+        }
+
+
+
+        /*for(Plane plane: planes){
+            if (!planeMap.containsKey(plane.getFlightNumber())) {
+                root.getChildren().addAll(planeModel.getPlaneSphere(), planeModel.getLabel());
+            }
+        }*/
+
+
+
+        /*if (!planeMap.containsKey(plane.getFlightNumber())) {
+            PlaneModel planeModel = new PlaneModel(plane);
+            planeMap.put(plane.getFlightNumber(), planeModel);
+            root.getChildren().addAll(planeModel.getPlaneSphere(), planeModel.getLabel());
+
+        }
+
+        planeMap.entrySet().removeIf(entry -> {
+            Plane plane = controller.getPlaneByFlightNumber(entry.getKey());
+            return plane == null || plane.isDestroyed() || plane.isLanded();
+        });*/
+
+
+
+
+        /////////////////////////////
+
+        /*// Create a map of active planes for easier lookup by flight number
         Map<String, Plane> activePlanesMap = activePlanes.stream()
                 .collect(Collectors.toMap(Plane::getFlightNumber, plane -> plane));
 
@@ -70,38 +136,8 @@ public class SceneUpdater {
             }
             Location nextWaypoint = plane.getNavigator().getLocation();
             planeModel.animateToNextWaypoint(nextWaypoint);
-        }
+        }*/
     }
 
-        //List<Plane> activePlanes = controller.getPlanes();
-        /*for (Plane plane : activePlanes) {
-            PlaneModel planeModel = planeMap.get(plane.getFlightNumber());
 
-            if (planeModel == null) {
-                planeModel = new PlaneModel(plane);
-                planeMap.put(plane.getFlightNumber(), planeModel);
-                root.getChildren().addAll(planeModel.getPlaneSphere(), planeModel.getLabel());
-            }
-
-            if(plane.getPhase().equals(Plane.FlightPhase.HOLDING)){
-                planeModel.setPlaneColour(Color.ORANGE);
-            } else if(plane.getPhase().equals(Plane.FlightPhase.LANDING)){
-                planeModel.setPlaneColour(Color.YELLOW);
-            }
-
-            if (plane.isDestroyed()) {
-                root.getChildren().removeAll(planeModel.getPlaneSphere(), planeModel.getLabel());
-            } else {
-                Location nextWaypoint = plane.getNavigator().getLocation();
-                planeModel.animateToNextWaypoint(nextWaypoint); // Animation smooth movement
-            }
-
-            if (plane.isLanded()) {
-                PlaneModel finalPlaneModel = planeModel;
-                new Timeline(new KeyFrame(Duration.millis(1000), ev -> {
-                    root.getChildren().removeAll(finalPlaneModel.getPlaneSphere(), finalPlaneModel.getLabel());
-                    planeMap.remove(plane.getFlightNumber());
-                })).play();
-            }
-        }*/
 }

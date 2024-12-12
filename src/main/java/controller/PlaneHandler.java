@@ -71,6 +71,12 @@ public class PlaneHandler extends Thread {
             return false;
         }
 
+        try{
+            Thread.sleep(1000);
+        } catch (InterruptedException ex){
+            ex.getMessage();
+        }
+
         if (controller.isLocationOccupied(plane)) {
             messenger.send(OCCUPIED, out);
             log.info("Initial location Plane [{}] is occupied", plane.getFlightNumber());

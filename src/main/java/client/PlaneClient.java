@@ -35,6 +35,7 @@ public class PlaneClient extends Client implements Runnable {
 
             initializeServices();
             communicationService.sendInitialData();
+
             handleInstructions();
 
         } catch (IOException | ClassNotFoundException ex) {

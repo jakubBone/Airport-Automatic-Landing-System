@@ -10,23 +10,24 @@ import location.WaypointGenerator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import utills.Observable;
 
 @Getter
 @Setter
 @Log4j2
-public class Navigator {
+public class Navigator extends Observable {
     private List<Location> waypoints;
     private FuelManager fuelManager;
-    private boolean isFirstMove;
     private int currentIndex;
     private Location location;
+    private boolean isFirstMove;
 
     public Navigator(FuelManager fuelManager) {
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.fuelManager = fuelManager;
-        this.isFirstMove = true;
         this.currentIndex = 316;
         this.location = waypoints.get(currentIndex);
+        this.isFirstMove = true;
         //spawnPlane();
     }
 
@@ -64,6 +65,10 @@ public class Navigator {
         this.currentIndex = random.nextInt(waypointsToSpawn.size());
         Location initialWaypoint = waypointsToSpawn.get(currentIndex);
         this.location = initialWaypoint;
+    }
 
+    public void setLocation(Location newLocation) {
+        this.location = newLocation;
+        notifyObservers();
     }
 }

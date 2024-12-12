@@ -11,28 +11,35 @@ import javafx.util.Duration;
 import location.Location;
 import lombok.Getter;
 import plane.Plane;
+import utills.Observable;
+import utills.Observer;
 
 @Getter
-public class PlaneModel {
+public class PlaneModel implements Observer {
 
+    private Plane plane;
     private Sphere planeSphere;
     private Text label;
     private PhongMaterial material;
 
     public PlaneModel(Plane plane) {
-        createPlane();
+        createPlane(plane);
+        createLabel();
+        setPlaneColour(Color.WHITE);
+        plane.addObserver(this); // register as observer
+        updatePosition(plane.getNavigator().getLocation());
+    }
+
+    /*public PlaneModel(Plane plane) {
+        createPlane()
         createLabel();
         updatePosition(plane);
     }
-
-    public void createPlane() {
+*/
+    public void createPlane(Plane plane) {
+        this.plane = plane;
         this.material = new PhongMaterial(Color.WHITE);
         this.planeSphere = new Sphere(50);
-        this.planeSphere.setMaterial(material);
-    }
-
-    public void setPlaneColour(Color colour) {
-        this.material = new PhongMaterial(colour);
         this.planeSphere.setMaterial(material);
     }
 
@@ -42,14 +49,29 @@ public class PlaneModel {
         this.label.setFill(Color.MAGENTA);
     }
 
-    public void updatePosition(Plane plane) {
-        this.planeSphere.setTranslateX((plane.getNavigator().getLocation().getX()) / 2.0);
-        this.planeSphere.setTranslateY(-(plane.getNavigator().getLocation().getAltitude()) / 2.0);
-        this.planeSphere.setTranslateZ((plane.getNavigator().getLocation().getY()) / 2.0);
+    @Override
+    public void update(Observable observable) {
+        if (observable instanceof Plane) {
+            Plane updatedPlane = (Plane) observable;
+            if (updatedPlane.isDestroyed()) {
+                this.removeFromScene();
+            } else if (updatedPlane.isLanded()) {
+                this.removeFromScene();
+            } else {
+                this.updatePosition(updatedPlane.getNavigator().getLocation());
+            }
+        }
+    }
 
-        this.label.setTranslateX(((plane.getNavigator().getLocation().getX() + 150)) / 2.0);
-        this.label.setTranslateY(-((plane.getNavigator().getLocation().getAltitude() -150)) / 2.0);
-        this.label.setTranslateZ((plane.getNavigator().getLocation().getY()) / 2.0);
+    public void setPlaneColour(Color colour) {
+        this.material = new PhongMaterial(colour);
+        this.planeSphere.setMaterial(material);
+    }
+
+    private void updatePosition(Location location) {
+        planeSphere.setTranslateX(location.getX() / 2.0);
+        planeSphere.setTranslateY(-location.getAltitude() / 2.0);
+        planeSphere.setTranslateZ(location.getY() / 2.0);
     }
 
     public void animateToNextWaypoint(Location nextLocation) {
@@ -72,5 +94,9 @@ public class PlaneModel {
             label.setTranslateZ(toZ + 75);
         });
         transition.play();
+    }
+
+    private void removeFromScene(){
+        planeSphere.setVisible(false);
     }
 }
