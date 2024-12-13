@@ -1,5 +1,6 @@
 package animation.model;
 
+import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
@@ -30,12 +31,6 @@ public class PlaneModel implements Observer {
         updatePosition(plane.getNavigator().getLocation());
     }
 
-    /*public PlaneModel(Plane plane) {
-        createPlane()
-        createLabel();
-        updatePosition(plane);
-    }
-*/
     public void createPlane(Plane plane) {
         this.plane = plane;
         this.material = new PhongMaterial(Color.WHITE);
@@ -74,7 +69,7 @@ public class PlaneModel implements Observer {
         planeSphere.setTranslateZ(location.getY() / 2.0);
     }
 
-    public void animateToNextWaypoint(Location nextLocation) {
+    public void animateMovement(Location nextLocation) {
         double toX = nextLocation.getX() / 2.0;
         double toY = -nextLocation.getAltitude() / 2.0;
         double toZ = nextLocation.getY() / 2.0;
@@ -88,6 +83,9 @@ public class PlaneModel implements Observer {
         transition.setToX(toX);
         transition.setToY(toY);
         transition.setToZ(toZ);
+
+        transition.setInterpolator(Interpolator.LINEAR);
+
         transition.setOnFinished(event -> {
             label.setTranslateX(toX + 75);
             label.setTranslateY(toY + 75);

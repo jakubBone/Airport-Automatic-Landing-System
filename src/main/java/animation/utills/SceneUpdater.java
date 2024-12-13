@@ -42,16 +42,20 @@ public class SceneUpdater {
 
             planeModel = planesMap.get(plane.getFlightNumber());
 
-            if (plane.getPhase().equals(Plane.FlightPhase.HOLDING)) {
-                planeModel.setPlaneColour(Color.ORANGE);
-            } else if (plane.getPhase().equals(Plane.FlightPhase.LANDING)) {
-                planeModel.setPlaneColour(Color.YELLOW);
-            }
+            updateColour(plane, planeModel);
 
             Location nextWaypoint = plane.getNavigator().getLocation();
-            planeModel.animateToNextWaypoint(nextWaypoint);
+            planeModel.animateMovement(nextWaypoint);
         }
         cleanupScene();
+    }
+
+    private void updateColour(Plane plane, PlaneModel planeModel){
+        if (plane.getPhase().equals(Plane.FlightPhase.HOLDING)) {
+            planeModel.setPlaneColour(Color.ORANGE);
+        } else if (plane.getPhase().equals(Plane.FlightPhase.LANDING)) {
+            planeModel.setPlaneColour(Color.YELLOW);
+        }
     }
 
     private void cleanupScene(){
