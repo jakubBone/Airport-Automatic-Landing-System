@@ -121,7 +121,6 @@ public class AirTrafficController {
             lock.unlock();
         }
     }
-
     public void checkCollision() {
         lock.lock();
         String [] collidedID = new String[2];
@@ -131,12 +130,13 @@ public class AirTrafficController {
                 for (int j = i + 1; j < planes.size(); j++) {
                     Plane plane2 = planes.get(j);
                     if (arePlanesToClose(plane1, plane2)) {
-                        collidedID[0] = plane1.getFlightNumber();
-                        collidedID[1] = plane2.getFlightNumber();
-                        database.getCollisionDAO().registerCollisionToDB(collidedID);
-
-                        planes.get(i).setDestroyed(true);
-                        planes.get(j).setDestroyed(true);
+                        //if(!(collidedID[0].equals(plane1.getFlightNumber())) && !(collidedID[1].equals(plane2.getFlightNumber()))){
+                            collidedID[0] = plane1.getFlightNumber();
+                            collidedID[1] = plane2.getFlightNumber();
+                            database.getCollisionDAO().registerCollisionToDB(collidedID);
+                            planes.get(i).setDestroyed(true);
+                            planes.get(j).setDestroyed(true);
+                       // }
 
                         log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getFlightNumber(), plane2.getFlightNumber());
                     }
@@ -146,11 +146,6 @@ public class AirTrafficController {
             lock.unlock();
         }
     }
-
-    /*private boolean arePlanesToClose(Plane plane1, Plane plane2) {
-        return plane1.getNavigator().getLocation().equals(plane2.getNavigator().getLocation()) &&
-                plane1.getNavigator().getCurrentIndex() == plane2.getNavigator().getCurrentIndex();
-    }*/
 
     private boolean arePlanesToClose(Plane plane1, Plane plane2) {
         Location loc1 = plane1.getNavigator().getLocation();

@@ -1,23 +1,16 @@
 package animation.utills;
 
+import animation.model.WaypointModel;
 import controller.AirTrafficController;
 import airport.Airport;
 
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Scale;
+import javafx.scene.shape.Sphere;
 import javafx.stage.Stage;
 import animation.model.AirspaceModel;
-import animation.model.PlaneModel;
 import animation.model.RunwayModel;
-
-import java.awt.event.KeyEvent;
-import java.util.HashMap;
-
-import java.util.Map;
 
 public class SceneRenderer extends Application {
     private SmartGroup group;
@@ -54,9 +47,14 @@ public class SceneRenderer extends Application {
         RunwayModel runway1Model = new RunwayModel(Airport.runway1);
         RunwayModel runway2Model = new RunwayModel(Airport.runway2);
         AirspaceModel airspaceModel = new AirspaceModel();
+        WaypointModel waypointModel = new WaypointModel();
 
         group.getChildren().addAll(airspaceModel.getFloor(), airspaceModel.getLeftWall(), airspaceModel.getRightWall(),
                 runway1Model.getRunwayRect(), runway2Model.getRunwayRect());
+
+        for(Sphere waypoint: waypointModel.getDescentModels()){
+            group.getChildren().add(waypoint);
+        }
     }
 
     private void setupRotationHandler(){

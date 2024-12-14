@@ -46,7 +46,7 @@ public class Navigator extends Observable {
     public void updateLocation(Location location, String id) {
         if(!isFirstMove){
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }

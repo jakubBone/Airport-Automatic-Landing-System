@@ -69,6 +69,21 @@ public class PlaneModel implements Observer {
         planeSphere.setTranslateZ(location.getY() / 2.0);
     }
 
+    /*public void animateMovement(Location nextLocation) {
+        TranslateTransition transition = new TranslateTransition(Duration.seconds(1), planeSphere);
+        transition.setToX(nextLocation.getX() / 2.0);
+        transition.setToY(-nextLocation.getAltitude() / 2.0);
+        transition.setToZ(nextLocation.getY() / 2.0);
+        transition.setInterpolator(Interpolator.LINEAR);
+
+        transition.setOnFinished(event -> {
+            label.setTranslateX(nextLocation.getX() / 2.0 + 75);
+            label.setTranslateY(-nextLocation.getAltitude() + 75);
+            label.setTranslateZ(nextLocation.getY() + 75);
+        });
+        transition.play();
+    }*/
+
     public void animateMovement(Location nextLocation) {
         double toX = nextLocation.getX() / 2.0;
         double toY = -nextLocation.getAltitude() / 2.0;

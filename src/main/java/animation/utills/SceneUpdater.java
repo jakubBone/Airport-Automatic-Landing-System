@@ -25,7 +25,7 @@ public class SceneUpdater {
     }
 
     public void start() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), event -> updateAirspace()));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> updateAirspace()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
