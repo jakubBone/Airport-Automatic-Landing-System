@@ -49,10 +49,27 @@ public class AirTrafficController {
 
     public boolean isLocationOccupied(Plane plane1) {
         lock.lock();
+        try {
+            for (Plane plane2 : planes) {
+                for(Location waypoint: plane1.getNavigator().getRiskZoneWaypoints()){
+                    if(waypoint.equals(plane2.getNavigator().getLocation())) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /*public boolean isLocationOccupied(Plane plane1) {
+        lock.lock();
         Location plane1Location = plane1.getNavigator().getLocation();
         try {
             for (Plane plane2 : planes) {
                 if (plane2.getNavigator().getLocation().equals(plane1Location)) {
+
                  return true;
              }
             }
@@ -60,7 +77,7 @@ public class AirTrafficController {
         } finally {
             lock.unlock();
         }
-    }
+    }*/
 
     public boolean isHoldingCollisionRisk(Plane plane1) {
         lock.lock();
@@ -129,7 +146,10 @@ public class AirTrafficController {
                 Plane plane1 = planes.get(i);
                 for (int j = i + 1; j < planes.size(); j++) {
                     Plane plane2 = planes.get(j);
-                    if (arePlanesToClose(plane1, plane2)) {
+
+                    Location loc1 = plane1.getNavigator().getLocation();
+                    Location loc2 = plane2.getNavigator().getLocation();
+                    if (arePlanesToClose(loc1, loc2)) {
                         //if(!(collidedID[0].equals(plane1.getFlightNumber())) && !(collidedID[1].equals(plane2.getFlightNumber()))){
                             collidedID[0] = plane1.getFlightNumber();
                             collidedID[1] = plane2.getFlightNumber();
@@ -147,14 +167,47 @@ public class AirTrafficController {
         }
     }
 
-    private boolean arePlanesToClose(Plane plane1, Plane plane2) {
+    /*public void checkCollision() {
+        lock.lock();
+        String [] collidedID = new String[2];
+        try{
+            for (int i = 0; i < planes.size(); i++) {
+                Plane plane1 = planes.get(i);
+                for (int j = i + 1; j < planes.size(); j++) {
+                    Plane plane2 = planes.get(j);
+                    if (arePlanesToClose(plane1, plane2)) {
+                        //if(!(collidedID[0].equals(plane1.getFlightNumber())) && !(collidedID[1].equals(plane2.getFlightNumber()))){
+                            collidedID[0] = plane1.getFlightNumber();
+                            collidedID[1] = plane2.getFlightNumber();
+                            database.getCollisionDAO().registerCollisionToDB(collidedID);
+                            planes.get(i).setDestroyed(true);
+                            planes.get(j).setDestroyed(true);
+                       // }
+
+                        log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getFlightNumber(), plane2.getFlightNumber());
+                    }
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
+    }*/
+
+    private boolean arePlanesToClose(Location loc1, Location loc2) {
+        double distance = Math.sqrt(Math.pow(loc1.getX() - loc2.getX(), 2)
+                + Math.pow(loc1.getY() - loc2.getY(), 2)
+                + Math.pow(loc1.getAltitude() - loc2.getAltitude(), 2));
+        return distance < 10;
+    }
+
+    /*private boolean arePlanesToClose(Plane plane1, Plane plane2) {
         Location loc1 = plane1.getNavigator().getLocation();
         Location loc2 = plane2.getNavigator().getLocation();
         double distance = Math.sqrt(Math.pow(loc1.getX() - loc2.getX(), 2)
                 + Math.pow(loc1.getY() - loc2.getY(), 2)
                 + Math.pow(loc1.getAltitude() - loc2.getAltitude(), 2));
         return distance < 10;
-    }
+    }*/
 
     public boolean isPlaneApproachingHoldingAltitude(Plane plane) {
         int entryPointAltitude = 1013;

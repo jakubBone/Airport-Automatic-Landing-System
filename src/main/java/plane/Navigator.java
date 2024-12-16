@@ -2,6 +2,7 @@ package plane;
 
 import location.Location;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -70,5 +71,15 @@ public class Navigator extends Observable {
     public void setLocation(Location newLocation) {
         this.location = newLocation;
         notifyObservers();
+    }
+
+    public List <Location> getRiskZoneWaypoints(){
+        List <Location> nearWaypoints = new ArrayList<>();
+        nearWaypoints.add(waypoints.get(currentIndex - 1));
+        nearWaypoints.add(waypoints.get(currentIndex - 2));
+        nearWaypoints.add(waypoints.get(currentIndex));
+        nearWaypoints.add(waypoints.get(currentIndex + 1));
+        nearWaypoints.add(waypoints.get(currentIndex + 2));
+        return nearWaypoints;
     }
 }
