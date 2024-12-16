@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Sphere;
+import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import animation.model.AirspaceModel;
 import animation.model.RunwayModel;

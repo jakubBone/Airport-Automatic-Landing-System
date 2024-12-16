@@ -32,7 +32,7 @@ public class Camera {
 
         scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {
-                // Camera
+                // Unit setting
                 case X -> zoom(-200);   // Zoom in
                 case Z -> zoom(200);    // Zoom out
                 case W -> rotateCamera(-5, 0);   // Upward
@@ -40,13 +40,15 @@ public class Camera {
                 case D -> rotateCamera(0, -5); // Left
                 case A -> rotateCamera(0, 5); // Right
 
-                // Scene as Node
-                case K -> rotateX.setAngle(rotateX.getAngle() + 10); // Rotation by X
-                case RIGHT -> rotateY.setAngle(rotateY.getAngle() + 10); // Rotation by Y
-                case UP -> rotateZ.setAngle(rotateZ.getAngle() + 10); // Rotation by Z
-                case L -> rotateX.setAngle(rotateX.getAngle() - 10); // Rotation by X
-                case LEFT -> rotateY.setAngle(rotateY.getAngle() - 10); // Rotation by Y
-                case DOWN -> rotateZ.setAngle(rotateZ.getAngle() - 10); // Rotation by Z
+                // View setting
+                case UP -> rotateX.setAngle(rotateX.getAngle() + 50); // Rotation by X
+                case DOWN -> rotateX.setAngle(rotateX.getAngle() - 50); // Rotation by X
+                case LEFT -> rotateY.setAngle(rotateY.getAngle() - 50); // Rotation by Y
+                case RIGHT -> rotateY.setAngle(rotateY.getAngle() +50); // Rotation by Y*/
+                case C -> getView(-45.0, 0.0, 0.0, -5000.0, -4200.0);
+                case V -> getView(-60.0, 0.0, 0.0, -5000.0, -2200);
+
+
             }
         });
     }
@@ -56,7 +58,14 @@ public class Camera {
         rotateY.setAngle(rotateY.getAngle() + angleY);
     }
 
+    public void getView(double rotationX, double rotationY, double translationX,  double translationY, double translationZ) {
+        rotateX.setAngle(rotationX);
+        rotateY.setAngle(rotationY);
+        translate.setX(translationX);
+        translate.setY(translationY);
+        translate.setZ(translationZ);
+    }
+
     public void zoom(double deltaZ) {
         translate.setZ(translate.getZ() + deltaZ);
     }
-}
