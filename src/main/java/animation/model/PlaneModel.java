@@ -26,7 +26,6 @@ public class PlaneModel implements Observer {
     public PlaneModel(Plane plane) {
         createPlane(plane);
         createLabel();
-        setPlaneColour(Color.WHITE);
         plane.addObserver(this); // register as observer
         updatePosition(plane.getNavigator().getLocation());
     }
@@ -41,7 +40,8 @@ public class PlaneModel implements Observer {
     public void createLabel() {
         this.label = new Text();
         this.label.setFont(new Font(100));
-        this.label.setFill(Color.MAGENTA);
+        this.label.setFill(Color.BLACK);
+        this.label.setText(plane.getFlightNumber()); // Ustawienie tekstu
     }
 
     @Override
@@ -64,48 +64,38 @@ public class PlaneModel implements Observer {
     }
 
     private void updatePosition(Location location) {
-        planeSphere.setTranslateX(location.getX() / 2.0);
-        planeSphere.setTranslateY(-location.getAltitude() / 2.0);
-        planeSphere.setTranslateZ(location.getY() / 2.0);
+        this.planeSphere.setTranslateX(location.getX() / 2.0);
+        this.planeSphere.setTranslateY(-location.getAltitude() / 2.0);
+        this.planeSphere.setTranslateZ(location.getY() / 2.0);
+        this.label.setTranslateX(((location.getX() + 150)) / 2.0);
+        this.label.setTranslateY(-((location.getAltitude() + 150)) / 2.0);
+        this.label.setTranslateZ((location.getY()) / 2.0);
     }
 
-    /*public void animateMovement(Location nextLocation) {
-        TranslateTransition transition = new TranslateTransition(Duration.seconds(1), planeSphere);
-        transition.setToX(nextLocation.getX() / 2.0);
-        transition.setToY(-nextLocation.getAltitude() / 2.0);
-        transition.setToZ(nextLocation.getY() / 2.0);
-        transition.setInterpolator(Interpolator.LINEAR);
 
-        transition.setOnFinished(event -> {
-            label.setTranslateX(nextLocation.getX() / 2.0 + 75);
-            label.setTranslateY(-nextLocation.getAltitude() + 75);
-            label.setTranslateZ(nextLocation.getY() + 75);
-        });
-        transition.play();
-    }*/
 
     public void animateMovement(Location nextLocation) {
-        double toX = nextLocation.getX() / 2.0;
-        double toY = -nextLocation.getAltitude() / 2.0;
-        double toZ = nextLocation.getY() / 2.0;
-        animatePlane(this.planeSphere, toX, toY, toZ);
+        double toPlaneSphereX = nextLocation.getX() / 2.0;
+        double toPlaneSphereY = -nextLocation.getAltitude() / 2.0;
+        double toPlaneSphereZ = nextLocation.getY() / 2.0;
+        double toLabelX = (nextLocation.getX() + 150) / 2.0;
+        double toLabelY =  - nextLocation.getAltitude() / 2.0;
+        double toLabelZ = (nextLocation.getY() + 150) / 2.0;
+        animatePlane(planeSphere, toPlaneSphereX, toPlaneSphereY, toPlaneSphereZ);
+        animatePlane(label, toLabelX, toLabelY, toLabelZ);
+
     }
 
-    public void animatePlane(Node plane, double toX, double toY, double toZ) {
+    public void animatePlane(Node node, double toX, double toY, double toZ) {
         TranslateTransition transition = new TranslateTransition();
         transition.setDuration(Duration.seconds(1));
-        transition.setNode(plane);
+        transition.setNode(node);
         transition.setToX(toX);
         transition.setToY(toY);
         transition.setToZ(toZ);
 
         transition.setInterpolator(Interpolator.LINEAR);
 
-        transition.setOnFinished(event -> {
-            label.setTranslateX(toX + 75);
-            label.setTranslateY(toY + 75);
-            label.setTranslateZ(toZ + 75);
-        });
         transition.play();
     }
 
