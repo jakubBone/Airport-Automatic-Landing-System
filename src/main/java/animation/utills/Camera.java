@@ -23,7 +23,7 @@ public class Camera {
         this.camera.getTransforms().addAll(translate, rotateX, rotateY);
     }
 
-    public void initializeRotationControls(Group group, Scene scene){
+    public void initializeRotationControls(Group group, Scene scene) {
         Rotate rotateX = new Rotate(0, Rotate.X_AXIS);
         Rotate rotateY = new Rotate(0, Rotate.Y_AXIS);
         Rotate rotateZ = new Rotate(0, Rotate.Z_AXIS);
@@ -44,7 +44,7 @@ public class Camera {
                 case UP -> rotateX.setAngle(rotateX.getAngle() + 50); // Rotation by X
                 case DOWN -> rotateX.setAngle(rotateX.getAngle() - 50); // Rotation by X
                 case LEFT -> rotateY.setAngle(rotateY.getAngle() - 50); // Rotation by Y
-                case RIGHT -> rotateY.setAngle(rotateY.getAngle() +50); // Rotation by Y*/
+                case RIGHT -> rotateY.setAngle(rotateY.getAngle() + 50); // Rotation by Y*/
                 case C -> getView(-45.0, 0.0, 0.0, -5000.0, -4200.0);
                 case V -> getView(-60.0, 0.0, 0.0, -5000.0, -2200);
 
@@ -58,7 +58,7 @@ public class Camera {
         rotateY.setAngle(rotateY.getAngle() + angleY);
     }
 
-    public void getView(double rotationX, double rotationY, double translationX,  double translationY, double translationZ) {
+    public void getView(double rotationX, double rotationY, double translationX, double translationY, double translationZ) {
         rotateX.setAngle(rotationX);
         rotateY.setAngle(rotationY);
         translate.setX(translationX);
@@ -69,3 +69,4 @@ public class Camera {
     public void zoom(double deltaZ) {
         translate.setZ(translate.getZ() + deltaZ);
     }
+}

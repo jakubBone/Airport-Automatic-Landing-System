@@ -2,6 +2,7 @@ package airport;
 
 import location.Location;
 import lombok.Getter;
+import utills.Constant;
 
 
 @Getter
@@ -11,10 +12,8 @@ public class Airport {
     public static Runway runway1;
 
     public Airport() {
-        this.runway1 = createRunway("R-1", "C-1", new Location(3000, 1500, 0), new Location(-5000, 3500, 1000), new Location(-3000, 1500, 700)); // (-3000, 1000, 700)
-        this.runway2 = createRunway("R-2", "C-2", new Location(3000, -1500, 0), new Location(-5000, 500, 1000), new Location(-3000, -1500, 700)); // (-3000, 1000, 700)
-        //runway1.setAvailable(false);
-        //runway2.setAvailable(false);
+        this.runway1 = createRunway("R-1", "C-1", Constant.LANDING_POINT_RUNWAY_1, Constant.ENTRY_POINT_CORRIDOR_1, Constant.SECOND_ENTRY_POINT_CORRIDOR_1);
+        this.runway2 = createRunway("R-2", "C-2", Constant.LANDING_POINT_RUNWAY_2, Constant.ENTRY_POINT_CORRIDOR_2, Constant.SECOND_ENTRY_POINT_CORRIDOR_2);
     }
 
     private Runway createRunway(String runwayId, String corridorId, Location landingPoint, Location entryPoint, Location secondEntryPoint) {

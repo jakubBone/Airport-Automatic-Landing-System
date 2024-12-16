@@ -35,7 +35,7 @@ public class SimulationLauncher extends Application {
         serverThread.isDaemon();
         serverThread.start();
 
-        int numberOfClients = 1;
+        int numberOfClients = 100;
 
         new Thread(() -> {
             for (int i = 0; i < numberOfClients; i++) {

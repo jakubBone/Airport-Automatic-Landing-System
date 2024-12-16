@@ -2,6 +2,7 @@ package location;
 
 import airport.Runway;
 import lombok.Getter;
+import utills.Constant;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,13 +16,11 @@ public class WaypointGenerator implements Serializable {
     }
 
     public static List<Location> getHoldingPatternWaypoints() {
-        int altitude = 1000;
-        return generateHoldingWaypoints(altitude);
+        return generateHoldingWaypoints(Constant.HOLDING_ALTITUDE);
     }
 
     public static List<Location> getStandbyWaypoints() {
-        int altitude = 1200;
-        return generateHoldingWaypoints(altitude);
+        return generateHoldingWaypoints(Constant.STANDBY_ALTITUDE);
     }
 
     public static List<Location> getLandingWaypoints(Runway runway) {
@@ -32,13 +31,11 @@ public class WaypointGenerator implements Serializable {
         List<Location> waypoints = new ArrayList<>();
         int radius = 5000;
         int totalWaypoints = 320;
-        int startAltitude = 5000;
-        int endAltitude = 1000;
-        double altitudeDecrement = (double) (startAltitude - endAltitude) / totalWaypoints;
+        double altitudeDecrement = (double) (Constant.MAX_ALTITUDE - Constant.HOLDING_ALTITUDE) / totalWaypoints;
 
         double angleStep = 360.0 / 80;
 
-        double currentAltitude = startAltitude;
+        double currentAltitude = Constant.MAX_ALTITUDE;
 
         for (int i = 0; i < totalWaypoints; i++) {
             // Calculate the angle in radians for the current waypoint
@@ -87,10 +84,10 @@ public class WaypointGenerator implements Serializable {
 
     public static List<Location> generateArc(int centerX, int centerY, int radius, double startAngle, double endAngle, int altitude, int altitudeDecrement) {
         List<Location> arcPoints = new ArrayList<>();
-        int waypoints = 4;
-        double angleStep = (endAngle - startAngle) / (waypoints - 1);
+        int waypointsOnArc = 4;
+        double angleStep = (endAngle - startAngle) / (waypointsOnArc - 1);
 
-        for (int i = 0; i < waypoints; i++) {
+        for (int i = 0; i < waypointsOnArc; i++) {
             // Calculate the angle in radians for the current waypoint
             // startAngle is the initial angle of the arc, and angleStep defines the angular increment between points
             double angle = Math.toRadians(startAngle + i * angleStep);
@@ -108,9 +105,9 @@ public class WaypointGenerator implements Serializable {
 
     public static List<Location> generateLandingWaypoints(Runway runway) {
         List<Location> waypoints = new ArrayList<>();
-        int altitude = 1000;
-        int totalWaypoints = 10;
-        int altitudeDecrement = altitude / totalWaypoints;
+        int landingWaypoints = 10;
+        int altitude = Constant.HOLDING_ALTITUDE;
+        int altitudeDecrement = altitude / landingWaypoints;
 
         int arcCenterY = "R-2".equals(runway.getId()) ? 0 : 3000;
         List<Location> arc4 = generateArc(-3500, arcCenterY, 1500, 180, 270, altitude, altitudeDecrement);
@@ -118,7 +115,7 @@ public class WaypointGenerator implements Serializable {
             waypoints.add(waypoint);
         }
 
-        altitude = 700;
+        altitude = Constant.LANDING_ALTITUDE;
         int landingDescentY = runway.getCorridor().getEntryPoint().getY() - 2000;
         for (int x = -3000; x <= 500; x += 500) {
             waypoints.add(new Location(x, landingDescentY, altitude));
