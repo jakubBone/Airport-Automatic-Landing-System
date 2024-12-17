@@ -31,7 +31,7 @@ public class AirspaceModel {
     }
 
     private void setupLeftWall() {
-        Image image = new Image(getClass().getResource("/images/wall.png").toExternalForm());
+        Image image = new Image(getClass().getResource("/images/newYork.png").toExternalForm());
         this.leftWall = createWall(6000, 2500, image);
         this.leftWall.getTransforms().add(new Rotate(180, Rotate.X_AXIS));
         this.leftWall.setTranslateX(-3000);
