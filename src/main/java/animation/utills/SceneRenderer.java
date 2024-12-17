@@ -1,5 +1,6 @@
 package animation.utills;
 
+import animation.model.TerminalModel;
 import animation.model.WaypointModel;
 import controller.AirTrafficController;
 import airport.Airport;
@@ -48,14 +49,16 @@ public class SceneRenderer extends Application {
         RunwayModel runway1Model = new RunwayModel(Airport.runway1);
         RunwayModel runway2Model = new RunwayModel(Airport.runway2);
         AirspaceModel airspaceModel = new AirspaceModel();
-        WaypointModel waypointModel = new WaypointModel();
+        //WaypointModel waypointModel = new WaypointModel();
+        TerminalModel terminal1Model = new TerminalModel(-1000, 50, 2000);
+        TerminalModel terminal2Model = new TerminalModel(1000, 50, 2000);
 
         group.getChildren().addAll(airspaceModel.getFloor(), airspaceModel.getLeftWall(), airspaceModel.getRightWall(),
-                runway1Model.getRunwayRect(), runway2Model.getRunwayRect());
+                runway1Model.getRunwayRect(), runway2Model.getRunwayRect(), terminal1Model.getPlaneGroup(), terminal2Model.getPlaneGroup());
 
-        for(Sphere waypoint: waypointModel.getDescentModels()){
+       /* for(Sphere waypoint: waypointModel.getDescentModels()){
             group.getChildren().add(waypoint);
-        }
+        }*/
     }
 
     private void setupRotationHandler(){

@@ -4,7 +4,6 @@ import animation.utills.SceneRenderer;
 import controller.AirTrafficController;
 import client.PlaneClient;
 import database.AirportDatabase;
-import database.DatabaseSchema;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import server.AirportServer;

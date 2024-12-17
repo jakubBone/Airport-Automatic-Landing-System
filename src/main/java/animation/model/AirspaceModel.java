@@ -14,6 +14,7 @@ public class AirspaceModel {
     private Rectangle floor;
     private Rectangle leftWall;
     private Rectangle rightWall;
+
     public AirspaceModel() {
         setupFloor();
         setupLeftWall();
@@ -21,7 +22,8 @@ public class AirspaceModel {
     }
 
     private void setupFloor() {
-        this.floor = createWall(6000, 6000);
+        Image image = new Image(getClass().getResource("/images/wall.png").toExternalForm());
+        this.floor = createWall(6000, 6000, image);
         this.floor.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
         this.floor.setTranslateX(- 3000);
         this.floor.setTranslateY(0);
@@ -29,8 +31,8 @@ public class AirspaceModel {
     }
 
     private void setupLeftWall() {
-        this.leftWall = createWall(6000, 2500);
-
+        Image image = new Image(getClass().getResource("/images/wall.png").toExternalForm());
+        this.leftWall = createWall(6000, 2500, image);
         this.leftWall.getTransforms().add(new Rotate(180, Rotate.X_AXIS));
         this.leftWall.setTranslateX(-3000);
         this.leftWall.setTranslateY(0);
@@ -38,16 +40,19 @@ public class AirspaceModel {
     }
 
     private void setupRightWall() {
-        this.rightWall = createWall(2500, 6000);
-
-        this.rightWall.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
-        this.rightWall.getTransforms().add(new Rotate(270, Rotate.Y_AXIS));
+        Image image = new Image(getClass().getResource("/images/departures.png").toExternalForm());
+        this.rightWall = createWall(2500, 6000, image);
+        //this.rightWall.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
+        //this.rightWall.getTransforms().add(new Rotate(270, Rotate.Y_AXIS));
+        //this.rightWall.getTransforms().add(new Rotate(180, Rotate.Y_AXIS));
+        this.rightWall.getTransforms().add(new Rotate(-90, Rotate.X_AXIS));
+        this.rightWall.getTransforms().add(new Rotate(90, Rotate.Y_AXIS));
         this.rightWall.setTranslateX(3000);
         this.rightWall.setTranslateY(0);
-        this.rightWall.setTranslateZ(-3000);
+        this.rightWall.setTranslateZ(3000);
     }
 
-    private Rectangle createWall(int width, int height) {
+    /*private Rectangle createWall(int width, int height) {
         Rectangle wall = new Rectangle(width, height);
         Canvas canvas = new Canvas(width / 2, height / 2);
         int spacing = 500;
@@ -57,7 +62,26 @@ public class AirspaceModel {
         Image image = canvas.snapshot(null, null);
         wall.setFill(new ImagePattern(image));
         return wall;
+    }*/
+
+    private Rectangle createWall(int width, int height, Image image) {
+        Rectangle wall = new Rectangle(width, height);
+        ImagePattern wallPattern = new ImagePattern(image);
+        wall.setFill(wallPattern);
+        return wall;
     }
+
+    /*private Rectangle createWall(int width, int height) {
+        Rectangle wall = new Rectangle(width, height);
+        Canvas canvas = new Canvas(width / 2, height / 2);
+        int spacing = 500;
+
+        addGrid(canvas, width, height, spacing);
+
+        Image image = canvas.snapshot(null, null);
+        wall.setFill(new ImagePattern(image));
+        return wall;
+    }*/
 
 
     private void addGrid(Canvas canvas, int width, int height, int spacing){
