@@ -39,13 +39,14 @@ public class PlaneModel {
     }
     public void loadPlaneModel() {
         ObjModelImporter importer = new ObjModelImporter();
-        importer.read(getClass().getResource("/models/boeing737/planeModel.obj"));
+        importer.read(getClass().getResource("/models/boeing737/boeingModel.obj"));
+        //importer.read(getClass().getResource("/models/airbusA380/airbusModel.obj"));
 
-        material = new PhongMaterial(Color.BLACK);
+        //material = new PhongMaterial(Color.BLACK);
         meshViews = importer.getImport();
-        for(MeshView meshView: meshViews){
+        /*for(MeshView meshView: meshViews){
             meshView.setMaterial(material);
-        }
+        }*/
         planeGroup.getChildren().addAll(meshViews);
     }
 

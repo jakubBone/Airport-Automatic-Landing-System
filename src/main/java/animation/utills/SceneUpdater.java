@@ -5,7 +5,6 @@ import controller.AirTrafficController;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Group;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import location.Location;
@@ -34,8 +33,9 @@ public class SceneUpdater {
         List<Plane> planes = controller.getPlanes();
 
         for (Plane plane : planes) {
-            PlaneModel planeModel = new PlaneModel(plane);
+            PlaneModel planeModel;
             if (!planesMap.containsKey(plane.getFlightNumber())) {
+                planeModel = new PlaneModel(plane);
                 planesMap.put(plane.getFlightNumber(), planeModel);
                 root.getChildren().addAll(planeModel.getPlaneGroup(), planeModel.getLabel());
             }
