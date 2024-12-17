@@ -18,7 +18,6 @@ public class Plane extends Observable implements Serializable {
     public enum FlightPhase {
         DESCENDING,
         HOLDING,
-        STANDING_BY,
         LANDING
     }
     private String flightNumber;
@@ -57,15 +56,6 @@ public class Plane extends Observable implements Serializable {
         }
     }
 
-    public void standby(){
-        navigator.setWaypoints(WaypointGenerator.getStandbyWaypoints());
-        navigator.move(flightNumber);
-        if (navigator.isAtLastWaypoint()) {
-            // Jump 1 index up at last point to avoid crash
-            navigator.setCurrentIndex(0);
-        }
-    }
-
     public void land(Runway runway){
         assignedRunway = runway;
         navigator.move(flightNumber);
@@ -87,5 +77,4 @@ public class Plane extends Observable implements Serializable {
         this.isDestroyed = true;
         notifyObservers();
     }
-
 }

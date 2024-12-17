@@ -19,10 +19,6 @@ public class WaypointGenerator implements Serializable {
         return generateHoldingWaypoints(Constant.HOLDING_ALTITUDE);
     }
 
-    public static List<Location> getStandbyWaypoints() {
-        return generateHoldingWaypoints(Constant.STANDBY_ALTITUDE);
-    }
-
     public static List<Location> getLandingWaypoints(Runway runway) {
         return generateLandingWaypoints(runway);
     }

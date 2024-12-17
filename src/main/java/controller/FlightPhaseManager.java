@@ -33,7 +33,6 @@ public class FlightPhaseManager {
         switch (plane.getPhase()) {
             case DESCENDING -> handleDescent(plane, out);
             case HOLDING -> handleHolding(plane, out);
-            case STANDING_BY -> handleStandby(plane, out);
             case LANDING -> handleLanding(plane);
             default -> log.warn("Unknown flight phase for Plane [{}]: {}", plane.getFlightNumber(), plane.getPhase());
         }
@@ -41,25 +40,9 @@ public class FlightPhaseManager {
 
     private void handleDescent(Plane plane, ObjectOutputStream out) throws IOException {
         if (controller.isPlaneApproachingHoldingAltitude(plane)) {
-            if (controller.isHoldingCollisionRisk(plane)) {
-                applyStandby(plane, out);
-            } else {
-                enterHolding(plane, out);
-            }
+            enterHolding(plane, out);
         } else {
             applyDescending(plane, out);
-        }
-    }
-
-    private void handleStandby(Plane plane, ObjectOutputStream out) throws IOException {
-        if(controller.isPlaneApproachHoldingEntry(plane)) {
-            if(controller.isHoldingCollisionRisk(plane)) {
-                applyStandby(plane, out);
-            } else {
-                enterHolding(plane, out);
-            }
-        } else {
-            applyStandby(plane, out);
         }
     }
 
@@ -108,12 +91,6 @@ public class FlightPhaseManager {
         messenger.send(HOLD_PATTERN, out);
         plane.setPhase(HOLDING);
         log.info("Plane [{}] is holding pattern", plane.getFlightNumber());
-    }
-
-    private void applyStandby(Plane plane, ObjectOutputStream out) throws IOException {
-        messenger.send(STANDBY, out);
-        plane.setPhase(STANDING_BY);
-        log.info("Plane [{}] redirected to standby pattern", plane.getFlightNumber());
     }
 
     private void applyLanding(Plane plane, Runway runway, ObjectOutputStream out) throws IOException {

@@ -84,9 +84,6 @@ public class PlaneHandler extends Thread {
         }
         controller.registerPlane(plane);
 
-        /*Location firstWaypoint = plane.getNavigator().getWaypoints().get(plane.getNavigator().getCurrentIndex() + 1);
-        plane.getNavigator().setLocation(firstWaypoint);*/
-
         log.info("Plane [{}] registered in airspace on [{}] / [{}] / [{}]", plane.getFlightNumber(), plane.getNavigator().getLocation().getX(), plane.getNavigator().getLocation().getY(), plane.getNavigator().getLocation().getAltitude());
         return true;
     }

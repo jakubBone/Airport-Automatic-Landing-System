@@ -160,8 +160,8 @@ public class AirTrafficController {
         return plane.getNavigator().getLocation().getAltitude() == Constant.HOLDING_ENTRY_ALTITUDE;
     }
 
-    public boolean isPlaneApproachHoldingEntry(Plane plane) {
-        return plane.getNavigator().getLocation().equals(Constant.LEAVING_POINT);
+    public boolean isPlaneLeaveStandby(Plane plane) {
+        return plane.getNavigator().getLocation().equals(Constant.STANDBY_LEAVING_POINT);
     }
 
     public boolean hasLandedOnRunway(Plane plane, Runway runway){

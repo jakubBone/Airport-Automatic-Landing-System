@@ -21,30 +21,30 @@ public class AirspaceModel {
     }
 
     private void setupFloor() {
-        this.floor = createWall(5000, 5000);
+        this.floor = createWall(6000, 6000);
         this.floor.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
-        this.floor.setTranslateX(- 2500);
+        this.floor.setTranslateX(- 3000);
         this.floor.setTranslateY(0);
-        this.floor.setTranslateZ(- 2500) ;
+        this.floor.setTranslateZ(- 3000) ;
     }
 
     private void setupLeftWall() {
-        this.leftWall = createWall(5000, 2500);
+        this.leftWall = createWall(6000, 2500);
 
         this.leftWall.getTransforms().add(new Rotate(180, Rotate.X_AXIS));
-        this.leftWall.setTranslateX(-2500);
+        this.leftWall.setTranslateX(-3000);
         this.leftWall.setTranslateY(0);
-        this.leftWall.setTranslateZ(2500);
+        this.leftWall.setTranslateZ(3000);
     }
 
     private void setupRightWall() {
-        this.rightWall = createWall(2500, 5000);
+        this.rightWall = createWall(2500, 6000);
 
         this.rightWall.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
         this.rightWall.getTransforms().add(new Rotate(270, Rotate.Y_AXIS));
-        this.rightWall.setTranslateX(2500);
+        this.rightWall.setTranslateX(3000);
         this.rightWall.setTranslateY(0);
-        this.rightWall.setTranslateZ(-2500);
+        this.rightWall.setTranslateZ(-3000);
     }
 
     private Rectangle createWall(int width, int height) {

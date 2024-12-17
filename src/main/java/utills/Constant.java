@@ -18,7 +18,7 @@ public class Constant {
     public static int HOLDING_ALTITUDE = 1000;
     public static int HOLDING_ENTRY_ALTITUDE = 1013;
     public static int STANDBY_ALTITUDE = 500;
-    public static Location LEAVING_POINT = new Location(-5000, 4500, 4000);
+    public static Location STANDBY_LEAVING_POINT = new Location(-5000, 4500, 4000);
 
 
     // DESCENDING

@@ -33,7 +33,6 @@ public class WaypointModel {
         this.landingWaypointsR1 = WaypointGenerator.getLandingWaypoints(Airport.runway1);
         this.landingWaypointsR2 = WaypointGenerator.getLandingWaypoints(Airport.runway2);
         this.holdingPatternWaypoints = WaypointGenerator.getHoldingPatternWaypoints();
-        this.holdingAlternativePatternWaypoints = WaypointGenerator.getStandbyWaypoints();
         this.descentWaypoints = WaypointGenerator.getDescentWaypoints();
     }
 
@@ -47,7 +46,6 @@ public class WaypointModel {
         addModels(landingWaypointsR1, landingR1Models, getColorsForWaypoints(landingWaypointsR1));
         addModels(landingWaypointsR2, landingR2Models, getColorsForWaypoints(landingWaypointsR2));
         addModels(holdingPatternWaypoints, holdingPatternModels, getColorsForWaypoints(holdingPatternWaypoints));
-        addModels(holdingAlternativePatternWaypoints, holdingAlternativePatternModels, getColorsForWaypoints(holdingAlternativePatternWaypoints));
         addModels(descentWaypoints, descentModels, getColorsForWaypoints(descentWaypoints));
     }
 
@@ -69,7 +67,6 @@ public class WaypointModel {
     private Color getColorsForWaypoints(List<Location> waypoints) {
         if (waypoints == landingWaypointsR1 || waypoints == landingWaypointsR2) return Color.YELLOW;
         if (waypoints == holdingPatternWaypoints) return Color.LIGHTBLUE;
-        if (waypoints == holdingAlternativePatternWaypoints) return Color.RED;
         if (waypoints == descentWaypoints) return Color.BLACK;
         return Color.GRAY;
     }
