@@ -1,10 +1,14 @@
 package animation.model;
 
+import com.interactivemesh.jfx.importer.ModelImporter;
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
+import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Sphere;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -12,67 +16,59 @@ import javafx.util.Duration;
 import location.Location;
 import lombok.Getter;
 import plane.Plane;
-import utills.Observable;
-import utills.Observer;
+
+import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
+
 
 @Getter
-public class PlaneModel implements Observer {
-
+public class PlaneModel {
     private Plane plane;
-    private Sphere planeSphere;
+    private Group planeGroup;
+    private MeshView[] meshViews;
     private Text label;
     private PhongMaterial material;
 
+
     public PlaneModel(Plane plane) {
-        createPlane(plane);
+        this.plane = plane;
+        this.planeGroup = new Group();
+        loadPlaneModel();
         createLabel();
-        plane.addObserver(this); // register as observer
         updatePosition(plane.getNavigator().getLocation());
+
     }
 
-    public void createPlane(Plane plane) {
-        this.plane = plane;
-        this.material = new PhongMaterial(Color.WHITE);
-        this.planeSphere = new Sphere(50);
-        this.planeSphere.setMaterial(material);
+    public void loadPlaneModel() {
+        ObjModelImporter importer = new ObjModelImporter();
+        importer.read(getClass().getResource("/models/boeing737/planeModel.obj"));
+
+        material = new PhongMaterial(Color.BLACK);
+        meshViews = importer.getImport();
+        for(MeshView meshView: meshViews){
+            meshView.setMaterial(material);
+        }
+        planeGroup.getChildren().addAll(meshViews);
     }
 
     public void createLabel() {
         this.label = new Text();
         this.label.setFont(new Font(100));
         this.label.setFill(Color.BLACK);
-        this.label.setText(plane.getFlightNumber()); // Ustawienie tekstu
+        this.label.setText(plane.getFlightNumber());
     }
 
-    @Override
-    public void update(Observable observable) {
-        if (observable instanceof Plane) {
-            Plane updatedPlane = (Plane) observable;
-            if (updatedPlane.isDestroyed()) {
-                this.removeFromScene();
-            } else if (updatedPlane.isLanded()) {
-                this.removeFromScene();
-            } else {
-                this.updatePosition(updatedPlane.getNavigator().getLocation());
-            }
-        }
-    }
 
-    public void setPlaneColour(Color colour) {
-        this.material = new PhongMaterial(colour);
-        this.planeSphere.setMaterial(material);
-    }
+    //importer.read(getClass().getResource("/models/airbusA380/untitled.obj"));
 
     private void updatePosition(Location location) {
-        this.planeSphere.setTranslateX(location.getX() / 2.0);
-        this.planeSphere.setTranslateY(-location.getAltitude() / 2.0);
-        this.planeSphere.setTranslateZ(location.getY() / 2.0);
+        this.planeGroup.setTranslateX(location.getX() / 2.0);
+        this.planeGroup.setTranslateY(-location.getAltitude() / 2.0);
+        this.planeGroup.setTranslateZ(location.getY() / 2.0);
+
         this.label.setTranslateX(((location.getX() + 150)) / 2.0);
         this.label.setTranslateY(-((location.getAltitude() + 150)) / 2.0);
         this.label.setTranslateZ((location.getY()) / 2.0);
     }
-
-
 
     public void animateMovement(Location nextLocation) {
         double toPlaneSphereX = nextLocation.getX() / 2.0;
@@ -81,7 +77,7 @@ public class PlaneModel implements Observer {
         double toLabelX = (nextLocation.getX() + 150) / 2.0;
         double toLabelY =  - nextLocation.getAltitude() / 2.0;
         double toLabelZ = (nextLocation.getY() + 150) / 2.0;
-        animatePlane(planeSphere, toPlaneSphereX, toPlaneSphereY, toPlaneSphereZ);
+        animatePlane(planeGroup, toPlaneSphereX, toPlaneSphereY, toPlaneSphereZ);
         animatePlane(label, toLabelX, toLabelY, toLabelZ);
 
     }
@@ -97,9 +93,5 @@ public class PlaneModel implements Observer {
         transition.setInterpolator(Interpolator.LINEAR);
 
         transition.play();
-    }
-
-    private void removeFromScene(){
-        planeSphere.setVisible(false);
     }
 }
