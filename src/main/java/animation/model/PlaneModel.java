@@ -37,7 +37,6 @@ public class PlaneModel {
         updatePosition(plane.getNavigator().getLocation());
 
     }
-
     public void loadPlaneModel() {
         ObjModelImporter importer = new ObjModelImporter();
         importer.read(getClass().getResource("/models/boeing737/planeModel.obj"));
@@ -58,8 +57,6 @@ public class PlaneModel {
     }
 
 
-    //importer.read(getClass().getResource("/models/airbusA380/untitled.obj"));
-
     private void updatePosition(Location location) {
         this.planeGroup.setTranslateX(location.getX() / 2.0);
         this.planeGroup.setTranslateY(-location.getAltitude() / 2.0);
@@ -77,6 +74,7 @@ public class PlaneModel {
         double toLabelX = (nextLocation.getX() + 150) / 2.0;
         double toLabelY =  - nextLocation.getAltitude() / 2.0;
         double toLabelZ = (nextLocation.getY() + 150) / 2.0;
+
         animatePlane(planeGroup, toPlaneSphereX, toPlaneSphereY, toPlaneSphereZ);
         animatePlane(label, toLabelX, toLabelY, toLabelZ);
 
