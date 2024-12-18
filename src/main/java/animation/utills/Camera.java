@@ -17,8 +17,8 @@ public class Camera {
 
     public Camera() {
         this.camera = new PerspectiveCamera();
-        this.translate = new Translate(0, -5000, -15000);
-        this.rotateX = new Rotate(25, Rotate.X_AXIS);
+        this.translate = new Translate(0, -5000, -2200);
+        this.rotateX = new Rotate(-60, Rotate.X_AXIS);
         this.rotateY = new Rotate(0, Rotate.Y_AXIS);
         this.camera.getTransforms().addAll(translate, rotateX, rotateY);
     }
@@ -44,11 +44,9 @@ public class Camera {
                 case UP -> rotateX.setAngle(rotateX.getAngle() + 50); // Rotation by X
                 case DOWN -> rotateX.setAngle(rotateX.getAngle() - 50); // Rotation by X
                 case LEFT -> rotateY.setAngle(rotateY.getAngle() - 50); // Rotation by Y
-                case RIGHT -> rotateY.setAngle(rotateY.getAngle() + 50); // Rotation by Y*/
+                case RIGHT -> rotateY.setAngle(rotateY.getAngle() + 50); // Rotation by Y
                 case C -> getView(-45.0, 0.0, 0.0, -5000.0, -4200.0);
                 case V -> getView(-60.0, 0.0, 0.0, -5000.0, -2200);
-
-
             }
         });
     }

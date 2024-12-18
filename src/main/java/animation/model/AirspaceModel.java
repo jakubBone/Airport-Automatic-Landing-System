@@ -42,9 +42,6 @@ public class AirspaceModel {
     private void setupRightWall() {
         Image image = new Image(getClass().getResource("/images/departures.png").toExternalForm());
         this.rightWall = createWall(2500, 6000, image);
-        //this.rightWall.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
-        //this.rightWall.getTransforms().add(new Rotate(270, Rotate.Y_AXIS));
-        //this.rightWall.getTransforms().add(new Rotate(180, Rotate.Y_AXIS));
         this.rightWall.getTransforms().add(new Rotate(-90, Rotate.X_AXIS));
         this.rightWall.getTransforms().add(new Rotate(90, Rotate.Y_AXIS));
         this.rightWall.setTranslateX(3000);
@@ -52,49 +49,10 @@ public class AirspaceModel {
         this.rightWall.setTranslateZ(3000);
     }
 
-    /*private Rectangle createWall(int width, int height) {
-        Rectangle wall = new Rectangle(width, height);
-        Canvas canvas = new Canvas(width / 2, height / 2);
-        int spacing = 500;
-
-        addGrid(canvas, width, height, spacing);
-
-        Image image = canvas.snapshot(null, null);
-        wall.setFill(new ImagePattern(image));
-        return wall;
-    }*/
-
     private Rectangle createWall(int width, int height, Image image) {
         Rectangle wall = new Rectangle(width, height);
         ImagePattern wallPattern = new ImagePattern(image);
         wall.setFill(wallPattern);
         return wall;
-    }
-
-    /*private Rectangle createWall(int width, int height) {
-        Rectangle wall = new Rectangle(width, height);
-        Canvas canvas = new Canvas(width / 2, height / 2);
-        int spacing = 500;
-
-        addGrid(canvas, width, height, spacing);
-
-        Image image = canvas.snapshot(null, null);
-        wall.setFill(new ImagePattern(image));
-        return wall;
-    }*/
-
-
-    private void addGrid(Canvas canvas, int width, int height, int spacing){
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setLineWidth(2);
-        gc.setStroke(Color.BLACK);
-
-        for (int y = 0; y <= height; y += spacing / 2) {
-            gc.strokeLine(0, y, width, y);
-        }
-
-        for (int x = 0; x <= width; x += spacing / 2) {
-            gc.strokeLine(x, 0, x, height);
-        }
     }
 }

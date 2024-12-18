@@ -5,6 +5,7 @@ import controller.AirTrafficController;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Group;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import location.Location;
@@ -12,15 +13,20 @@ import plane.Plane;
 
 import java.util.*;
 
+import static plane.Plane.FlightPhase.LANDING;
+
 public class SceneUpdater {
     private final Group root;
     private AirTrafficController controller;
     private Map<String, PlaneModel> planesMap;
 
+    private boolean isFirstPlane;
+
     public SceneUpdater(Group root, AirTrafficController controller) {
         this.root = root;
         this.controller = controller;
         this.planesMap = new HashMap<>();
+        this.isFirstPlane = true;
     }
 
     public void start() {
@@ -33,6 +39,14 @@ public class SceneUpdater {
         List<Plane> planes = controller.getPlanes();
 
         for (Plane plane : planes) {
+            if(isFirstPlane){
+                try{
+                    Thread.sleep(500);
+                } catch (InterruptedException ex){
+                    ex.getMessage();
+                }
+                isFirstPlane = false;
+            }
             PlaneModel planeModel;
             if (!planesMap.containsKey(plane.getFlightNumber())) {
                 planeModel = new PlaneModel(plane);
@@ -41,6 +55,9 @@ public class SceneUpdater {
             }
 
             planeModel = planesMap.get(plane.getFlightNumber());
+            if(plane.getPhase().equals(LANDING)){
+                planeModel.setPlaneModelColor(Color.YELLOW);
+            }
 
             Location nextWaypoint = plane.getNavigator().getLocation();
             planeModel.animateMovement(nextWaypoint);
