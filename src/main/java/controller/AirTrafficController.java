@@ -34,7 +34,7 @@ public class AirTrafficController {
         lock.lock();
         try {
             planes.add(plane);
-            database.getPlaneDAO().registerPlaneInDB(plane);
+            database.getPLANE_DAO().registerPlaneInDB(plane);
         } finally {
             lock.unlock();
         }
@@ -137,7 +137,7 @@ public class AirTrafficController {
                     if (arePlanesToClose(loc1, loc2)) {
                             collidedID[0] = plane1.getFlightNumber();
                             collidedID[1] = plane2.getFlightNumber();
-                            database.getCollisionDAO().registerCollisionToDB(collidedID);
+                            database.getCOLLISION_DAO().registerCollisionToDB(collidedID);
                             planes.get(i).setDestroyed(true);
                             planes.get(j).setDestroyed(true);
                         log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getFlightNumber(), plane2.getFlightNumber());
@@ -160,15 +160,11 @@ public class AirTrafficController {
         return plane.getNavigator().getLocation().getAltitude() == Constant.HOLDING_ENTRY_ALTITUDE;
     }
 
-    public boolean isPlaneLeaveStandby(Plane plane) {
-        return plane.getNavigator().getLocation().equals(Constant.STANDBY_LEAVING_POINT);
-    }
-
     public boolean hasLandedOnRunway(Plane plane, Runway runway){
         boolean hasLanded = false;
         if(plane.getNavigator().getLocation().equals(runway.getLandingPoint())){
             hasLanded = true;
-            database.getPlaneDAO().registerLandingInDB(plane);
+            database.getPLANE_DAO().registerLandingInDB(plane);
         }
         return hasLanded;
     }

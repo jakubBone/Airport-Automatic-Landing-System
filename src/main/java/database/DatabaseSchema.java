@@ -6,7 +6,6 @@ import org.jooq.impl.SQLDataType;
 
 public class DatabaseSchema {
     private final DSLContext CONTEXT;
-
     public DatabaseSchema(DSLContext dsl) {
         this.CONTEXT = dsl;
         createTables();

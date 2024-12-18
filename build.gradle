@@ -34,14 +34,12 @@ dependencies {
 
     // JOOQ
     implementation 'org.jooq:jooq:3.19.15'
+    implementation 'org.postgresql:postgresql:42.5.4'
     jooqGenerator 'org.postgresql:postgresql:42.5.4'
 
-    // ConnectionPool
-    implementation files('libs/connection-pool-1.0/connection-pool.jar')
 
     // jim3dsModelImporterJFX
     implementation files('libs/jim3dsModelImporterJFX/jimObjModelImporterJFX.jar')
-
 
 }
 
