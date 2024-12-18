@@ -62,9 +62,9 @@ public class Collisions extends TableImpl<CollisionsRecord> {
     public final TableField<CollisionsRecord, String[]> INVOLVED_PLANES = createField(DSL.name("involved_planes"), SQLDataType.VARCHAR.array(), this, "");
 
     /**
-     * The column <code>public.collisions.collision_time</code>.
+     * The column <code>public.collisions.time</code>.
      */
-    public final TableField<CollisionsRecord, LocalDateTime> COLLISION_TIME = createField(DSL.name("collision_time"), SQLDataType.LOCALDATETIME(1), this, "");
+    public final TableField<CollisionsRecord, LocalDateTime> TIME = createField(DSL.name("time"), SQLDataType.LOCALDATETIME(1), this, "");
 
     private Collisions(Name alias, Table<CollisionsRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

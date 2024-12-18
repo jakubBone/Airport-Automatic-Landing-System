@@ -17,7 +17,7 @@ public class CollisionDAO {
     public void registerCollisionToDB(String [] planesIds){
         CONTEXT.insertInto(table("collisions"),
                     field("involved_planes"),
-                    field("collision_time"))
+                    field("time"))
                 .values(planesIds,
                         LocalDateTime.now())
                 .execute();

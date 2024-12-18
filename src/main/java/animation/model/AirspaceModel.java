@@ -40,6 +40,7 @@ public class AirspaceModel {
     }
 
     private void setupRightWall() {
+        //Image image = new Image(getClass().getResource("/images/departures.png").toExternalForm());
         Image image = new Image(getClass().getResource("/images/departures.png").toExternalForm());
         this.rightWall = createWall(2500, 6000, image);
         this.rightWall.getTransforms().add(new Rotate(-90, Rotate.X_AXIS));

@@ -67,9 +67,9 @@ public class Planes extends TableImpl<PlanesRecord> {
     public final TableField<PlanesRecord, LocalDateTime> START_TIME = createField(DSL.name("start_time"), SQLDataType.LOCALDATETIME(1).nullable(false), this, "");
 
     /**
-     * The column <code>public.planes.land_time</code>.
+     * The column <code>public.planes.landing_time</code>.
      */
-    public final TableField<PlanesRecord, LocalDateTime> LAND_TIME = createField(DSL.name("land_time"), SQLDataType.LOCALDATETIME(1), this, "");
+    public final TableField<PlanesRecord, LocalDateTime> LANDING_TIME = createField(DSL.name("landing_time"), SQLDataType.LOCALDATETIME(1), this, "");
 
     private Planes(Name alias, Table<PlanesRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

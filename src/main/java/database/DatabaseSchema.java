@@ -16,7 +16,7 @@ public class DatabaseSchema {
                 .column("id", SQLDataType.INTEGER.identity(true))
                 .column("flight_number", SQLDataType.VARCHAR)
                 .column("start_time", SQLDataType.LOCALDATETIME(1).nullable(false))
-                .column("land_time", SQLDataType.LOCALDATETIME(1))
+                .column("landing_time", SQLDataType.LOCALDATETIME(1))
                 .constraints(
                         DSL.constraint("PK_PLANES").primaryKey("id"))
                 .execute();
@@ -24,7 +24,7 @@ public class DatabaseSchema {
         CONTEXT.createTableIfNotExists("collisions")
                 .column("id", SQLDataType.INTEGER.identity(true))
                 .column("involved_planes", SQLDataType.INTEGER.getArrayDataType())
-                .column("collision_time", SQLDataType.LOCALDATETIME(1))
+                .column("time", SQLDataType.LOCALDATETIME(1))
                 .constraints(
                         DSL.constraint("PK_COLLISIONS").primaryKey("id"))
                 .execute();

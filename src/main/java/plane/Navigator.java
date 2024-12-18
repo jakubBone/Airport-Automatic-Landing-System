@@ -26,10 +26,10 @@ public class Navigator extends Observable {
     public Navigator(FuelManager fuelManager) {
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.fuelManager = fuelManager;
-        this.currentIndex = 316;
-        this.location = waypoints.get(currentIndex);
+        //this.currentIndex = 316;
+        //this.location = waypoints.get(currentIndex);
         this.isFirstMove = true;
-        //spawnPlane();
+        spawnPlane();
     }
 
     public void move(String id) {

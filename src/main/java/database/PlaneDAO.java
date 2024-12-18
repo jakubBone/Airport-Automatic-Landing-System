@@ -24,7 +24,7 @@ public class PlaneDAO {
 
     public void registerLandingInDB(Plane plane){
         CONTEXT.update(table("planes"))
-                .set(field("land_time"), LocalDateTime.now())
+                .set(field("landing_time"), LocalDateTime.now())
                 .where(field("flight_number").eq(plane.getFlightNumber()))
                 .execute();
     }

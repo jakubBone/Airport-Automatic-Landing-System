@@ -49,16 +49,16 @@ public class CollisionsRecord extends UpdatableRecordImpl<CollisionsRecord> {
     }
 
     /**
-     * Setter for <code>public.collisions.collision_time</code>.
+     * Setter for <code>public.collisions.time</code>.
      */
-    public void setCollisionTime(LocalDateTime value) {
+    public void setTime(LocalDateTime value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>public.collisions.collision_time</code>.
+     * Getter for <code>public.collisions.time</code>.
      */
-    public LocalDateTime getCollisionTime() {
+    public LocalDateTime getTime() {
         return (LocalDateTime) get(2);
     }
 
@@ -85,12 +85,12 @@ public class CollisionsRecord extends UpdatableRecordImpl<CollisionsRecord> {
     /**
      * Create a detached, initialised CollisionsRecord
      */
-    public CollisionsRecord(Integer id, String[] involvedPlanes, LocalDateTime collisionTime) {
+    public CollisionsRecord(Integer id, String[] involvedPlanes, LocalDateTime time) {
         super(Collisions.COLLISIONS);
 
         setId(id);
         setInvolvedPlanes(involvedPlanes);
-        setCollisionTime(collisionTime);
+        setTime(time);
         resetChangedOnNotNull();
     }
 }
