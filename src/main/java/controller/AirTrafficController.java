@@ -64,23 +64,6 @@ public class AirTrafficController {
         }
     }
 
-    public boolean isHoldingCollisionRisk(Plane plane1) {
-        lock.lock();
-        Location waypoint = new Location(5000, -1000, 1000);
-        try {
-            for (Plane plane2 : planes) {
-                if(!plane1.getFlightNumber().equals(plane2.getFlightNumber())){
-                    if (waypoint.equals(plane2.getNavigator().getLocation())) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        } finally {
-            lock.unlock();
-        }
-    }
-
     public boolean isRunwayAvailable(Runway runway){
        lock.lock();
        try {

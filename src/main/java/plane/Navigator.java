@@ -11,12 +11,11 @@ import location.WaypointGenerator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import utills.Observable;
 
 @Getter
 @Setter
 @Log4j2
-public class Navigator extends Observable {
+public class Navigator {
     private List<Location> waypoints;
     private FuelManager fuelManager;
     private int currentIndex;
@@ -70,7 +69,6 @@ public class Navigator extends Observable {
 
     public void setLocation(Location newLocation) {
         this.location = newLocation;
-        notifyObservers();
     }
 
     public List <Location> getRiskZoneWaypoints(){

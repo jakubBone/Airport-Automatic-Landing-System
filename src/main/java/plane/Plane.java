@@ -6,7 +6,6 @@ import location.WaypointGenerator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import utills.Observable;
 
 import java.io.Serializable;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.List;
 @Log4j2
 @Getter
 @Setter
-public class Plane extends Observable implements Serializable {
+public class Plane implements Serializable {
     public enum FlightPhase {
         DESCENDING,
         HOLDING,
@@ -63,7 +62,6 @@ public class Plane extends Observable implements Serializable {
         if(navigator.isAtLastWaypoint()) {
             navigator.setLocation(runway.getLandingPoint());
             landed = true;
-            notifyObservers();
         }
     }
 
@@ -75,6 +73,5 @@ public class Plane extends Observable implements Serializable {
 
     public void destroyPlane() {
         this.isDestroyed = true;
-        notifyObservers();
     }
 }
