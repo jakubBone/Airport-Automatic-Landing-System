@@ -109,8 +109,8 @@ public class AirTrafficController {
        }
     }
 
-    public void releaseRunwayIfPlaneAtSecondEntryPoint(Plane plane, Runway runway){
-        if(plane.getNavigator().getLocation().equals(runway.getCorridor().getSecondEntryPoint())){
+    public void releaseRunwayIfPlaneFinalApproach(Plane plane, Runway runway){
+        if(plane.getNavigator().getLocation().equals(runway.getCorridor().getFinalApproachPoint())){
             releaseRunway(runway);
         }
     }

@@ -71,7 +71,7 @@ public class FlightPhaseManager {
             log.info("Plane [{}] has successfully landed on runway [{}]", plane.getFlightNumber(), availableRunway.getId());
             return;
         }
-        controller.releaseRunwayIfPlaneAtSecondEntryPoint(plane, availableRunway);
+        controller.releaseRunwayIfPlaneFinalApproach(plane, availableRunway);
     }
 
 

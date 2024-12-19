@@ -10,15 +10,12 @@ public class Constant {
     public static Location LANDING_POINT_RUNWAY_2 = new Location(3000, -1500, 0);
     public static Location ENTRY_POINT_CORRIDOR_1 = new Location(-5000, 3500, 1000);
     public static Location ENTRY_POINT_CORRIDOR_2 = new Location(-5000, 500, 1000);
-    public static Location SECOND_ENTRY_POINT_CORRIDOR_1 = new Location(-3000, 1500, 700);
-    public static Location SECOND_ENTRY_POINT_CORRIDOR_2 = new Location(-3000, -1500, 700);
-
+    public static Location FINAL_APPROACH_CORRIDOR_1 = new Location(-3000, 1500, 700);
+    public static Location FINAL_APPROACH_CORRIDOR_2 = new Location(-3000, -1500, 700);
 
     // HOLDING
     public static int HOLDING_ALTITUDE = 1000;
     public static int HOLDING_ENTRY_ALTITUDE = 1013;
-    public static int STANDBY_ALTITUDE = 500;
-    public static Location STANDBY_LEAVING_POINT = new Location(-5000, 4500, 4000);
 
 
     // DESCENDING
