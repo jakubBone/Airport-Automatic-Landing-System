@@ -1,7 +1,7 @@
 package animation.utills;
 
 import animation.model.PlaneModel;
-import controller.AirTrafficController;
+import controller.ControlTower;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Group;
@@ -17,12 +17,12 @@ import static plane.Plane.FlightPhase.LANDING;
 
 public class SceneUpdater {
     private final Group root;
-    private AirTrafficController controller;
+    private ControlTower controller;
     private Map<String, PlaneModel> planesMap;
 
     private boolean isFirstPlane;
 
-    public SceneUpdater(Group root, AirTrafficController controller) {
+    public SceneUpdater(Group root, ControlTower controller) {
         this.root = root;
         this.controller = controller;
         this.planesMap = new HashMap<>();

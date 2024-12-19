@@ -1,15 +1,12 @@
 package animation.utills;
 
 import animation.model.TerminalModel;
-import animation.model.WaypointModel;
-import controller.AirTrafficController;
+import controller.ControlTower;
 import airport.Airport;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Sphere;
-import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import animation.model.AirspaceModel;
 import animation.model.RunwayModel;
@@ -19,9 +16,9 @@ public class SceneRenderer extends Application {
     private Scene scene;
     Camera camera;
     private Airport airport;
-    private final AirTrafficController controller;
+    private final ControlTower controller;
 
-    public SceneRenderer(AirTrafficController controller) {
+    public SceneRenderer(ControlTower controller) {
         this.group = new SmartGroup(0.5, 0.5, 0.5);
         this.scene = new Scene(group, 800, 600, Color.BLACK);
         this.camera = new Camera();

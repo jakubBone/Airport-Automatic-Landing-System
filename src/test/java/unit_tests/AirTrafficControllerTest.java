@@ -1,6 +1,6 @@
 package unit_tests;
 
-import controller.AirTrafficController;
+import controller.ControlTower;
 import airport.Corridor;
 import airport.Runway;
 import database.AirportDatabase;
@@ -18,12 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AirTrafficControllerTest {
-    AirTrafficController controller;
+    AirportDatabase database;
+    ControlTower controlTower;
     List<Plane> incomingPlanes;
     @BeforeEach
     void setUp() throws SQLException {
-        AirportDatabase database = new AirportDatabase();
-        this.controller = new AirTrafficController(database);
+        this.database = new AirportDatabase();
+        this.controlTower = new ControlTower(database);
         this.incomingPlanes = new ArrayList<>();
     }
 
@@ -31,28 +32,40 @@ class AirTrafficControllerTest {
     @DisplayName("Should return true when all planes registered")
     void testRegisterPlane(){
         for (int i = 0; i < 10; i++){
-            incomingPlanes.add(new Plane("x"));
+            incomingPlanes.add(new Plane("123"));
         }
 
         for(Plane incoming: incomingPlanes){
-            controller.registerPlane(incoming);
+            controlTower.registerPlane(incoming);
         }
 
-        assertTrue(controller.getPlanes().size() == 10);
+        assertTrue(controlTower.getPlanes().size() == 10, "Should not register plane");
     }
 
     @Test
     @DisplayName("Should return false when space is not full")
         void testIsSpaceFull(){
         for (int i = 0; i < 110; i++){
-            incomingPlanes.add(new Plane("x"));
+            incomingPlanes.add(new Plane("123"));
         }
 
         for(Plane incoming: incomingPlanes){
-            controller.registerPlane(incoming);
+            controlTower.registerPlane(incoming);
         }
 
-        assertTrue(controller.isSpaceFull());
+        assertTrue(controlTower.isSpaceFull(), "Should inform about full airspace");
+    }
+    @Test
+    void testIfPlaneAtCollisionRiskZone() {
+        Plane plane1 = new Plane("123");
+        controlTower.registerPlane(plane1);
+        int index = plane1.getNavigator().getCurrentIndex();
+
+        Plane plane2 = new Plane("321");
+        plane2.getNavigator().setCurrentIndex(index + 2);
+
+        assertTrue(controlTower.isAtCollisionRiskZone(plane2),
+                "Plane 2 should be detected in Plane 1's collision risk zone");
     }
 
     @Test
@@ -63,20 +76,20 @@ class AirTrafficControllerTest {
         Plane plane2 = new Plane("y");
         plane2.getNavigator().setLocation(new Location(5000, 5000, 4000));
 
-        controller.registerPlane(plane1);
-        controller.registerPlane(plane2);
+        controlTower.registerPlane(plane1);
+        controlTower.registerPlane(plane2);
 
-        controller.checkCollision();
+        controlTower.checkCollision();
 
-        assertTrue(plane1.isDestroyed());
-        assertTrue(plane2.isDestroyed());
+        assertTrue(plane1.isDestroyed(), "Plane 1 should be destroyed after collision");
+        assertTrue(plane2.isDestroyed(), "Plane 1 should be destroyed after collision");
     }
 
     @Test
     @DisplayName("Should return true when runway is available")
     void testIsRunwayAvailable(){
         Runway runway = new Runway("R-1", new Location(500, 1000, 0), new Corridor("C-1", new Location(-5000, 3000, 1000), new Location(-3000, 1000, 700)));
-        assertTrue(controller.isRunwayAvailable(runway));
+        assertTrue(controlTower.isRunwayAvailable(runway), "Runway should be set as available");
     }
 
     @Test
@@ -85,7 +98,7 @@ class AirTrafficControllerTest {
         // Runway set as unavailable
         Runway runway = new Runway("R-2", new Location(500, -2000, 0), new Corridor( "C-1", new Location(-5000, 0, 1000), new Location(-3000, -2000, 700)));
         runway.setAvailable(false);
-        assertFalse(controller.isRunwayAvailable(runway));
+        assertFalse(controlTower.isRunwayAvailable(runway),"Runway should be set as unavailable" );
     }
 
     @Test
@@ -93,18 +106,18 @@ class AirTrafficControllerTest {
     void testAssignRunway(){
         Runway runway = new Runway("R-1", new Location(1500, 1000, 0), new Corridor( "C-1", new Location(1000, 2000, 0), new Location(-3000, 1000, 700)));
 
-        controller.assignRunway(runway);
+        controlTower.assignRunway(runway);
 
-        assertFalse(runway.isAvailable());
+        assertFalse(runway.isAvailable(), "Runway should be assigned to plane");
     }
 
     @Test
     @DisplayName("Should return true if runway released")
     void testReleaseRunway(){
         Runway runway = new Runway("R-1", new Location(500, 1000, 0), new Corridor( "C-1", new Location(1000, 2000, 0), new Location(-3000, 1000, 700)));
-        controller.releaseRunway(runway);
+        controlTower.releaseRunway(runway);
 
-        assertTrue(runway.isAvailable());
+        assertTrue(runway.isAvailable(), "Runway should be released after landing");
     }
 
     @Test
@@ -114,9 +127,9 @@ class AirTrafficControllerTest {
         plane.getNavigator().setLocation(new Location(-3000, 1000, 700));
         Runway runway = new Runway("R-1", new Location(500, 1000, 0), new Corridor( "C-1", new Location(1000, 2000, 0), new Location(-3000, 1000, 700)));
 
-        controller.releaseRunwayIfPlaneAtFinalApproach(plane, runway);
+        controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, runway);
 
-        assertTrue(runway.isAvailable());
+        assertTrue(runway.isAvailable(), "Runway should be released after take final approach point");
     }
 
     @Test
@@ -124,11 +137,11 @@ class AirTrafficControllerTest {
     void testRemovePlaneFromSpace(){
         Plane plane = new Plane("x");
 
-        controller.registerPlane(plane);
+        controlTower.registerPlane(plane);
 
-        controller.removePlaneFromSpace(plane);
+        controlTower.removePlaneFromSpace(plane);
 
-        assertTrue(!controller.getPlanes().contains(plane));
+        assertTrue(!controlTower.getPlanes().contains(plane), "Plane should be removed from airspace");
     }
 
     @Test
@@ -138,7 +151,7 @@ class AirTrafficControllerTest {
         plane1.getNavigator().setLocation(new Location(500, 1000, 0));
         Runway runway = new Runway("R-1", new Location(500, 1000, 0), new Corridor( "C-1", new Location(1000, 2000, 0), new Location(-3000, 1000, 700)));
 
-        assertTrue(controller.hasLandedOnRunway(plane1, runway));
+        assertTrue(controlTower.hasLandedOnRunway(plane1, runway), "Plane should be set as landed");
     }
 
 }

@@ -1,6 +1,6 @@
 package server;
 
-import controller.AirTrafficController;
+import controller.ControlTower;
 import airport.Airport;
 import controller.CollisionDetector;
 import database.AirportDatabase;
@@ -17,11 +17,11 @@ import java.sql.SQLException;
 @Getter
 public class AirportServer  {
     private ServerSocket serverSocket;
-    private AirTrafficController controller;
+    private ControlTower controlTower;
     private Airport airport;
 
-    public AirportServer(AirTrafficController controller) throws SQLException {
-        this.controller = controller;
+    public AirportServer(ControlTower controller) throws SQLException {
+        this.controlTower = controller;
         this.airport = new Airport();
     }
 
@@ -30,7 +30,7 @@ public class AirportServer  {
             this.serverSocket = new ServerSocket(port);
             log.info("Server started");
 
-            new CollisionDetector(controller).start();
+            new CollisionDetector(controlTower).start();
             log.info("Collision detector started");
 
             while (true) {
@@ -38,7 +38,7 @@ public class AirportServer  {
                     Socket clientSocket = serverSocket.accept();
                     if (clientSocket != null) {
                         log.info("Server connected with client at port: {}", port);
-                        new PlaneHandler(clientSocket, controller, airport).start();
+                        new PlaneHandler(clientSocket, controlTower, airport).start();
                     }
                 } catch (Exception ex) {
                     log.error("Error handling client connection: {}", ex.getMessage(), ex);
@@ -61,8 +61,8 @@ public class AirportServer  {
 
     public static void main(String[] args) throws IOException, SQLException {
         AirportDatabase database = new AirportDatabase();
-        AirTrafficController airTrafficController = new AirTrafficController(database);
-        AirportServer airportServer = new AirportServer(airTrafficController);
+        ControlTower controlTower = new ControlTower(database);
+        AirportServer airportServer = new AirportServer(controlTower);
         airportServer.startServer(5000);
         airportServer.stopServer();
     }

@@ -1,17 +1,18 @@
 package client;
 
+import lombok.Getter;
 import utills.Messenger;
 import lombok.extern.log4j.Log4j2;
 import plane.Plane;
 
 import java.io.*;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
 
 @Log4j2
+@Getter
 public class PlaneClient extends Client implements Runnable {
     private Plane plane;
     private Messenger messenger;

@@ -1,7 +1,7 @@
 package animation;
 
 import animation.utills.SceneRenderer;
-import controller.AirTrafficController;
+import controller.ControlTower;
 import client.PlaneClient;
 import database.AirportDatabase;
 import javafx.application.Application;
@@ -12,13 +12,13 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class SimulationLauncher extends Application {
-    private AirTrafficController controller;
+    private ControlTower controller;
     private AirportServer airportServer;
     private AirportDatabase database;
     @Override
     public void start(Stage primaryStage) throws Exception, SQLException {
         this.database = new AirportDatabase();
-        this.controller = new AirTrafficController(database);
+        this.controller = new ControlTower(database);
         this.airportServer = null;
         Thread serverThread = new Thread(() -> {
             try {

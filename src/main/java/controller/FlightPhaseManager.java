@@ -8,7 +8,6 @@ import plane.Plane;
 import utills.Messenger;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import static controller.PlaneHandler.AirportInstruction.*;
@@ -17,12 +16,12 @@ import static plane.Plane.FlightPhase.*;
 @Log4j2
 public class FlightPhaseManager {
 
-    private AirTrafficController controller;
+    private ControlTower controller;
     private Airport airport;
     private Messenger messenger;
     private Runway availableRunway;
 
-    public FlightPhaseManager(AirTrafficController controller, Airport airport, Messenger messenger) {
+    public FlightPhaseManager(ControlTower controller, Airport airport, Messenger messenger) {
         this.controller = controller;
         this.airport = airport;
         this.messenger = messenger;

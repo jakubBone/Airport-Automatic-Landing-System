@@ -19,12 +19,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Log4j2
 @Getter
-public class AirTrafficController {
+public class ControlTower {
     private List<Plane> planes;
     private Lock lock;
     private AirportDatabase database;
 
-    public AirTrafficController(AirportDatabase database) throws SQLException {
+    public ControlTower(AirportDatabase database) throws SQLException {
         this.planes = new ArrayList<>();
         this.lock = new ReentrantLock();
         this.database = database;

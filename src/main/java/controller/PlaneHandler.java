@@ -21,12 +21,12 @@ public class PlaneHandler extends Thread {
     }
 
     private final Socket clientSocket;
-    private final AirTrafficController controller;
+    private final ControlTower controller;
     private final Airport airport;
     private Messenger messenger;
     private FlightPhaseManager flightPhaseManager;
 
-    public PlaneHandler(Socket clientSocket, AirTrafficController controller, Airport airport) {
+    public PlaneHandler(Socket clientSocket, ControlTower controller, Airport airport) {
         this.clientSocket = clientSocket;
         this.controller = controller;
         this.airport = airport;
