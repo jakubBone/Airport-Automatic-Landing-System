@@ -37,7 +37,7 @@ public class PlaneInstructionHandler {
             case HOLD_PATTERN -> executeHoldPattern();
             case LAND -> processLanding();
             case FULL -> executeFullAirspace();
-            case OCCUPIED -> executeOccupiedLocation();
+            case RISK_ZONE -> executeRiskZone();
             case COLLISION -> executeCollision();
             default -> log.warn("Unknown instruction for Plane [{}]: [{}]", plane.getFlightNumber(), instruction);
         }
@@ -82,8 +82,8 @@ public class PlaneInstructionHandler {
         isProcessCompleted = true;
     }
 
-    private void executeOccupiedLocation() {
-        log.info("Initial location OCCUPIED. Plane [{}] cannot be registered in the location. Stopping communication", plane.getFlightNumber());
+    private void executeRiskZone() {
+        log.info("Initial location at risk zone. Plane [{}] cannot be registered in the location. Stopping communication", plane.getFlightNumber());
         isProcessCompleted = true;
     }
 

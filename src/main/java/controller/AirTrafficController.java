@@ -48,7 +48,7 @@ public class AirTrafficController {
         }
     }
 
-    public boolean isLocationOccupied(Plane plane1) {
+    public boolean isAtCollisionRiskZone(Plane plane1) {
         lock.lock();
         try {
             for (Plane plane2 : planes) {
@@ -92,7 +92,7 @@ public class AirTrafficController {
        }
     }
 
-    public void releaseRunwayIfPlaneFinalApproach(Plane plane, Runway runway){
+    public void releaseRunwayIfPlaneAtFinalApproach(Plane plane, Runway runway){
         if(plane.getNavigator().getLocation().equals(runway.getCorridor().getFinalApproachPoint())){
             releaseRunway(runway);
         }
@@ -136,7 +136,7 @@ public class AirTrafficController {
         double distance = Math.sqrt(Math.pow(loc1.getX() - loc2.getX(), 2)
                 + Math.pow(loc1.getY() - loc2.getY(), 2)
                 + Math.pow(loc1.getAltitude() - loc2.getAltitude(), 2));
-        return distance < 10;
+        return distance <= 10;
     }
 
     public boolean isPlaneApproachingHoldingAltitude(Plane plane) {

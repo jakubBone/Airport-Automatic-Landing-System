@@ -28,7 +28,7 @@ public class FlightPhaseManager {
         this.messenger = messenger;
     }
 
-    public void processFlightPhase(Plane plane, Location location, ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    public void processFlightPhase(Plane plane, Location location, ObjectOutputStream out) throws IOException, ClassNotFoundException {
         plane.getNavigator().setLocation(location);
         switch (plane.getPhase()) {
             case DESCENDING -> handleDescent(plane, out);
@@ -71,7 +71,7 @@ public class FlightPhaseManager {
             log.info("Plane [{}] has successfully landed on runway [{}]", plane.getFlightNumber(), availableRunway.getId());
             return;
         }
-        controller.releaseRunwayIfPlaneFinalApproach(plane, availableRunway);
+        controller.releaseRunwayIfPlaneAtFinalApproach(plane, availableRunway);
     }
 
 
@@ -113,19 +113,5 @@ public class FlightPhaseManager {
             return runway = Airport.runway2;
         }
         return null;
-    }
-
-    private void completeLanding(Plane plane, Runway runway) {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            return;
-        }
-
-        controller.removePlaneFromSpace(plane);
-        log.info("Plane [{}] removed from airspace", plane.getFlightNumber());
-        controller.releaseRunway(runway);
-        log.info("Runway [{}] released", runway.getId());
     }
 }

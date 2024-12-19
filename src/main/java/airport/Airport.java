@@ -7,7 +7,7 @@ import utills.Constant;
 
 @Getter
 public class Airport {
-    public static final int MAX_CAPACITY = 1000;
+    public static final int MAX_CAPACITY = 100;
     public static Runway runway2;
     public static Runway runway1;
 

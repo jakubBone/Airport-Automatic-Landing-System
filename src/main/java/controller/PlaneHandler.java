@@ -17,7 +17,7 @@ import static plane.Plane.FlightPhase.DESCENDING;
 public class PlaneHandler extends Thread {
 
     public enum AirportInstruction {
-        DESCENT, HOLD_PATTERN, STANDBY, LAND, FULL, COLLISION, OCCUPIED
+        DESCENT, HOLD_PATTERN, STANDBY, LAND, FULL, COLLISION, RISK_ZONE
     }
 
     private final Socket clientSocket;
@@ -77,9 +77,9 @@ public class PlaneHandler extends Thread {
             ex.getMessage();
         }
 
-        if (controller.isLocationOccupied(plane)) {
-            messenger.send(OCCUPIED, out);
-            log.info("Initial location Plane [{}] is occupied", plane.getFlightNumber());
+        if (controller.isAtCollisionRiskZone(plane)) {
+            messenger.send(RISK_ZONE, out);
+            log.info("Initial location Plane [{}] is at risk zone", plane.getFlightNumber());
             return false;
         }
         controller.registerPlane(plane);
@@ -100,7 +100,7 @@ public class PlaneHandler extends Thread {
             }
 
             Location location = messenger.receiveAndParse(in, Location.class);
-            flightPhaseManager.processFlightPhase(plane, location, in, out);
+            flightPhaseManager.processFlightPhase(plane, location, out);
 
             if (plane.isDestroyed()) {
                 handleCollision(plane, out);
