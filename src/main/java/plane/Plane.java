@@ -36,7 +36,6 @@ public class Plane implements Serializable {
         this.isDestroyed = false;
         this.landed = false;
         this.assignedRunway = null;
-
     }
 
     public void descend(){
@@ -49,6 +48,7 @@ public class Plane implements Serializable {
     }
 
     public void hold(){
+        setPhase(FlightPhase.HOLDING);
         navigator.move(flightNumber);
         if (navigator.isAtLastWaypoint()) {
             navigator.setCurrentIndex(0);

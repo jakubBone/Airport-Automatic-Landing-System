@@ -15,14 +15,13 @@ import static plane.Plane.FlightPhase.*;
 
 @Log4j2
 public class FlightPhaseManager {
-
-    private ControlTower controller;
+    private ControlTower controlTower;
     private Airport airport;
     private Messenger messenger;
     private Runway availableRunway;
 
-    public FlightPhaseManager(ControlTower controller, Airport airport, Messenger messenger) {
-        this.controller = controller;
+    public FlightPhaseManager(ControlTower controlTower, Airport airport, Messenger messenger) {
+        this.controlTower = controlTower;
         this.airport = airport;
         this.messenger = messenger;
     }
@@ -38,7 +37,7 @@ public class FlightPhaseManager {
     }
 
     private void handleDescent(Plane plane, ObjectOutputStream out) throws IOException {
-        if (controller.isPlaneApproachingHoldingAltitude(plane)) {
+        if (controlTower.isPlaneApproachingHoldingAltitude(plane)) {
             enterHolding(plane, out);
         } else {
             applyDescending(plane, out);
@@ -49,7 +48,7 @@ public class FlightPhaseManager {
         Runway runway = getRunwayIfPlaneAtCorridor(plane);
         availableRunway = runway;
 
-        if(runway != null && controller.isRunwayAvailable(runway)){
+        if(runway != null && controlTower.isRunwayAvailable(runway)){
             applyLanding(plane, runway, out);
         } else {
             applyHolding(plane, out);
@@ -59,18 +58,18 @@ public class FlightPhaseManager {
     private void handleLanding(Plane plane) throws IOException, ClassNotFoundException {
         log.info("Plane [{}] is landing", plane.getFlightNumber());
 
-        if (controller.hasLandedOnRunway(plane, availableRunway)) {
+        if (controlTower.hasLandedOnRunway(plane, availableRunway)) {
             plane.setLanded(true);
             try{
                 Thread.sleep(500);
             } catch (InterruptedException ex){
                 ex.getMessage();
             }
-            controller.removePlaneFromSpace(plane);
+            controlTower.removePlaneFromSpace(plane);
             log.info("Plane [{}] has successfully landed on runway [{}]", plane.getFlightNumber(), availableRunway.getId());
             return;
         }
-        controller.releaseRunwayIfPlaneAtFinalApproach(plane, availableRunway);
+        controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, availableRunway);
     }
 
 
@@ -93,7 +92,7 @@ public class FlightPhaseManager {
     }
 
     private void applyLanding(Plane plane, Runway runway, ObjectOutputStream out) throws IOException {
-        controller.assignRunway(runway);
+        controlTower.assignRunway(runway);
         plane.setPhase(LANDING);
         messenger.send(LAND, out);
         messenger.send(runway, out);
