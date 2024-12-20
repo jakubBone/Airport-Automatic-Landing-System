@@ -41,6 +41,9 @@ public class AirportServer  {
                         new PlaneHandler(clientSocket, controlTower, airport).start();
                     }
                 } catch (Exception ex) {
+                    if(serverSocket.isClosed()){
+                        return;
+                    }
                     log.error("Error handling client connection: {}", ex.getMessage(), ex);
                 }
             }
@@ -53,6 +56,7 @@ public class AirportServer  {
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();
+                log.info("Server closed successfully");
             }
         } catch (IOException ex) {
             log.error("Error occurred while closing server socket: {}", ex.getMessage());
