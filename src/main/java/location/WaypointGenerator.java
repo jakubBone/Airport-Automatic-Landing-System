@@ -120,9 +120,13 @@ public class WaypointGenerator implements Serializable {
 
         altitude = 0;
         // Add waypoints along the runway
-        for (int x = 500; x <= 3000; x += 250) {
+        for (int x = 1000; x <= 3000; x += 250) {
             waypoints.add(new Location(x, runway.getLandingPoint().getY(), altitude));
         }
+
+        /*for (int x = 1000; x <= 3000; x += 250) {
+            waypoints.add(new Location(x, runway.getLandingPoint().getY(), altitude));
+        }*/
 
         return waypoints;
     }
