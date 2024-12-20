@@ -30,8 +30,7 @@ public class PlaneInstructionHandler {
         this.communicationService = new PlaneCommunicationService(plane, messenger, out);
     }
 
-    public void processInstruction() throws IOException, ClassNotFoundException {
-        PlaneHandler.AirportInstruction instruction = messenger.receiveAndParse(in, PlaneHandler.AirportInstruction.class);
+    public void processInstruction(PlaneHandler.AirportInstruction instruction) throws IOException, ClassNotFoundException {
         switch (instruction) {
             case DESCENT -> executeDescent();
             case HOLD_PATTERN -> executeHoldPattern();

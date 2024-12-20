@@ -1,5 +1,6 @@
 package client;
 
+import controller.PlaneHandler;
 import lombok.Getter;
 import utills.Messenger;
 import lombok.extern.log4j.Log4j2;
@@ -58,7 +59,8 @@ public class PlaneClient extends Client implements Runnable {
                 return;
             }
 
-            instructionHandler.processInstruction();
+            PlaneHandler.AirportInstruction instruction = messenger.receiveAndParse(in, PlaneHandler.AirportInstruction.class);
+            instructionHandler.processInstruction(instruction);
 
             if(plane.isDestroyed()){
                 return;

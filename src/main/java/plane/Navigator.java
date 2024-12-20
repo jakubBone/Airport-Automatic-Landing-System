@@ -75,9 +75,11 @@ public class Navigator {
         List <Location> nearWaypoints = new ArrayList<>();
         nearWaypoints.add(waypoints.get(currentIndex - 1));
         nearWaypoints.add(waypoints.get(currentIndex - 2));
+        nearWaypoints.add(waypoints.get(currentIndex - 3));
         nearWaypoints.add(waypoints.get(currentIndex));
         nearWaypoints.add(waypoints.get(currentIndex + 1));
         nearWaypoints.add(waypoints.get(currentIndex + 2));
+        nearWaypoints.add(waypoints.get(currentIndex + 3));
         return nearWaypoints;
     }
 }
