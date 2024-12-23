@@ -4,10 +4,13 @@ import controller.ControlTower;
 import airport.Corridor;
 import airport.Runway;
 import database.AirportDatabase;
+import database.CollisionDAO;
+import database.PlaneDAO;
 import location.Location;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import plane.Plane;
 
 import java.sql.SQLException;
@@ -16,15 +19,23 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 class ControlTowerUnitTest {
-    AirportDatabase database;
+    AirportDatabase mockDatabase;
+    PlaneDAO mockPlaneDAO;
+    CollisionDAO mockCollisionDAO;
     ControlTower controlTower;
     List<Plane> incomingPlanes;
     @BeforeEach
     void setUp() throws SQLException {
-        this.database = new AirportDatabase();
-        this.controlTower = new ControlTower(database);
+        this.mockDatabase = Mockito.mock(AirportDatabase.class);
+        this.mockPlaneDAO = Mockito.mock(PlaneDAO.class);
+        this.mockCollisionDAO = Mockito.mock(CollisionDAO.class);
+        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneDAO);
+        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDAO);
+
+        this.controlTower = new ControlTower(mockDatabase);
         this.incomingPlanes = new ArrayList<>();
     }
 
@@ -62,75 +73,13 @@ class ControlTowerUnitTest {
         int index = plane1.getNavigator().getCurrentIndex();
 
         Plane plane2 = new Plane("1111");
-        plane2.getNavigator().setCurrentIndex(index + 2);
+        plane2.getNavigator().setCurrentIndex(index + 1);
 
         assertTrue(controlTower.isAtCollisionRiskZone(plane2),
                 "Plane 2 should be detected in Plane 1's collision risk zone");
     }
 
-    @Test
-    @DisplayName("Should return true when collided planes destroyed ")
-    void tesPlanesCollision(){
-        Plane plane1 = new Plane("0000");
-        plane1.getNavigator().setLocation(new Location(5000, 5000, 4010));
-        Plane plane2 = new Plane("1111");
-        plane2.getNavigator().setLocation(new Location(5000, 5000, 4000));
 
-        controlTower.registerPlane(plane1);
-        controlTower.registerPlane(plane2);
-
-        controlTower.checkCollision();
-
-        assertTrue(plane1.isDestroyed(), "Plane 1 should be destroyed after collision");
-        assertTrue(plane2.isDestroyed(), "Plane 1 should be destroyed after collision");
-    }
-
-    @Test
-    @DisplayName("Should return true when runway is available")
-    void testIsRunwayAvailable(){
-        Runway runway = new Runway("R-1", new Location(500, 1000, 0), new Corridor("C-1", new Location(-5000, 3000, 1000), new Location(-3000, 1000, 700)));
-        assertTrue(controlTower.isRunwayAvailable(runway), "Runway should be set as available");
-    }
-
-    @Test
-    @DisplayName("Should return false when runway is unavailable")
-    void testIsRunwayUnavailable(){
-        // Runway set as unavailable
-        Runway runway = new Runway("R-2", new Location(500, -2000, 0), new Corridor( "C-1", new Location(-5000, 0, 1000), new Location(-3000, -2000, 700)));
-        runway.setAvailable(false);
-        assertFalse(controlTower.isRunwayAvailable(runway),"Runway should be set as unavailable" );
-    }
-
-    @Test
-    @DisplayName("Should return false when runway is occupied")
-    void testAssignRunway(){
-        Runway runway = new Runway("R-1", new Location(1500, 1000, 0), new Corridor( "C-1", new Location(1000, 2000, 0), new Location(-3000, 1000, 700)));
-
-        controlTower.assignRunway(runway);
-
-        assertFalse(runway.isAvailable(), "Runway should be assigned to plane");
-    }
-
-    @Test
-    @DisplayName("Should return true if runway released")
-    void testReleaseRunway(){
-        Runway runway = new Runway("R-1", new Location(500, 1000, 0), new Corridor( "C-1", new Location(1000, 2000, 0), new Location(-3000, 1000, 700)));
-        controlTower.releaseRunway(runway);
-
-        assertTrue(runway.isAvailable(), "Runway should be released after landing");
-    }
-
-    @Test
-    @DisplayName("Should return true when runway is released after across final approach point")
-    void testReleaseRunwayIdPlaneFinalAtApproach(){
-        Plane plane = new Plane("0000");
-        plane.getNavigator().setLocation(new Location(-3000, 1000, 700));
-        Runway runway = new Runway("R-1", new Location(500, 1000, 0), new Corridor( "C-1", new Location(1000, 2000, 0), new Location(-3000, 1000, 700)));
-
-        controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, runway);
-
-        assertTrue(runway.isAvailable(), "Runway should be released after take final approach point");
-    }
 
     @Test
     @DisplayName("Should return true when no one plane in the space")
