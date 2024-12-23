@@ -41,10 +41,10 @@ public class Camera {
                 case A -> rotateCamera(0, 5); // Right
 
                 // View setting
-                case UP -> rotateX.setAngle(rotateX.getAngle() + 50); // Rotation by X
-                case DOWN -> rotateX.setAngle(rotateX.getAngle() - 50); // Rotation by X
-                case LEFT -> rotateY.setAngle(rotateY.getAngle() - 50); // Rotation by Y
-                case RIGHT -> rotateY.setAngle(rotateY.getAngle() + 50); // Rotation by Y
+                case UP -> rotateX.setAngle(rotateX.getAngle() + 25); // Rotation by X
+                case DOWN -> rotateX.setAngle(rotateX.getAngle() - 25); // Rotation by X
+                case LEFT -> rotateY.setAngle(rotateY.getAngle() - 25); // Rotation by Y
+                case RIGHT -> rotateY.setAngle(rotateY.getAngle() + 25); // Rotation by Y
                 case C -> getView(-45.0, 0.0, 0.0, -5000.0, -4200.0);
                 case V -> getView(-60.0, 0.0, 0.0, -5000.0, -2200);
             }
