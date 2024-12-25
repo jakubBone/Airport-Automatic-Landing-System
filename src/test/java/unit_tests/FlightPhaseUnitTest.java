@@ -2,6 +2,7 @@ package unit_tests;
 
 import airport.Airport;
 
+import airport.Runway;
 import controller.ControlTower;
 import controller.FlightPhaseManager;
 import database.AirportDatabase;
@@ -24,8 +25,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static plane.Plane.FlightPhase.*;
+import static utills.Constant.FINAL_APPROACH_CORRIDOR_1;
 
-public class FlightPhaseUnitTest {
+class FlightPhaseUnitTest {
     AirportDatabase mockDatabase;
     PlaneDAO mockPlaneDAO;
     CollisionDAO mockCollisionDAO;
@@ -85,5 +87,26 @@ public class FlightPhaseUnitTest {
         flightPhaseManager.processFlightPhase(plane, corridorEntry, null);
 
         assertEquals(LANDING, plane.getPhase(), "Plane should transition to LANDING phase at the corridor entry");
+    }
+
+    @Test
+    @DisplayName("Should test correct plane marking as landed after landing process")
+    void testMarkingAsLanded(){
+        Plane plane = new Plane("0000");
+        plane.getNavigator().setLocation(runway1.getLandingPoint());
+
+        assertTrue(controlTower.hasLandedOnRunway(plane, runway1), "Plane should be marked as landed");
+    }
+
+    @Test
+    @DisplayName("Should test runway releasing after cross final approach point")
+    void testRunwayReleaseAfterCrossFinalApproach() {
+        Plane plane = new Plane("0000");
+        plane.getNavigator().setLocation(FINAL_APPROACH_CORRIDOR_1);
+        runway1.setAvailable(false);
+
+        controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, runway1);
+
+        assertTrue(runway1.isAvailable(), "Runway should be set as available");
     }
 }

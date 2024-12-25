@@ -1,12 +1,9 @@
 package unit_tests;
 
 import controller.ControlTower;
-import airport.Corridor;
-import airport.Runway;
 import database.AirportDatabase;
 import database.CollisionDAO;
 import database.PlaneDAO;
-import location.Location;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -92,4 +89,6 @@ class ControlTowerUnitTest {
 
         assertFalse(controlTower.getPlanes().contains(plane), "Plane should be removed from airspace");
     }
+
+
 }

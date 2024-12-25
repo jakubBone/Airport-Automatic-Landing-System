@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-public class RunwayUnitTest {
+class RunwayUnitTest {
     AirportDatabase mockDatabase;
     PlaneDAO mockPlaneDAO;
     CollisionDAO mockCollisionDAO;

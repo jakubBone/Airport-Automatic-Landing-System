@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-public class CollisionUnitTest {
+class CollisionUnitTest {
     AirportDatabase mockDatabase;
     PlaneDAO mockPlaneDAO;
     CollisionDAO mockCollisionDao;
@@ -86,4 +86,5 @@ public class CollisionUnitTest {
         assertFalse(plane1.isDestroyed(), "Plane 1 should be destroyed after collision");
         assertFalse(plane2.isDestroyed(), "Plane 2 should be destroyed after collision");
     }
+
 }

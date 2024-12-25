@@ -7,7 +7,7 @@ import plane.Plane;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class LocationUnitTest {
+class LocationUnitTest {
     @Test
     @DisplayName("Should test plane location updating")
     void testUpdateLocation() {
