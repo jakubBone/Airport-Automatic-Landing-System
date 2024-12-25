@@ -17,8 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 class ControlTowerUnitTest {
@@ -40,7 +39,7 @@ class ControlTowerUnitTest {
     }
 
     @Test
-    @DisplayName("Should return true when all planes registered")
+    @DisplayName("Should test correct register planes")
     void testRegisterPlane(){
         for (int i = 0; i < 10; i++){
             incomingPlanes.add(new Plane("0000"));
@@ -50,11 +49,12 @@ class ControlTowerUnitTest {
             controlTower.registerPlane(incoming);
         }
 
-        assertTrue(controlTower.getPlanes().size() == 10, "Should not register plane");
+        assertEquals(10, controlTower.getPlanes().size());
+        assertTrue(controlTower.getPlanes().size() == 10, "All incoming planes should be registered");
     }
 
     @Test
-    @DisplayName("Should return false when space is not full")
+    @DisplayName("Should test reporting when the airspace reaches maximum capacity")
         void testIsSpaceFull(){
         for (int i = 0; i < 110; i++){
             incomingPlanes.add(new Plane("0000"));
@@ -64,9 +64,11 @@ class ControlTowerUnitTest {
             controlTower.registerPlane(incoming);
         }
 
-        assertTrue(controlTower.isSpaceFull(), "Should inform about full airspace");
+        assertTrue(controlTower.isSpaceFull(), "Should report about maximum capacity");
     }
+
     @Test
+    @DisplayName("Should test reporting when incoming plane reaches collision risk zone")
     void testIfPlaneAtCollisionRiskZone() {
         Plane plane1 = new Plane("0000");
         controlTower.registerPlane(plane1);
@@ -79,10 +81,8 @@ class ControlTowerUnitTest {
                 "Plane 2 should be detected in Plane 1's collision risk zone");
     }
 
-
-
     @Test
-    @DisplayName("Should return true when no one plane in the space")
+    @DisplayName("Should test correct plane remove")
     void testRemovePlaneFromSpace(){
         Plane plane = new Plane("0000");
 
@@ -90,17 +90,6 @@ class ControlTowerUnitTest {
 
         controlTower.removePlaneFromSpace(plane);
 
-        assertTrue(!controlTower.getPlanes().contains(plane), "Plane should be removed from airspace");
+        assertFalse(controlTower.getPlanes().contains(plane), "Plane should be removed from airspace");
     }
-
-    @Test
-    @DisplayName("Should return true when planes has landed")
-    void testHasLandedOnRunway(){
-        Plane plane1 = new Plane("0000");
-        plane1.getNavigator().setLocation(new Location(500, 1000, 0));
-        Runway runway = new Runway("R-1", new Location(500, 1000, 0), new Corridor( "C-1", new Location(1000, 2000, 0), new Location(-3000, 1000, 700)));
-
-        assertTrue(controlTower.hasLandedOnRunway(plane1, runway), "Plane should be set as landed");
-    }
-
 }

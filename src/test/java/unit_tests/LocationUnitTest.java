@@ -23,7 +23,7 @@ public class LocationUnitTest {
     }
 
     @Test
-    @DisplayName("Should test location equals method correctness")
+    @DisplayName("Should test appropriate location equals method override")
     void testEqualLocationIdentification(){
         Plane plane1 = new Plane("0000");
         plane1.getNavigator().setLocation(new Location(1000, 1000, 1000));

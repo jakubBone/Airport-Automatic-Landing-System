@@ -17,7 +17,7 @@ import static plane.Plane.FlightPhase.DESCENDING;
 public class PlaneHandler extends Thread {
 
     public enum AirportInstruction {
-        DESCENT, HOLD_PATTERN, STANDBY, LAND, FULL, COLLISION, RISK_ZONE
+        DESCENT, HOLD_PATTERN, LAND, FULL, COLLISION, RISK_ZONE
     }
 
     private final Socket clientSocket;

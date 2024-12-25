@@ -39,21 +39,20 @@ public class RunwayUnitTest {
     }
 
     @Test
-    @DisplayName("Should return true when runway is available")
+    @DisplayName("Should test correct runway setting as available")
     void testIsRunwayAvailable(){
         assertTrue(controlTower.isRunwayAvailable(runway), "Runway should be set as available");
     }
 
     @Test
-    @DisplayName("Should return false when runway is unavailable")
+    @DisplayName("Should test correct runway setting as unavailable")
     void testIsRunwayUnavailable(){
-        // Runway set as unavailable
         runway.setAvailable(false);
         assertFalse(controlTower.isRunwayAvailable(runway),"Runway should be set as unavailable" );
     }
 
     @Test
-    @DisplayName("Should return false when runway is occupied")
+    @DisplayName("Should test runway assigning blocking when the runway is occupied")
     void testAssignRunway(){
         controlTower.assignRunway(runway);
 
@@ -61,7 +60,7 @@ public class RunwayUnitTest {
     }
 
     @Test
-    @DisplayName("Should return true if runway released")
+    @DisplayName("Should test correct runway release after landing")
     void testReleaseRunway(){
         controlTower.releaseRunway(runway);
 
@@ -69,7 +68,7 @@ public class RunwayUnitTest {
     }
 
     @Test
-    @DisplayName("Should return true when runway is released after across final approach point")
+    @DisplayName("Should test runway release after across final approach point")
     void testReleaseRunwayIdPlaneFinalAtApproach(){
         Plane plane = new Plane("0000");
         plane.getNavigator().setLocation(new Location(-3000, 1000, 700));
