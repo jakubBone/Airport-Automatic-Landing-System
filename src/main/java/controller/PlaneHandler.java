@@ -94,7 +94,7 @@ public class PlaneHandler extends Thread {
         while (true) {
             double fuelLevel = messenger.receiveAndParse(in, Double.class);
             plane.getFuelManager().setFuelLevel(fuelLevel);
-            if (fuelLevel <= 0) {
+            if (plane.getFuelManager().isOutOfFuel()) {
                 handleOutOfFuel(plane);
                 return;
             }
