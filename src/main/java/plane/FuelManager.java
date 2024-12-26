@@ -19,7 +19,7 @@ public class FuelManager {
     }
 
     public boolean isOutOfFuel() {
-        return this.fuelLevel <= 0;
+        return fuelLevel <= 0;
     }
 
 }

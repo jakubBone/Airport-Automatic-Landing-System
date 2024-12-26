@@ -18,11 +18,14 @@ class FuelManagerUnitTest {
     @Test
     void testBurnFuel() {
         Plane plane = new Plane("0000");
-        double x = plane.getFuelManager().getFuelLevel();
+        double consumption = plane.getFuelManager().getConsumptionPerSecond();
+
+        double initialFuelLevel = plane.getFuelManager().getFuelLevel();
         plane.getFuelManager().burnFuel();
-        double y = plane.getFuelManager().getFuelLevel();
+        double currentFuelLevel = plane.getFuelManager().getFuelLevel();
 
-        assertEquals(y, x - plane.getFuelManager().getConsumptionPerSecond());
-
+        assertEquals(currentFuelLevel, initialFuelLevel - consumption);
     }
+
+
 }
