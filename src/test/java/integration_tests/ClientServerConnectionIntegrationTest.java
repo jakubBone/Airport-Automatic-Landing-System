@@ -4,6 +4,8 @@ package integration_tests;
 import client.PlaneClient;
 import controller.ControlTower;
 import database.AirportDatabase;
+import database.CollisionDAO;
+import database.PlaneDAO;
 import org.junit.jupiter.api.*;
 import plane.Plane;
 import server.AirportServer;
@@ -13,16 +15,25 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class ClientServerConnectionIntegrationTest {
-    AirportDatabase database;
+    AirportDatabase mockDatabase;
+    PlaneDAO planeDAO;
+    CollisionDAO collisionDAO;
     ControlTower controlTower;
     AirportServer server;
 
     @BeforeEach
-    void setUp()throws IOException, SQLException {
-        this.database = new AirportDatabase();
-        this.controlTower = new ControlTower(database);
+    void setUp() throws IOException, SQLException {
+        this.mockDatabase =  mock(AirportDatabase.class);
+        this.planeDAO = mock(PlaneDAO.class);
+        this.collisionDAO = mock(CollisionDAO.class);
+        when(mockDatabase.getPLANE_DAO()).thenReturn(planeDAO);
+        when(mockDatabase.getCOLLISION_DAO()).thenReturn(collisionDAO);
+
+        this.controlTower = new ControlTower(mockDatabase);
             new Thread(() -> {
                 try {
                     this.server = new AirportServer(controlTower);
