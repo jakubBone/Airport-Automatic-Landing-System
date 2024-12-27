@@ -13,7 +13,9 @@ import location.WaypointGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import plane.Plane;
 import utills.Messenger;
 
@@ -28,8 +30,11 @@ import static plane.Plane.FlightPhase.*;
 import static utills.Constant.FINAL_APPROACH_CORRIDOR_1;
 
 class FlightPhaseUnitTest {
+    @Mock
     AirportDatabase mockDatabase;
+    @Mock
     PlaneDAO mockPlaneDAO;
+    @Mock
     CollisionDAO mockCollisionDAO;
     ControlTower controlTower;
     FlightPhaseManager flightPhaseManager;
@@ -39,9 +44,7 @@ class FlightPhaseUnitTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        this.mockDatabase = Mockito.mock(AirportDatabase.class);
-        this.mockPlaneDAO = Mockito.mock(PlaneDAO.class);
-        this.mockCollisionDAO = Mockito.mock(CollisionDAO.class);
+        MockitoAnnotations.openMocks(this);
         when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneDAO);
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDAO);
         this.controlTower = new ControlTower(mockDatabase);

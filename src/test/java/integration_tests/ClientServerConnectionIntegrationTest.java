@@ -7,6 +7,8 @@ import database.AirportDatabase;
 import database.CollisionDAO;
 import database.PlaneDAO;
 import org.junit.jupiter.api.*;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import plane.Plane;
 import server.AirportServer;
 
@@ -15,21 +17,21 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ClientServerConnectionIntegrationTest {
+    @Mock
     AirportDatabase mockDatabase;
+    @Mock
     PlaneDAO planeDAO;
+    @Mock
     CollisionDAO collisionDAO;
     ControlTower controlTower;
     AirportServer server;
 
     @BeforeEach
     void setUp() throws IOException, SQLException {
-        this.mockDatabase =  mock(AirportDatabase.class);
-        this.planeDAO = mock(PlaneDAO.class);
-        this.collisionDAO = mock(CollisionDAO.class);
+        MockitoAnnotations.openMocks(this);
         when(mockDatabase.getPLANE_DAO()).thenReturn(planeDAO);
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(collisionDAO);
 
@@ -137,6 +139,6 @@ class ClientServerConnectionIntegrationTest {
             } catch (InterruptedException ex){
                 ex.printStackTrace();
             }
-        assertEquals(100, server.getControlTower().getPlanes().size(), "Plane list should contain only 100 planes - new plane did not add");
+        assertEquals(100, server.getControlTower().getPlanes().size(), "Plane list should contain only 100 planes; new plane not added");
     }
 }

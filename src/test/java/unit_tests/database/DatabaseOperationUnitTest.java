@@ -8,6 +8,8 @@ import database.PlaneDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import plane.Plane;
 import utills.Constant;
 
@@ -17,16 +19,17 @@ import static airport.Airport.runway1;
 import static org.mockito.Mockito.*;
 
 public class DatabaseOperationUnitTest {
+    @Mock
     AirportDatabase mockDatabase;
+    @Mock
     PlaneDAO mockPlaneDAO;
+    @Mock
     CollisionDAO mockCollisionDAO;
     ControlTower controlTower;
 
     @BeforeEach
     void setUp() throws SQLException {
-        this.mockDatabase = mock(AirportDatabase.class);
-        this.mockPlaneDAO = mock(PlaneDAO.class);
-        this.mockCollisionDAO = mock(CollisionDAO.class);
+        MockitoAnnotations.openMocks(this);
         this.controlTower = new ControlTower(mockDatabase);
         when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneDAO);
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDAO);
