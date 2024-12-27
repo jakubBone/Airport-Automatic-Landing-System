@@ -1,4 +1,4 @@
-package unit_tests;
+package unit_tests.flight;
 
 import location.Location;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package unit_tests;
+package unit_tests.airspace;
 
 import airport.Corridor;
 import airport.Runway;

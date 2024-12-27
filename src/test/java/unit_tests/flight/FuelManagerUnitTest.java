@@ -1,4 +1,4 @@
-package unit_tests;
+package unit_tests.flight;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

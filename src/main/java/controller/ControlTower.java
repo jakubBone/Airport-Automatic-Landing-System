@@ -108,7 +108,7 @@ public class ControlTower {
     }
     public void checkCollision() {
         lock.lock();
-        String [] collidedID = new String[2];
+        String [] collidedIDs = new String[2];
         try{
             for (int i = 0; i < planes.size(); i++) {
                 Plane plane1 = planes.get(i);
@@ -118,9 +118,9 @@ public class ControlTower {
                     Location loc1 = plane1.getNavigator().getLocation();
                     Location loc2 = plane2.getNavigator().getLocation();
                     if (arePlanesToClose(loc1, loc2)) {
-                            collidedID[0] = plane1.getFlightNumber();
-                            collidedID[1] = plane2.getFlightNumber();
-                            database.getCOLLISION_DAO().registerCollisionToDB(collidedID);
+                            collidedIDs[0] = plane1.getFlightNumber();
+                            collidedIDs[1] = plane2.getFlightNumber();
+                            database.getCOLLISION_DAO().registerCollisionToDB(collidedIDs);
                             planes.get(i).setDestroyed(true);
                             planes.get(j).setDestroyed(true);
                         log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getFlightNumber(), plane2.getFlightNumber());

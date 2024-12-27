@@ -1,4 +1,4 @@
-package unit_tests;
+package unit_tests.airspace;
 
 import controller.ControlTower;
 import database.AirportDatabase;

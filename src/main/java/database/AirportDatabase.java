@@ -23,19 +23,18 @@ public class AirportDatabase {
     private Connection connection;
 
     public AirportDatabase() throws SQLException {
-        this.connection = getConnection();
+        this.connection = getAirportConnection();
         this.CONTEXT = DSL.using(connection);
         this.PLANE_DAO = new PlaneDAO(CONTEXT);
         this.COLLISION_DAO = new CollisionDAO(CONTEXT);
         this.SCHEMA = new DatabaseSchema(CONTEXT);
     }
 
-    public Connection getConnection() throws SQLException {
+    public Connection getAirportConnection() throws SQLException {
         if (connection != null && !connection.isClosed()) {
             return connection;
         }
         try {
-            log.info("Attempting to connect to the database '{}' on port {} with user '{}'", DATABASE, 5432, USER);
             this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
             log.info("Connection established successfully with database '{}' on port {}", DATABASE, 5432);
         } catch (SQLException ex) {
