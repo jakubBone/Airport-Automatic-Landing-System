@@ -128,7 +128,7 @@ class ClientServerConnectionIntegrationTest {
         }
 
         for(int i = 0; i < 100; i++){
-            Plane plane = new Plane("0000");
+            Plane plane = new Plane("TEST_PLANE");
             server.getControlTower().getPlanes().add(plane);
         }
 

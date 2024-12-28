@@ -39,7 +39,7 @@ public class DatabaseOperationUnitTest {
     @Test
     @DisplayName("Should test new plane database registration")
     void testPlaneRegisterToDatabase() throws SQLException {
-        Plane plane = new Plane("0000");
+        Plane plane = new Plane("TEST_PLANE");
         controlTower.registerPlane(plane);
 
         verify(mockPlaneDAO, times(1)).registerPlaneInDB(plane);
@@ -49,7 +49,7 @@ public class DatabaseOperationUnitTest {
     @DisplayName("Should test database landing registration")
     void testLandingRegisterToDatabase() throws SQLException {
         Airport airport = new Airport();
-        Plane plane = new Plane("0000");
+        Plane plane = new Plane("TEST_PLANE");
         plane.getNavigator().setLocation(runway1.getLandingPoint());
         controlTower.hasLandedOnRunway(plane, runway1);
 
@@ -59,8 +59,8 @@ public class DatabaseOperationUnitTest {
     @Test
     @DisplayName("Should test database landing registration")
     void testCollisionRegisterToDatabase() throws SQLException {
-        Plane plane1 = new Plane("0000");
-        Plane plane2 = new Plane("1111");
+        Plane plane1 = new Plane("TEST_PLANE_1");
+        Plane plane2 = new Plane("TEST_PLANE_2");
         plane1.getNavigator().setLocation(Constant.ENTRY_POINT_CORRIDOR_1);
         plane2.getNavigator().setLocation(Constant.ENTRY_POINT_CORRIDOR_1);
         controlTower.getPlanes().add(plane1);

@@ -73,11 +73,11 @@ class RunwayUnitTest {
     @Test
     @DisplayName("Should test runway release after across final approach point")
     void testReleaseRunwayIdPlaneFinalAtApproach(){
-        Plane plane = new Plane("0000");
+        Plane plane = new Plane("TEST_PLANE");
         plane.getNavigator().setLocation(new Location(-3000, 1000, 700));
 
         controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, runway);
 
-        assertTrue(runway.isAvailable(), "Runway should be released after take final approach point");
+        assertTrue(runway.isAvailable(), "Runway should be released after take final approach point by TEST_PLANE");
     }
 }

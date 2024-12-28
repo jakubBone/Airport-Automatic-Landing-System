@@ -42,7 +42,7 @@ class ControlTowerUnitTest {
     @DisplayName("Should test correct register planes")
     void testRegisterPlane(){
         for (int i = 0; i < 10; i++){
-            incomingPlanes.add(new Plane("0000"));
+            incomingPlanes.add(new Plane("TEST_PLANE"));
         }
 
         for(Plane incoming: incomingPlanes){
@@ -57,7 +57,7 @@ class ControlTowerUnitTest {
     @DisplayName("Should test reporting when the airspace reaches maximum capacity")
         void testIsSpaceFull(){
         for (int i = 0; i < 110; i++){
-            incomingPlanes.add(new Plane("0000"));
+            incomingPlanes.add(new Plane("TEST_PLANE"));
         }
 
         for(Plane incoming: incomingPlanes){
@@ -70,28 +70,26 @@ class ControlTowerUnitTest {
     @Test
     @DisplayName("Should test reporting when incoming plane reaches collision risk zone")
     void testIfPlaneAtCollisionRiskZone() {
-        Plane plane1 = new Plane("0000");
+        Plane plane1 = new Plane("TEST_PLANE_1");
         controlTower.registerPlane(plane1);
         int index = plane1.getNavigator().getCurrentIndex();
 
-        Plane plane2 = new Plane("1111");
+        Plane plane2 = new Plane("TEST_PLANE_2");
         plane2.getNavigator().setCurrentIndex(index + 1);
 
         assertTrue(controlTower.isAtCollisionRiskZone(plane2),
-                "Plane 2 should be detected in Plane 1's collision risk zone");
+                "TEST_PLANE_2 should be detected in TEST_PLANE_2 collision risk zone");
     }
 
     @Test
     @DisplayName("Should test correct plane remove")
     void testRemovePlaneFromSpace(){
-        Plane plane = new Plane("0000");
+        Plane plane = new Plane("TEST_PLANE");
 
         controlTower.registerPlane(plane);
 
         controlTower.removePlaneFromSpace(plane);
 
-        assertFalse(controlTower.getPlanes().contains(plane), "Plane should be removed from airspace");
+        assertFalse(controlTower.getPlanes().contains(plane), "TEST_PLANE should be removed from airspace");
     }
-
-
 }
