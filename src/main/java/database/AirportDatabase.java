@@ -23,14 +23,14 @@ public class AirportDatabase {
     private Connection connection;
 
     public AirportDatabase() throws SQLException {
-        this.connection = getAirportConnection();
+        this.connection = getDatabaseConnection();
         this.CONTEXT = DSL.using(connection);
         this.PLANE_DAO = new PlaneDAO(CONTEXT);
         this.COLLISION_DAO = new CollisionDAO(CONTEXT);
         this.SCHEMA = new DatabaseSchema(CONTEXT);
     }
 
-    public Connection getAirportConnection() throws SQLException {
+    public Connection getDatabaseConnection() throws SQLException {
         if (connection != null && !connection.isClosed()) {
             return connection;
         }

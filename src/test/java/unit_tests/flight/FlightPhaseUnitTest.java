@@ -2,7 +2,6 @@ package unit_tests.flight;
 
 import airport.Airport;
 
-import airport.Runway;
 import controller.ControlTower;
 import controller.FlightPhaseManager;
 import database.AirportDatabase;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import plane.Plane;
 import utills.Messenger;
@@ -29,6 +27,10 @@ import static org.mockito.Mockito.when;
 import static plane.Plane.FlightPhase.*;
 import static utills.Constant.FINAL_APPROACH_CORRIDOR_1;
 
+/**
+ * This class tests how a plane's flight phase changes
+ * based on its location and interactions with the ControlTower
+ */
 class FlightPhaseUnitTest {
     @Mock
     AirportDatabase mockDatabase;
@@ -40,7 +42,6 @@ class FlightPhaseUnitTest {
     FlightPhaseManager flightPhaseManager;
     Airport airport;
     Messenger messenger;
-
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -55,11 +56,12 @@ class FlightPhaseUnitTest {
     }
 
     @Test
-    @DisplayName("Should test flight phase set as descending after plane spawn")
+    @DisplayName("Should test flight phase set as DESCENDING after plane spawn")
     void testPhaseSettingToDescending() throws IOException, ClassNotFoundException {
+        // Plane spawns at a certain altitude
         Plane plane = new Plane("TEST_PLANE");
+        Location descentPoint = new Location(0, 0, 3000);
 
-        Location descentPoint = new Location(0, 0, 3000); // spawn altitude
         flightPhaseManager.processFlightPhase(plane, descentPoint, null);
 
         assertEquals(DESCENDING, plane.getPhase(), "Flight phase should be set as DESCENDING");
@@ -69,23 +71,27 @@ class FlightPhaseUnitTest {
     @Test
     @DisplayName("Should test flight phase switch to holding")
     void testPhaseSwitchToHolding() throws IOException, ClassNotFoundException {
+        // Plane has reached the end of its descent waypoints
         Plane plane = new Plane("TEST_PLANE");
         plane.getNavigator().setCurrentIndex(WaypointGenerator.generateDescentWaypoints().size());
         plane.descend();
 
-        Location holdingPoint = new Location(0, 0, 1000); // Holding altitude
+        // Holding altitude = 1000
+        Location holdingPoint = new Location(0, 0, 1000);
         flightPhaseManager.processFlightPhase(plane, holdingPoint, null);
 
         assertEquals(HOLDING, plane.getPhase(), "Flight phase should be switched to HOLDING");
     }
 
     @Test
-    @DisplayName("Should test flight phase switch to landing when plane is at corridor entry point")
+    @DisplayName("Should test flight phase switch to LANDING when plane is at corridor entry point")
     void testPhaseSwitchToLandingAtCorridorEntryPoint() throws IOException, ClassNotFoundException {
+        // Plane is currently in the holding pattern
         Plane plane = new Plane("TEST_PLANE");
         plane.getNavigator().setWaypoints(WaypointGenerator.getHoldingPatternWaypoints());
         plane.setPhase(HOLDING);
 
+        // Corridor entry triggers the switch to LANDING
         Location corridorEntry = runway1.getCorridor().getEntryPoint();
         flightPhaseManager.processFlightPhase(plane, corridorEntry, null);
 
@@ -95,6 +101,7 @@ class FlightPhaseUnitTest {
     @Test
     @DisplayName("Should test correct plane marking as landed after landing process")
     void testMarkingAsLanded(){
+        // Plane is at the runway landing point
         Plane plane = new Plane("TEST_PLANE");
         plane.getNavigator().setLocation(runway1.getLandingPoint());
 
@@ -102,12 +109,16 @@ class FlightPhaseUnitTest {
     }
 
     @Test
-    @DisplayName("Should test runway releasing after cross final approach point")
+    @DisplayName("Should test runway release after crossing final approach point")
     void testRunwayReleaseAfterCrossFinalApproach() {
+        // Plane is exactly at final approach coordinates
         Plane plane = new Plane("TEST_PLANE");
         plane.getNavigator().setLocation(FINAL_APPROACH_CORRIDOR_1);
+
+        // Initially mark runway as unavailable
         runway1.setAvailable(false);
 
+        // The plane crossing final approach triggers runway release
         controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, runway1);
 
         assertTrue(runway1.isAvailable(), "Runway should be set as available");

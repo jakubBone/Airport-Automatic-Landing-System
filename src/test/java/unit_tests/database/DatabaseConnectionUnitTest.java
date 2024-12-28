@@ -16,19 +16,18 @@ public class DatabaseConnectionUnitTest {
     @BeforeEach
     void setUp() throws SQLException {
         this.database = new AirportDatabase();
-
     }
 
     @Test
-    @DisplayName("Should test database connection getting")
+    @DisplayName("Database connection should not return be null")
     void testGetConnection() throws SQLException {
-        assertNotNull(database.getAirportConnection());
+        assertNotNull(database.getDatabaseConnection(), "Database connection should not return null");
     }
 
     @Test
-    @DisplayName("Should test database connection closing")
+    @DisplayName("Database connection should close properly")
     void testCloseConnection() throws SQLException {
         database.closeConnection();
-        assertTrue(database.getConnection().isClosed());
+        assertTrue(database.getConnection().isClosed(), "Database connection should be closed");
     }
 }

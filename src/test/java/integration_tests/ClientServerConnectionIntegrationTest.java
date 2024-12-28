@@ -54,7 +54,7 @@ class ClientServerConnectionIntegrationTest {
     /**
      * Helper method to wait for the server to start without repeating try-catch blocks
      */
-    private void waitForServerToStart() {
+    private void waitForStart() {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
@@ -66,13 +66,13 @@ class ClientServerConnectionIntegrationTest {
     @DisplayName("Should test single client connection")
     void testSingleClientConnection() {
         // Wait for the server to start
-        waitForServerToStart();
+        waitForStart();
 
         PlaneClient planeClient = new PlaneClient("localhost", 5000);
         new Thread(planeClient).start();
 
         // Give some time for the client to connect
-        waitForServerToStart();
+        waitForStart();
 
         assertTrue(planeClient.isConnected(), "Client should successfully connect to the server");
     }
@@ -80,19 +80,19 @@ class ClientServerConnectionIntegrationTest {
     @Test
     @DisplayName("Should test multiple clients connection")
     void testConnectionWithMultipleClients() {
-        waitForServerToStart();
+        waitForStart();
 
         PlaneClient planeClient1 = new PlaneClient("localhost", 5000);
         new Thread(planeClient1).start();
 
         // Wait for the first client to connect
-        waitForServerToStart();
+        waitForStart();
 
         PlaneClient planeClient2 = new PlaneClient("localhost", 5000);
         new Thread(planeClient2).start();
 
         // Wait for the second client to connect
-        waitForServerToStart();
+        waitForStart();
 
         assertTrue(planeClient1.isConnected(), "Client1 should successfully connect to the server");
         assertTrue(planeClient2.isConnected(), "Client2 should successfully connect to the server");
@@ -120,7 +120,7 @@ class ClientServerConnectionIntegrationTest {
     @Test
     @DisplayName("Should test client registration with full capacity")
     void testClientRegistrationWithFullCapacity() {
-        waitForServerToStart();
+        waitForStart();
 
         // Fill the list with 100 planes
         for(int i = 0; i < 100; i++){
@@ -132,7 +132,7 @@ class ClientServerConnectionIntegrationTest {
         new Thread(planeClient).start();
 
         // Wait for the client to attempt registration
-        waitForServerToStart();
+        waitForStart();
 
         assertEquals(100, server.getControlTower().getPlanes().size(),
                 "Plane list should contain only 100 planes; the new plane should not be added");

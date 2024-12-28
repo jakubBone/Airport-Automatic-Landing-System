@@ -11,12 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import plane.Plane;
-import utills.Constant;
 
 import java.sql.SQLException;
 
 import static airport.Airport.runway1;
 import static org.mockito.Mockito.*;
+import static utills.Constant.ENTRY_POINT_CORRIDOR_1;
 
 public class DatabaseOperationUnitTest {
     @Mock
@@ -35,42 +35,48 @@ public class DatabaseOperationUnitTest {
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDAO);
     }
 
-
     @Test
-    @DisplayName("Should test new plane database registration")
+    @DisplayName("Plane registration should be saved to the database")
     void testPlaneRegisterToDatabase() throws SQLException {
         Plane plane = new Plane("TEST_PLANE");
+
+        // Registration should trigger a DB operation
         controlTower.registerPlane(plane);
 
         verify(mockPlaneDAO, times(1)).registerPlaneInDB(plane);
     }
 
     @Test
-    @DisplayName("Should test database landing registration")
+    @DisplayName("Landing should be saved to the database")
     void testLandingRegisterToDatabase() throws SQLException {
         Airport airport = new Airport();
         Plane plane = new Plane("TEST_PLANE");
+
+        // Place the plane on the runway's landing point
         plane.getNavigator().setLocation(runway1.getLandingPoint());
+        // Inform control tower that plane has landed
         controlTower.hasLandedOnRunway(plane, runway1);
 
         verify(mockPlaneDAO, times(1)).registerLandingInDB(plane);
     }
 
     @Test
-    @DisplayName("Should test database landing registration")
+    @DisplayName("Collision should be saved to the database")
     void testCollisionRegisterToDatabase() throws SQLException {
         Plane plane1 = new Plane("TEST_PLANE_1");
         Plane plane2 = new Plane("TEST_PLANE_2");
-        plane1.getNavigator().setLocation(Constant.ENTRY_POINT_CORRIDOR_1);
-        plane2.getNavigator().setLocation(Constant.ENTRY_POINT_CORRIDOR_1);
+
+        // Both planes share the same location => collision scenario
+        plane1.getNavigator().setLocation(ENTRY_POINT_CORRIDOR_1);
+        plane2.getNavigator().setLocation(ENTRY_POINT_CORRIDOR_1);
+
         controlTower.getPlanes().add(plane1);
         controlTower.getPlanes().add(plane2);
 
-        String [] collidedIDs = new String[2];
-        collidedIDs[0] = plane1.getFlightNumber();
-        collidedIDs[1] = plane2.getFlightNumber();
-
         controlTower.checkCollision();
+
+        // Build the IDs array that the control tower will pass to the DAO
+        String[] collidedIDs = {plane1.getFlightNumber(), plane2.getFlightNumber()};
 
         verify(mockCollisionDAO, times(1)).registerCollisionToDB(collidedIDs);
     }
