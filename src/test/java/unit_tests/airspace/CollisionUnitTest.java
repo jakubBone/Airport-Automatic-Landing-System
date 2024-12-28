@@ -36,19 +36,26 @@ class CollisionUnitTest {
         this.controlTower = new ControlTower(mockDatabase);
     }
 
-    @Test
-    @DisplayName("Should test collision registration if distance between planes less than 10 meters")
-    void tesPlanesCollisionAtTheSameLocalisation(){
-        Plane plane1 = new Plane("TEST_PLANE_1");
-        plane1.getNavigator().setLocation(new Location(5000, 5000, 4010));
-        Plane plane2 = new Plane("TEST_PLANE_2");
-        plane2.getNavigator().setLocation(new Location(5000, 5000, 4000));
+    /**
+     * Helper method to create a plane, set its location, and register
+     */
+    private Plane createAndRegisterPlane(String name, int x, int y, int altitude) {
+        Plane plane = new Plane(name);
+        plane.getNavigator().setLocation(new Location(x, y, altitude));
+        controlTower.registerPlane(plane);
+        return plane;
+    }
 
-        controlTower.registerPlane(plane1);
-        controlTower.registerPlane(plane2);
+    @Test
+    @DisplayName("Should test collision if distance between planes is less than 10 meters")
+    void tesPlanesCollisionAtTheSameLocalisation(){
+        // Create two planes whose distance is under 10 meters
+        Plane plane1 = createAndRegisterPlane("TEST_PLANE_1", 5000, 5000, 4010);
+        Plane plane2 = createAndRegisterPlane("TEST_PLANE_2", 5000, 5000, 4000);
 
         controlTower.checkCollision();
 
+        // Both planes should be destroyed
         assertTrue(plane1.isDestroyed(), "TEST_PLANE_1 should be destroyed after collision");
         assertTrue(plane2.isDestroyed(), "TEST_PLANE_2 should be destroyed after collision");
     }
@@ -56,37 +63,28 @@ class CollisionUnitTest {
     @Test
     @DisplayName("Should test collision registration if distance between planes equal 10 meters")
     void tesPlanesCollisionAtRiskZone(){
-        Plane plane1 = new Plane("TEST_PLANE_1");
-        plane1.getNavigator().setLocation(new Location(5000, 5000, 4010));
-        Plane plane2 = new Plane("TEST_PLANE_2");
-        plane2.getNavigator().setLocation(new Location(5000, 5000, 4000));
-
-        controlTower.registerPlane(plane1);
-        controlTower.registerPlane(plane2);
+        // Create two planes whose distance is exactly 10 meters
+        Plane plane1 = createAndRegisterPlane("TEST_PLANE_1", 5000, 5000, 4010);
+        Plane plane2 = createAndRegisterPlane("TEST_PLANE_2", 5000, 5000, 4000);
 
         controlTower.checkCollision();
 
+        // Both planes should be destroyed
         assertTrue(plane1.isDestroyed(), "TEST_PLANE_1 should be destroyed after collision");
         assertTrue(plane2.isDestroyed(), "TEST_PLANE_2 should be destroyed after collision");
     }
 
-
-
     @Test
     @DisplayName("Should test registration collision avoiding if planes beyond risk zone")
-    void tesPlanesCollisionBeyondRiskZone(){
-        Plane plane1 = new Plane("TEST_PLANE_1");
-        plane1.getNavigator().setLocation(new Location(5000, 5000, 4020));
-        Plane plane2 = new Plane("TEST_PLANE_2");
-        plane2.getNavigator().setLocation(new Location(5000, 5000, 4000));
-
-        controlTower.registerPlane(plane1);
-        controlTower.registerPlane(plane2);
+    void testPlanesCollisionBeyondRiskZone(){
+        // Create two planes whose distance is more than 10 meters
+        Plane plane1 = createAndRegisterPlane("TEST_PLANE_1", 5000, 5000, 4020);
+        Plane plane2 = createAndRegisterPlane("TEST_PLANE_2", 5000, 5000, 4000);
 
         controlTower.checkCollision();
 
+        // Both planes should remain intact
         assertFalse(plane1.isDestroyed(), "TEST_PLANE_1 should not be destroyed after collision");
         assertFalse(plane2.isDestroyed(), "TEST_PLANE_2 should not be destroyed after collision");
     }
-
 }

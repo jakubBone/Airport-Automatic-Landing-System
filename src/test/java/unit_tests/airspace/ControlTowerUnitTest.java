@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import plane.Plane;
 
@@ -33,63 +32,75 @@ class ControlTowerUnitTest {
         MockitoAnnotations.openMocks(this);
         when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneDAO);
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDAO);
-
         this.controlTower = new ControlTower(mockDatabase);
         this.incomingPlanes = new ArrayList<>();
     }
 
     @Test
-    @DisplayName("Should test correct register planes")
+    @DisplayName("Should register all incoming planes correctly")
     void testRegisterPlane(){
+        // Prepare a list of 10 planes
         for (int i = 0; i < 10; i++){
             incomingPlanes.add(new Plane("TEST_PLANE"));
         }
 
+        // Register each plane
         for(Plane incoming: incomingPlanes){
             controlTower.registerPlane(incoming);
         }
 
-        assertEquals(10, controlTower.getPlanes().size());
-        assertTrue(controlTower.getPlanes().size() == 10, "All incoming planes should be registered");
+        // Assert that all were registered
+        assertEquals(10, controlTower.getPlanes().size(),
+                "Plane list should contain exactly 10 planes");
+        assertTrue(controlTower.getPlanes().size() == 10,
+                "All incoming planes should be registered");
     }
 
     @Test
-    @DisplayName("Should test reporting when the airspace reaches maximum capacity")
+    @DisplayName("Should detect when airspace reaches maximum capacity")
         void testIsSpaceFull(){
-        for (int i = 0; i < 110; i++){
+        // Prepare a list of 110 planes
+        for (int i = 0; i < 110; i++) {
             incomingPlanes.add(new Plane("TEST_PLANE"));
         }
 
-        for(Plane incoming: incomingPlanes){
-            controlTower.registerPlane(incoming);
+        // Register each plane
+        for (Plane plane : incomingPlanes) {
+            controlTower.registerPlane(plane);
         }
 
-        assertTrue(controlTower.isSpaceFull(), "Should report about maximum capacity");
+        assertTrue(controlTower.isSpaceFull(),
+                "Control tower should report that maximum capacity is reached");
     }
 
     @Test
-    @DisplayName("Should test reporting when incoming plane reaches collision risk zone")
+    @DisplayName("Should detect when an incoming plane is within the collision risk zone")
     void testIfPlaneAtCollisionRiskZone() {
+        // Register the first plane
         Plane plane1 = new Plane("TEST_PLANE_1");
         controlTower.registerPlane(plane1);
-        int index = plane1.getNavigator().getCurrentIndex();
+
+        // Retrieve its current index and shift the second plane's index by +1
+        int referenceIndex = plane1.getNavigator().getCurrentIndex();
 
         Plane plane2 = new Plane("TEST_PLANE_2");
-        plane2.getNavigator().setCurrentIndex(index + 1);
+        plane2.getNavigator().setCurrentIndex(referenceIndex + 1);
 
         assertTrue(controlTower.isAtCollisionRiskZone(plane2),
-                "TEST_PLANE_2 should be detected in TEST_PLANE_2 collision risk zone");
+                "Plane2 should be recognized as within collision risk zone relative to Plane1");
     }
 
     @Test
-    @DisplayName("Should test correct plane remove")
+    @DisplayName("Should remove plane from airspace correctly")
     void testRemovePlaneFromSpace(){
+        // Register plane
         Plane plane = new Plane("TEST_PLANE");
-
         controlTower.registerPlane(plane);
 
+        // Remove plane
         controlTower.removePlaneFromSpace(plane);
 
-        assertFalse(controlTower.getPlanes().contains(plane), "TEST_PLANE should be removed from airspace");
+        assertFalse(controlTower.getPlanes().contains(plane),
+                "TEST_PLANE should be removed from airspace");
     }
 }
