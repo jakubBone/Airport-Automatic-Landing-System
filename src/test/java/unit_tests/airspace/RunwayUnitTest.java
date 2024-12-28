@@ -1,25 +1,26 @@
 package unit_tests.airspace;
 
-import airport.Corridor;
-import airport.Runway;
+import airport.Airport;
+
 import controller.ControlTower;
 import database.AirportDatabase;
 import database.CollisionDAO;
 import database.PlaneDAO;
-import location.Location;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import plane.Plane;
 
 import java.sql.SQLException;
 
+import static airport.Airport.runway1;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static utills.Constant.FINAL_APPROACH_CORRIDOR_1;
 
 class RunwayUnitTest {
     @Mock
@@ -29,55 +30,61 @@ class RunwayUnitTest {
     @Mock
     CollisionDAO mockCollisionDAO;
     ControlTower controlTower;
-    Runway runway;
+    Airport airport;
 
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
         when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneDAO);
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDAO);
-
         this.controlTower = new ControlTower(mockDatabase);
-        this.runway = new Runway("R-1", new Location(500, 1000, 0), new Corridor("C-1", new Location(-5000, 3000, 1000), new Location(-3000, 1000, 700)));
+        this.airport = new Airport();
     }
 
     @Test
-    @DisplayName("Should test correct runway setting as available")
-    void testIsRunwayAvailable(){
-        assertTrue(controlTower.isRunwayAvailable(runway), "Runway should be set as available");
+    @DisplayName("Runway should initially be available")
+    void testIsRunwayAvailableInitially(){
+        // By default, the runway is assumed available
+        assertTrue(controlTower.isRunwayAvailable(runway1),
+                "Runway should be set as available at the beginning");
     }
 
     @Test
-    @DisplayName("Should test correct runway setting as unavailable")
-    void testIsRunwayUnavailable(){
-        runway.setAvailable(false);
-        assertFalse(controlTower.isRunwayAvailable(runway),"Runway should be set as unavailable" );
+    @DisplayName("Runway can be set to unavailable")
+    void testSetRunwayAsUnavailable(){
+        runway1.setAvailable(false);
+        assertFalse(controlTower.isRunwayAvailable(runway1),
+                "Runway should be set as unavailable" );
     }
 
     @Test
-    @DisplayName("Should test runway assigning blocking when the runway is occupied")
-    void testAssignRunway(){
-        controlTower.assignRunway(runway);
+    @DisplayName("Assigning a runway makes it unavailable")
+    void testAssignRunwayMakesItOccupied(){
+        // Once assigned, the runway is not available anymore
+        controlTower.assignRunway(runway1);
 
-        assertFalse(runway.isAvailable(), "Runway should be assigned to plane");
+        assertFalse(runway1.isAvailable(),
+                "Runway should be unavailable (occupied) after assignment");
     }
 
     @Test
-    @DisplayName("Should test correct runway release after landing")
+    @DisplayName("Releasing a runway makes it available again")
     void testReleaseRunway(){
-        controlTower.releaseRunway(runway);
+        // Once released, the runway is available
+        controlTower.releaseRunway(runway1);
 
-        assertTrue(runway.isAvailable(), "Runway should be released after landing");
+        assertTrue(runway1.isAvailable(), "Runway should be available after being released");
     }
 
     @Test
-    @DisplayName("Should test runway release after across final approach point")
-    void testReleaseRunwayIdPlaneFinalAtApproach(){
+    @DisplayName("Runway is released when a plane crosses final approach point")
+    void testReleaseRunwayIfPlaneIsAtFinalAtApproach(){
         Plane plane = new Plane("TEST_PLANE");
-        plane.getNavigator().setLocation(new Location(-3000, 1000, 700));
+        plane.getNavigator().setLocation(FINAL_APPROACH_CORRIDOR_1);
 
-        controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, runway);
+        controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, runway1);
 
-        assertTrue(runway.isAvailable(), "Runway should be released after take final approach point by TEST_PLANE");
+        assertTrue(runway1.isAvailable(),
+                "Runway should be released after the plane reaches the final approach point");
     }
 }
