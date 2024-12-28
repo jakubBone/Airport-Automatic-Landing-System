@@ -31,6 +31,8 @@ class ClientServerConnectionIntegrationTest {
     @BeforeEach
     void setUp() throws IOException, SQLException {
         MockitoAnnotations.openMocks(this);
+
+        // Mocking database behavior
         when(mockDatabase.getPLANE_DAO()).thenReturn(planeDAO);
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(collisionDAO);
 

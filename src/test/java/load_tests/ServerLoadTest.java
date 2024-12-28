@@ -11,6 +11,9 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This class tests the behavior of the server under high load conditions
+ */
 public class ServerLoadTest {
     static final Logger logger = Logger.getLogger(ClientLoadTest.class.getName());
     public static void main(String[] args) throws IOException, SQLException {
@@ -25,6 +28,8 @@ public class ServerLoadTest {
         }
 
         airportServer = new AirportServer(controller);
+
+        // Automatically stop after 70 minutes
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -33,7 +38,7 @@ public class ServerLoadTest {
                 System.exit(0);
 
             }
-        }, 4200000);  // 10s
+        }, 4200000);
 
         try {
             airportServer.startServer(5000);
