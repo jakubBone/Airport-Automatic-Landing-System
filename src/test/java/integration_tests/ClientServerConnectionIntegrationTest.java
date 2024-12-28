@@ -1,6 +1,5 @@
 package integration_tests;
 
-
 import client.PlaneClient;
 import controller.ControlTower;
 import database.AirportDatabase;
@@ -52,56 +51,55 @@ class ClientServerConnectionIntegrationTest {
         }
     }
 
-    @Test
-    @DisplayName("Should test connection with single client")
-    void testClientServerConnectionSingleClient() {
-        try{
+    /**
+     * Helper method to wait for the server to start without repeating try-catch blocks
+     */
+    private void waitForServerToStart() {
+        try {
             Thread.sleep(2000);
-        } catch (InterruptedException ex){
-            ex.printStackTrace();
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
         }
+    }
+
+    @Test
+    @DisplayName("Should test single client connection")
+    void testSingleClientConnection() {
+        // Wait for the server to start
+        waitForServerToStart();
 
         PlaneClient planeClient = new PlaneClient("localhost", 5000);
         new Thread(planeClient).start();
-            try{
-                Thread.sleep(2000);
-            } catch (InterruptedException ex){
-                ex.printStackTrace();
-            }
+
+        // Give some time for the client to connect
+        waitForServerToStart();
 
         assertTrue(planeClient.isConnected(), "Client should successfully connect to the server");
     }
 
     @Test
-    @DisplayName("Should test connection with multiple clients")
+    @DisplayName("Should test multiple clients connection")
     void testConnectionWithMultipleClients() {
-        try{
-            Thread.sleep(2000);
-        } catch (InterruptedException ex){
-            ex.printStackTrace();
-        }
+        waitForServerToStart();
 
         PlaneClient planeClient1 = new PlaneClient("localhost", 5000);
         new Thread(planeClient1).start();
-            try{
-                Thread.sleep(2000);
-            } catch (InterruptedException ex){
-                ex.printStackTrace();
-            }
+
+        // Wait for the first client to connect
+        waitForServerToStart();
 
         PlaneClient planeClient2 = new PlaneClient("localhost", 5000);
         new Thread(planeClient2).start();
-            try{
-                Thread.sleep(2000);
-            } catch (InterruptedException ex){
-                ex.printStackTrace();
-            }
+
+        // Wait for the second client to connect
+        waitForServerToStart();
+
         assertTrue(planeClient1.isConnected(), "Client1 should successfully connect to the server");
         assertTrue(planeClient2.isConnected(), "Client2 should successfully connect to the server");
     }
 
     @Test
-    @DisplayName("Should test client-server registration")
+    @DisplayName("Should test client registration")
     void testClientRegistration() {
         try{
             Thread.sleep(2000);
@@ -115,18 +113,16 @@ class ClientServerConnectionIntegrationTest {
             } catch (InterruptedException ex){
                 ex.printStackTrace();
             }
-        assertEquals(1, server.getControlTower().getPlanes().size(), "Planes list should contain only one Plane object");
+        assertEquals(1, server.getControlTower().getPlanes().size(),
+                "Planes list should contain only one Plane object after registration");
     }
 
     @Test
-    @DisplayName("Should test client-server registration with full space capacity")
+    @DisplayName("Should test client registration with full capacity")
     void testClientRegistrationWithFullCapacity() {
-        try{
-            Thread.sleep(2000);
-        } catch (InterruptedException ex){
-            ex.printStackTrace();
-        }
+        waitForServerToStart();
 
+        // Fill the list with 100 planes
         for(int i = 0; i < 100; i++){
             Plane plane = new Plane("TEST_PLANE");
             server.getControlTower().getPlanes().add(plane);
@@ -134,11 +130,11 @@ class ClientServerConnectionIntegrationTest {
 
         PlaneClient planeClient = new PlaneClient("localhost", 5000);
         new Thread(planeClient).start();
-            try{
-                Thread.sleep(2000);
-            } catch (InterruptedException ex){
-                ex.printStackTrace();
-            }
-        assertEquals(100, server.getControlTower().getPlanes().size(), "Plane list should contain only 100 planes; new plane not added");
+
+        // Wait for the client to attempt registration
+        waitForServerToStart();
+
+        assertEquals(100, server.getControlTower().getPlanes().size(),
+                "Plane list should contain only 100 planes; the new plane should not be added");
     }
 }
