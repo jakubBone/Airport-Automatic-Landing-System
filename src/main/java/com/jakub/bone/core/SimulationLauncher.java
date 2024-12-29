@@ -34,10 +34,10 @@ public class SimulationLauncher extends Application {
         serverThread.isDaemon();
         serverThread.start();
 
-        int numberOfClients = 1000;
+        int clientsNumber = 1000;
 
         new Thread(() -> {
-            for (int i = 0; i < numberOfClients; i++) {
+            for (int i = 0; i < clientsNumber; i++) {
                 PlaneClient client = new PlaneClient("localhost", 5000);
                 new Thread(client).start();
                 try {

@@ -27,6 +27,15 @@ public class AirspaceModel {
         this.floor.setTranslateZ(- 3000) ;
     }
 
+    /*private void setupFloor() {
+        Image image = new Image(getClass().getResource("/images/wall.png").toExternalForm());
+        this.floor = createWall(6000, 6000, image);
+        this.floor.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
+        this.floor.setTranslateX(- 3000);
+        this.floor.setTranslateY(0);
+        this.floor.setTranslateZ(- 3000) ;
+    }*/
+
     private void setupLeftWall() {
         Image image = new Image(getClass().getResource("/images/newYork.png").toExternalForm());
         this.leftWall = createWall(6000, 2500, image);

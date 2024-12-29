@@ -1,6 +1,5 @@
 package com.jakub.bone.application;
 
-import com.jakub.bone.domain.airport.Airport;
 import com.jakub.bone.domain.airport.Runway;
 import com.jakub.bone.database.AirportDatabase;
 import com.jakub.bone.domain.airport.Location;
@@ -17,7 +16,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import static com.jakub.bone.utills.Constant.HOLDING_ENTRY_ALTITUDE;
+import static com.jakub.bone.utills.Constant.*;
 
 @Log4j2
 @Getter
@@ -40,7 +39,7 @@ public class ControlTower {
     }
 
     public boolean isSpaceFull() {
-        return executeWithLock(() -> planes.size() >= Airport.MAX_CAPACITY);
+        return executeWithLock(() -> planes.size() >= MAX_CAPACITY);
     }
 
     public boolean isAtCollisionRiskZone(Plane plane) {
@@ -109,7 +108,7 @@ public class ControlTower {
                         Math.pow(loc1.getY() - loc2.getY(), 2)
         );
         double altDiff = Math.abs(loc1.getAltitude() - loc2.getAltitude());
-        return horizontalDistance <= 500 && altDiff <= 10;
+        return horizontalDistance <= HORIZONTAL_COLLISION_DISTANCE && altDiff <= ALTITUDE_COLLISION_DISTANCE;
     }
 
     public boolean isPlaneApproachingHoldingAltitude(Plane plane) {

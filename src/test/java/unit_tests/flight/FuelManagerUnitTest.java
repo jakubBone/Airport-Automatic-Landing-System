@@ -1,5 +1,6 @@
 package unit_tests.flight;
 
+import com.jakub.bone.utills.Constant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.jakub.bone.domain.plane.Plane;
@@ -13,7 +14,7 @@ class FuelManagerUnitTest {
         Plane plane = new Plane("TEST_PLANE");
 
         // Capture the plane's current consumption rate
-        double consumption = plane.getFuelManager().getConsumptionPerSecond();
+        double consumption = Constant.CONSUMPTION_PER_SECOND;
 
         // Record initial fuel level
         double initialFuelLevel = plane.getFuelManager().getFuelLevel();

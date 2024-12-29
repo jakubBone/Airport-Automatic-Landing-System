@@ -1,37 +1,24 @@
 package com.jakub.bone.domain.plane;
 
+import com.jakub.bone.utills.Constant;
 import lombok.Getter;
 import lombok.Setter;
+
+import static com.jakub.bone.utills.Constant.CONSUMPTION_PER_SECOND;
+import static com.jakub.bone.utills.Constant.INITIAL_FUEL_LEVEL;
 
 @Getter
 @Setter
 public class FuelManager {
-    private double consumptionPerHour;
-    private double consumptionPerSecond;
     private double fuelLevel;
     public FuelManager() {
-        this.consumptionPerHour = 2000;
-        this.consumptionPerSecond = consumptionPerHour / 3600;
-        this.fuelLevel = consumptionPerHour * 3;
+        this.fuelLevel = INITIAL_FUEL_LEVEL;
     }
     public void burnFuel() {
-        fuelLevel -= consumptionPerSecond;
+        fuelLevel -= CONSUMPTION_PER_SECOND;
     }
 
     public boolean isOutOfFuel() {
         return fuelLevel <= 0;
     }
-
-    /*public FuelManager() {
-        this.fuelConsumptionPerHour = 2000.0;
-        this.fuelLevel = fuelConsumptionPerHour * 3;
-    }
-    public void burnFuel() {
-        double fuelConsumptionPerSec = fuelConsumptionPerHour / 3600;
-        fuelLevel -= fuelConsumptionPerSec;
-    }
-    public boolean isOutOfFuel() {
-        return this.fuelLevel <= 0;
-    }*/
-
 }

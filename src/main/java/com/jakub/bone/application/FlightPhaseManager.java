@@ -12,6 +12,8 @@ import java.io.ObjectOutputStream;
 
 import static com.jakub.bone.application.PlaneHandler.AirportInstruction.*;
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.*;
+import static com.jakub.bone.utills.Constant.ENTRY_POINT_CORRIDOR_1;
+import static com.jakub.bone.utills.Constant.ENTRY_POINT_CORRIDOR_2;
 
 @Log4j2
 public class FlightPhaseManager {
@@ -100,14 +102,11 @@ public class FlightPhaseManager {
     }
 
     private Runway getRunwayIfPlaneAtCorridor(Plane plane) {
-        Location runway1Corridor = Airport.runway1.getCorridor().getEntryPoint();
-        Location runway2Corridor = Airport.runway2.getCorridor().getEntryPoint();
-
         Runway runway;
-        if (plane.getNavigator().getLocation().equals(runway1Corridor)){
+        if (plane.getNavigator().getLocation().equals(ENTRY_POINT_CORRIDOR_1)){
             return runway = Airport.runway1;
         }
-        else if (plane.getNavigator().getLocation().equals(runway2Corridor)) {
+        else if (plane.getNavigator().getLocation().equals(ENTRY_POINT_CORRIDOR_2)) {
             return runway = Airport.runway2;
         }
         return null;

@@ -16,7 +16,6 @@ public class WaypointModel {
     private List<Location> landingWaypointsR1;
     private List<Location> landingWaypointsR2;
     private List<Location> holdingPatternWaypoints;
-    private List<Location> holdingAlternativePatternWaypoints;
     private List<Location> descentWaypoints;
     private List<Sphere> landingR1Models;
     private List<Sphere> landingR2Models;
