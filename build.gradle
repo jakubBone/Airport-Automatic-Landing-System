@@ -67,7 +67,7 @@ jooq {
                     }
                     target {
                         packageName = 'jooq'
-                        directory = 'src/main/java/generated'
+                        directory = 'src/main/java/com/jakub/bone/generated'
                     }
                 }
             }
