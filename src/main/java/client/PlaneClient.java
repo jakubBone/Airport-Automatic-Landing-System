@@ -29,22 +29,26 @@ public class PlaneClient extends Client implements Runnable {
 
     @Override
     public void run() {
-        try {
-            startConnection();
-            if(!isConnected){
-                return;
-            }
+        connectAndHandle();
+    }
 
+    private void connectAndHandle(){
+        try {
+            establishConnection();
             initializeServices();
             communicationService.sendInitialData();
-
-            handleInstructions();
-
+            processInstructions();
         } catch (IOException | ClassNotFoundException ex) {
-            log.error("PlaneClient [{}]: Communication failure: {}", plane.getFlightNumber(), ex.getMessage());
+            log.error("PlaneClient [{}] encountered an error: {}", plane.getFlightNumber(), ex.getMessage());
         } finally {
-            log.info("Plane [{}] exited communication", plane.getFlightNumber());
-            stopConnection();
+            closeConnection();
+        }
+    }
+
+    private void establishConnection() throws IOException {
+        startConnection();
+        if (!isConnected) {
+            throw new IOException("Unable to establish connection to the server");
         }
     }
 
@@ -53,9 +57,10 @@ public class PlaneClient extends Client implements Runnable {
         this.instructionHandler = new PlaneInstructionHandler(plane, messenger, in, out);
     }
 
-    private void handleInstructions() throws IOException, ClassNotFoundException {
+    private void processInstructions() throws IOException, ClassNotFoundException {
         while (!instructionHandler.isProcessCompleted()) {
             if(!communicationService.sendFuelLevel() || !communicationService.sendPlaneLocation()){
+                log.warn("Plane [{}] lost communication due to fuel or location issues", plane.getFlightNumber());
                 return;
             }
 
@@ -63,6 +68,7 @@ public class PlaneClient extends Client implements Runnable {
             instructionHandler.processInstruction(instruction);
 
             if(plane.isDestroyed()){
+                log.warn("Plane [{}] destroyed", plane.getFlightNumber());
                 return;
             }
         }
@@ -70,14 +76,15 @@ public class PlaneClient extends Client implements Runnable {
 
     public String generateFlightNumber() {
         String[] airlineCodes = {"MH", "AA", "BA", "LH", "AF", "EK", "QR", "KL", "UA", "DL"};
-
         String code = airlineCodes[ThreadLocalRandom.current().nextInt(airlineCodes.length)];
-
         int number = ThreadLocalRandom.current().nextInt(100, 999);
-
         return code + number;
     }
 
+    private void closeConnection() {
+        log.info("Plane [{}] exiting communication.", plane.getFlightNumber());
+        stopConnection();
+    }
 
     public static void main(String[] args) throws IOException {
         int numberOfClients = 5;

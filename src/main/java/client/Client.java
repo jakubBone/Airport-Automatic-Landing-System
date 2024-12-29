@@ -11,12 +11,11 @@ import java.net.Socket;
 @Log4j2
 @Getter
 public class Client {
-    protected Socket socket;
+    private Socket socket;
     protected ObjectOutputStream out;
     protected ObjectInputStream in;
     private int port;
     private String ip;
-    private boolean stopReconnection = false;
     protected boolean isConnected;
 
     public Client(String ip,int port) {
@@ -26,15 +25,13 @@ public class Client {
 
     protected void startConnection() {
         try {
-            socket = new Socket(ip, port);
-            out = new ObjectOutputStream(socket.getOutputStream());
-            in = new ObjectInputStream(socket.getInputStream());
-            isConnected = true;
+            this.socket = new Socket(ip, port);
+            this.out = new ObjectOutputStream(socket.getOutputStream());
+            this.in = new ObjectInputStream(socket.getInputStream());
+            this.isConnected = true;
+            log.info("Connection established successfully");
         } catch (IOException ex) {
-            if(stopReconnection){
-                return;
-            }
-            log.error("Failed to establish connection with the server at port {}. Error: {}", port, ex.getMessage());
+            log.error("Failed to connect to server at {}:{} - {}", ip, port, ex.getMessage());
         }
     }
 
