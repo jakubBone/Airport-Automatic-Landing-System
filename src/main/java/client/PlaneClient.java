@@ -59,7 +59,7 @@ public class PlaneClient extends Client implements Runnable {
 
     private void processInstructions() throws IOException, ClassNotFoundException {
         while (!instructionHandler.isProcessCompleted()) {
-            if(!communicationService.sendFuelLevel() || !communicationService.sendPlaneLocation()){
+            if(!communicationService.sendFuelLevel() || !communicationService.sendLocation()){
                 log.warn("Plane [{}] lost communication due to fuel or location issues", plane.getFlightNumber());
                 return;
             }

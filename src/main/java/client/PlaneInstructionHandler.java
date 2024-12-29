@@ -32,21 +32,25 @@ public class PlaneInstructionHandler {
 
     public void processInstruction(PlaneHandler.AirportInstruction instruction) throws IOException, ClassNotFoundException {
         switch (instruction) {
-            case DESCENT -> executeDescent();
-            case HOLD_PATTERN -> executeHoldPattern();
-            case LAND -> processLanding();
-            case FULL -> executeFullAirspace();
-            case RISK_ZONE -> executeRiskZone();
-            case COLLISION -> executeCollision();
+            case DESCENT -> handleDescent();
+            case HOLD_PATTERN -> handleHoldPattern();
+            case LAND -> handleLanding();
+            case COLLISION -> handleCollision();
+            case FULL -> abortProcess("Airspace is FULL. Redirecting to another airport");
+            case RISK_ZONE -> abortProcess("Initial location in RISK ZONE. Cannot proceed");
             default -> log.warn("Unknown instruction for Plane [{}]: [{}]", plane.getFlightNumber(), instruction);
         }
     }
 
-    public void processLanding() throws IOException, ClassNotFoundException {
+    public void handleLanding() throws IOException, ClassNotFoundException {
         Runway runway = messenger.receiveAndParse(in, Runway.class);
         plane.setLandingPhase(runway);
 
         log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getFlightNumber(), runway.getId());
+        performLanding(runway);
+    }
+
+    private void performLanding(Runway runway) throws IOException {
         while (!isProcessCompleted) {
 
             if(!communicationService.sendFuelLevel()){
@@ -55,7 +59,7 @@ public class PlaneInstructionHandler {
 
             plane.land(runway);
 
-            if(!communicationService.sendPlaneLocation()){
+            if(!communicationService.sendLocation()){
                 return;
             }
 
@@ -66,27 +70,22 @@ public class PlaneInstructionHandler {
         }
     }
 
-    private void executeDescent() {
+    private void handleDescent() {
         log.info("Plane [{}] instructed to DESCENT", plane.getFlightNumber());
         plane.descend();
     }
 
-    private void executeHoldPattern() {
+    private void handleHoldPattern() {
         log.info("Plane [{}] instructed to HOLD_PATTERN", plane.getFlightNumber());
         plane.hold();
     }
 
-    private void executeFullAirspace() {
-        log.info("Airspace is FULL. Plane [{}] instructed to find an alternative airport. Stopping communication", plane.getFlightNumber());
+    private void abortProcess(String message) {
+        log.info("Plane [{}]: {}", plane.getFlightNumber(), message);
         isProcessCompleted = true;
     }
 
-    private void executeRiskZone() {
-        log.info("Initial location at risk zone. Plane [{}] cannot be registered in the location. Stopping communication", plane.getFlightNumber());
-        isProcessCompleted = true;
-    }
-
-    private void executeCollision() {
+    private void handleCollision() {
         log.info("COLLISION detected for Plane [{}]. Stopping communication", plane.getFlightNumber());
         plane.destroyPlane();
         isProcessCompleted = true;

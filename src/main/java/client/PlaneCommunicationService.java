@@ -1,5 +1,6 @@
 package client;
 
+import location.Location;
 import plane.Plane;
 import utills.Messenger;
 import lombok.extern.log4j.Log4j2;
@@ -20,12 +21,12 @@ public class PlaneCommunicationService {
     }
 
     public void sendInitialData() throws IOException {
-        messenger.send(plane, out);
+        sendData(plane);
     }
 
     public boolean sendFuelLevel() throws IOException {
-        messenger.send(plane.getFuelManager().getFuelLevel(), out);
-        out.flush();
+        double fuelLevel = plane.getFuelManager().getFuelLevel();
+        sendData(fuelLevel);
 
         if (plane.getFuelManager().isOutOfFuel()) {
             log.info("Plane [{}] is out of fuel. Collision", plane.getFlightNumber());
@@ -34,13 +35,20 @@ public class PlaneCommunicationService {
         return true;
     }
 
-    public boolean sendPlaneLocation() throws IOException {
-        if(plane.getNavigator().getLocation() == null) {
+    public boolean sendLocation() throws IOException {
+        Location location = plane.getNavigator().getLocation();
+
+        if(location == null) {
             log.info("Plane [{}] disappeared from the radar", plane.getFlightNumber());
             return false;
         }
-        messenger.send(plane.getNavigator().getLocation(), out);
-        out.flush();
+
+        sendData(location);
         return true;
+    }
+
+    private void sendData(Object data) throws IOException {
+        messenger.send(data, out);
+        out.flush();
     }
 }
