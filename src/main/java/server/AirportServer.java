@@ -30,9 +30,7 @@ public class AirportServer  {
             this.serverSocket = new ServerSocket(port);
             log.info("Server started");
 
-            CollisionDetector collisionDetector = new CollisionDetector(controlTower, 1200);
-            Thread collisionThread = new Thread(collisionDetector);
-            collisionThread.start();
+            new CollisionDetector(controlTower, 1200).start();
 
             log.info("Collision detector started");
 
