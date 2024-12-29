@@ -1,15 +1,15 @@
 package integration_tests;
 
-import client.PlaneClient;
-import controller.ControlTower;
-import database.AirportDatabase;
-import database.CollisionDAO;
-import database.PlaneDAO;
+import com.jakub.bone.client.PlaneClient;
+import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.database.AirportDatabase;
+import com.jakub.bone.database.CollisionDAO;
+import com.jakub.bone.database.PlaneDAO;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import plane.Plane;
-import server.AirportServer;
+import com.jakub.bone.domain.plane.Plane;
+import com.jakub.bone.server.AirportServer;
 
 import java.io.IOException;
 import java.sql.SQLException;

@@ -41,7 +41,6 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.5.4'
     jooqGenerator 'org.postgresql:postgresql:42.5.4'
 
-
     // jim3dsModelImporterJFX
     implementation files('libs/jim3dsModelImporterJFX/jimObjModelImporterJFX.jar')
 

@@ -2,7 +2,7 @@ package unit_tests.flight;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import plane.Plane;
+import com.jakub.bone.domain.plane.Plane;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

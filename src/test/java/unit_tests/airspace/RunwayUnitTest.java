@@ -1,26 +1,26 @@
 package unit_tests.airspace;
 
-import airport.Airport;
+import com.jakub.bone.domain.airport.Airport;
 
-import controller.ControlTower;
-import database.AirportDatabase;
-import database.CollisionDAO;
-import database.PlaneDAO;
+import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.database.AirportDatabase;
+import com.jakub.bone.database.CollisionDAO;
+import com.jakub.bone.database.PlaneDAO;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import plane.Plane;
+import com.jakub.bone.domain.plane.Plane;
 
 import java.sql.SQLException;
 
-import static airport.Airport.runway1;
+import static com.jakub.bone.domain.airport.Airport.runway1;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
-import static utills.Constant.FINAL_APPROACH_CORRIDOR_1;
+import static com.jakub.bone.utills.Constant.FINAL_APPROACH_CORRIDOR_1;
 
 class RunwayUnitTest {
     @Mock

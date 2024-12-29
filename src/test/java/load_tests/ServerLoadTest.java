@@ -1,8 +1,8 @@
 package load_tests;
 
-import controller.ControlTower;
-import database.AirportDatabase;
-import server.AirportServer;
+import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.database.AirportDatabase;
+import com.jakub.bone.server.AirportServer;
 
 import java.io.IOException;
 import java.sql.SQLException;

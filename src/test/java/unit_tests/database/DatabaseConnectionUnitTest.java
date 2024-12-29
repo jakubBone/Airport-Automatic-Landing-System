@@ -1,6 +1,6 @@
 package unit_tests.database;
 
-import database.AirportDatabase;
+import com.jakub.bone.database.AirportDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
