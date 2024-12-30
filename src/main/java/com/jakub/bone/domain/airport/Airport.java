@@ -7,21 +7,18 @@ import com.jakub.bone.utills.Constant;
 public class Airport {
     public static Runway runway2;
     public static Runway runway1;
-
     public Airport() {
-        this.runway1 = RunwayBuilder.create(
-                "R-1",
-                "C-1",
-                Constant.LANDING_POINT_RUNWAY_1,
-                Constant.ENTRY_POINT_CORRIDOR_1,
-                Constant.FINAL_APPROACH_CORRIDOR_1
-        );
-        this.runway2 = RunwayBuilder.create(
-                "R-2",
-                "C-2",
-                Constant.LANDING_POINT_RUNWAY_2,
-                Constant.ENTRY_POINT_CORRIDOR_2,
-                Constant.FINAL_APPROACH_CORRIDOR_2
-        );
+        this.runway1 = Runway.builder()
+                .id("R-1")
+                .landingPoint(Constant.LANDING_POINT_RUNWAY_1)
+                .corridor(new Corridor("C-1", Constant.ENTRY_POINT_CORRIDOR_1, Constant.FINAL_APPROACH_CORRIDOR_1))
+                .available(true)
+                .build();
+        this.runway2 = Runway.builder()
+                .id("R-2")
+                .landingPoint(Constant.LANDING_POINT_RUNWAY_2)
+                .corridor(new Corridor("C-2", Constant.ENTRY_POINT_CORRIDOR_2, Constant.FINAL_APPROACH_CORRIDOR_2))
+                .available(true)
+                .build();
     }
 }
