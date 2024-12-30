@@ -42,7 +42,7 @@ public class SceneRenderer extends Application {
         primaryStage.show();
     }
 
-    public void setupStaticElements(){
+    private void setupStaticElements(){
         RunwayModel runway1Model = new RunwayModel(Airport.runway1);
         RunwayModel runway2Model = new RunwayModel(Airport.runway2);
         AirspaceModel airspaceModel = new AirspaceModel();

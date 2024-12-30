@@ -1,6 +1,5 @@
 package com.jakub.bone.domain.plane;
 
-import com.jakub.bone.utills.Constant;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +13,7 @@ public class FuelManager {
     public FuelManager() {
         this.fuelLevel = INITIAL_FUEL_LEVEL;
     }
+
     public void burnFuel() {
         fuelLevel -= CONSUMPTION_PER_SECOND;
     }

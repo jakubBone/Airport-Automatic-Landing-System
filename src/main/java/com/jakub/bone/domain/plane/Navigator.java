@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import com.jakub.bone.utills.Constant;
 import com.jakub.bone.utills.WaypointGenerator;
 import lombok.Getter;
 import lombok.Setter;
@@ -59,7 +58,7 @@ public class Navigator {
         this.location = location;
     }
 
-    public void spawnPlane() {
+    private void spawnPlane() {
         List<Location> waypointsToSpawn = waypoints.stream()
                 .filter(wp -> wp.getAltitude() >= MIN_ALTITUDE && wp.getAltitude() <= MAX_ALTITUDE)
                 .collect(Collectors.toList());

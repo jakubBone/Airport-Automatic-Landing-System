@@ -32,8 +32,8 @@ class ControlTowerUnitTest {
         MockitoAnnotations.openMocks(this);
         when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneDAO);
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDAO);
-        this.controlTower = new ControlTower(mockDatabase);
-        this.incomingPlanes = new ArrayList<>();
+        controlTower = new ControlTower(mockDatabase);
+        incomingPlanes = new ArrayList<>();
     }
 
     @Test

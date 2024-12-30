@@ -6,10 +6,8 @@ import java.time.LocalDateTime;
 
 import static org.jooq.impl.DSL.*;
 
-
 public class CollisionDAO {
     private final DSLContext CONTEXT;
-
     public CollisionDAO(DSLContext CONTEXT) {
         this.CONTEXT = CONTEXT;
     }

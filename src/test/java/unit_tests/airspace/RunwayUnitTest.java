@@ -37,8 +37,8 @@ class RunwayUnitTest {
         MockitoAnnotations.openMocks(this);
         when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneDAO);
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDAO);
-        this.controlTower = new ControlTower(mockDatabase);
-        this.airport = new Airport();
+        controlTower = new ControlTower(mockDatabase);
+        airport = new Airport();
     }
 
     @Test

@@ -15,9 +15,7 @@ import java.util.List;
 @Setter
 public class Plane implements Serializable {
     public enum FlightPhase {
-        DESCENDING,
-        HOLDING,
-        LANDING
+        DESCENDING, HOLDING, LANDING
     }
     private String flightNumber;
     private boolean landed;

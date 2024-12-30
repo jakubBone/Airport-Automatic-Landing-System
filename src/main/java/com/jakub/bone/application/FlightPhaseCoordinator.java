@@ -76,7 +76,6 @@ public class FlightPhaseCoordinator {
         controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, availableRunway);
     }
 
-
     private void applyDescending(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);
         plane.setPhase(DESCENDING);
@@ -84,7 +83,6 @@ public class FlightPhaseCoordinator {
             log.info("Plane [{}]: instructed to {}", plane.getFlightNumber(), DESCENT);
             descentLogged = true;
         }
-
     }
 
     private void enterHolding(Plane plane, ObjectOutputStream out) throws IOException {
@@ -94,7 +92,6 @@ public class FlightPhaseCoordinator {
             log.info("Plane [{}] enter {}", plane.getFlightNumber(), HOLDING);
             holdPatternLogged = true;
         }
-
     }
 
     private void applyHolding(Plane plane, ObjectOutputStream out) throws IOException {

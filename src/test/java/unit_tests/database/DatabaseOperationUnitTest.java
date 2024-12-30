@@ -18,7 +18,7 @@ import static com.jakub.bone.domain.airport.Airport.runway1;
 import static org.mockito.Mockito.*;
 import static com.jakub.bone.utills.Constant.ENTRY_POINT_CORRIDOR_1;
 
-public class DatabaseOperationUnitTest {
+class DatabaseOperationUnitTest {
     @Mock
     AirportDatabase mockDatabase;
     @Mock
@@ -30,7 +30,7 @@ public class DatabaseOperationUnitTest {
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
-        this.controlTower = new ControlTower(mockDatabase);
+        controlTower = new ControlTower(mockDatabase);
         when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneDAO);
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDAO);
     }

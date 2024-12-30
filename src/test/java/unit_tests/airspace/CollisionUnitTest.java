@@ -36,10 +36,8 @@ class CollisionUnitTest {
         this.controlTower = new ControlTower(mockDatabase);
     }
 
-    /**
-     * Helper method to create a plane, set its location, and register
-     */
-    private Plane createAndRegisterPlane(String name, int x, int y, int altitude) {
+    //Helper method to create a plane, set its location, and register
+    Plane createAndRegisterPlane(String name, int x, int y, int altitude) {
         Plane plane = new Plane(name);
         plane.getNavigator().setLocation(new Location(x, y, altitude));
         controlTower.registerPlane(plane);

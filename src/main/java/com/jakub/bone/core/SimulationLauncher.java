@@ -50,7 +50,6 @@ public class SimulationLauncher extends Application {
 
         SceneRenderer visualization = new SceneRenderer(controller);
         visualization.start(primaryStage);
-
     }
 
     public static void main(String[] args) {

@@ -6,7 +6,6 @@ import com.jakub.bone.domain.airport.Location;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.domain.plane.Plane;
 import org.apache.logging.log4j.ThreadContext;
-import org.jooq.impl.QOM;
 
 import java.io.*;
 import java.net.Socket;
@@ -57,7 +56,7 @@ public class PlaneHandler extends Thread {
         }
     }
 
-    public void handleClient(ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
+    private void handleClient(ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
         Plane plane = messenger.receiveAndParse(in, Plane.class);
 
         if (!isPlaneRegistered(plane, out)) {
@@ -118,7 +117,7 @@ public class PlaneHandler extends Thread {
         }
     }
 
-    public void handleCollision(Plane plane, ObjectOutputStream out) throws IOException {
+    private void handleCollision(Plane plane, ObjectOutputStream out) throws IOException {
         if(plane.getAssignedRunway() != null){
             controlTower.releaseRunway(plane.getAssignedRunway());
         }

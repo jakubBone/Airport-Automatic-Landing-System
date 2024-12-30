@@ -47,7 +47,6 @@ public class PlaneModel {
         this.label.setText(plane.getFlightNumber());
     }
 
-
     private void updatePosition(Location location) {
         this.planeGroup.setTranslateX(location.getX() / 2.0);
         this.planeGroup.setTranslateY(-location.getAltitude() / 2.0);

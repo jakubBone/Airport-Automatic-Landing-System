@@ -13,7 +13,6 @@ import java.io.ObjectOutputStream;
 
 import static com.jakub.bone.application.PlaneHandler.AirportInstruction.*;
 
-
 @Log4j2
 @Getter
 public class PlaneInstructionHandler {
@@ -48,7 +47,7 @@ public class PlaneInstructionHandler {
         }
     }
 
-    public void handleLanding() throws IOException, ClassNotFoundException {
+    private void handleLanding() throws IOException, ClassNotFoundException {
         Runway runway = messenger.receiveAndParse(in, Runway.class);
         plane.setLandingPhase(runway);
 

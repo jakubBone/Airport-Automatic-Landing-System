@@ -51,12 +51,12 @@ public class Camera {
         });
     }
 
-    public void rotateCamera(double angleX, double angleY) {
+    private void rotateCamera(double angleX, double angleY) {
         rotateX.setAngle(rotateX.getAngle() + angleX);
         rotateY.setAngle(rotateY.getAngle() + angleY);
     }
 
-    public void getView(double rotationX, double rotationY, double translationX, double translationY, double translationZ) {
+    private void getView(double rotationX, double rotationY, double translationX, double translationY, double translationZ) {
         rotateX.setAngle(rotationX);
         rotateY.setAngle(rotationY);
         translate.setX(translationX);
@@ -64,7 +64,7 @@ public class Camera {
         translate.setZ(translationZ);
     }
 
-    public void zoom(double deltaZ) {
+    private void zoom(double deltaZ) {
         translate.setZ(translate.getZ() + deltaZ);
     }
 }

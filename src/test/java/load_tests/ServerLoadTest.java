@@ -11,7 +11,7 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
+/*
  * This class tests the behavior of the server under high load conditions
  */
 public class ServerLoadTest {

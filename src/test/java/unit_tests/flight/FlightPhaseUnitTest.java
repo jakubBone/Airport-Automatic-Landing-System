@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.*;
 import static com.jakub.bone.utills.Constant.FINAL_APPROACH_CORRIDOR_1;
 
-/**
+/*
  * This class tests how a plane's flight phase changes
  * based on its location and interactions with the ControlTower
  */
@@ -66,7 +66,6 @@ class FlightPhaseUnitTest {
 
         assertEquals(DESCENDING, plane.getPhase(), "Flight phase should be set as DESCENDING");
     }
-
 
     @Test
     @DisplayName("Should test flight phase switch to holding")

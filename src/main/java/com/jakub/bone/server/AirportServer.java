@@ -72,7 +72,5 @@ public class AirportServer  {
         AirportServer airportServer = new AirportServer(controlTower);
         airportServer.startServer(5000);
         airportServer.stopServer();
-        ThreadContext.clearMap(); // Usuwamy kontekst po zakończeniu
-
     }
 }

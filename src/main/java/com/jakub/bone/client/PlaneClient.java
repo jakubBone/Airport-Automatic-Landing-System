@@ -53,7 +53,6 @@ public class PlaneClient extends Client implements Runnable {
             throw new IOException("Unable to establish connection to the server");
         }
         log.info("PlaneClient [{}]: connected to server", plane.getFlightNumber());
-
     }
 
     private void initializeServices(){
