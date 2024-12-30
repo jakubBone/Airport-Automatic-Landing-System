@@ -73,7 +73,7 @@ class FlightPhaseUnitTest {
     void testPhaseSwitchToHolding() throws IOException, ClassNotFoundException {
         // Plane has reached the end of its descent waypoints
         Plane plane = new Plane("TEST_PLANE");
-        plane.getNavigator().setCurrentIndex(WaypointGenerator.generateDescentWaypoints().size());
+        plane.getNavigator().setCurrentIndex(WaypointGenerator.getDescentWaypoints().size());
         plane.descend();
 
         // Holding altitude = 1000
