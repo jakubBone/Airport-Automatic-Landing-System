@@ -1,7 +1,6 @@
 package com.jakub.bone.ui.model;
 
 import com.jakub.bone.domain.airport.Runway;
-import com.jakub.bone.utills.Constant;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;

@@ -1,8 +1,5 @@
 package com.jakub.bone.domain.airport;
 
-import com.jakub.bone.domain.airport.Corridor;
-import com.jakub.bone.domain.airport.Location;
-import com.jakub.bone.utills.Constant;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -22,6 +19,6 @@ public class Runway implements Serializable {
         this.id = id;
         this.landingPoint = landingPoint;
         this.corridor = corridor;
-        this.available = false;
+        this.available = true;
     }
 }

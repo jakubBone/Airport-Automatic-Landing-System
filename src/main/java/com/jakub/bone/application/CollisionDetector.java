@@ -18,7 +18,7 @@ public class CollisionDetector extends Thread {
         while(true) {
             try {
                 controlTower.checkCollision();
-                Thread.sleep(500);
+                Thread.sleep(COLLISION_CHECK_INTERVAL);
             } catch (InterruptedException ex){
                 log.error("Collision detection interrupted: {}", ex.getMessage());
                 Thread.currentThread().interrupt();

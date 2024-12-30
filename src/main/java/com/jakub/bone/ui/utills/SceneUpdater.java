@@ -19,7 +19,6 @@ public class SceneUpdater {
     private final Group root;
     private ControlTower controller;
     private Map<String, PlaneModel> planesMap;
-
     private boolean isFirstPlane;
 
     public SceneUpdater(Group root, ControlTower controller) {

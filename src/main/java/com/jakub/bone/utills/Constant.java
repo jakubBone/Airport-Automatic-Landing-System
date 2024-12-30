@@ -22,7 +22,7 @@ public class Constant {
     public static final double CONSUMPTION_PER_SECOND = CONSUMPTION_PER_HOUR / 3600.0; // in liters
 
     // Time-related values
-    public static final long COLLISION_CHECK_INTERVAL = 1200; // in milliseconds
+    public static final long COLLISION_CHECK_INTERVAL = 500; // in milliseconds
 
 
     // Landing-related values
