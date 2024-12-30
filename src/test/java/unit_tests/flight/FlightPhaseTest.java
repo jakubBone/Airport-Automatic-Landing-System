@@ -31,7 +31,7 @@ import static com.jakub.bone.utills.Constant.FINAL_APPROACH_CORRIDOR_1;
  * This class tests how a plane's flight phase changes
  * based on its location and interactions with the ControlTower
  */
-class FlightPhaseUnitTest {
+class FlightPhaseTest {
     @Mock
     AirportDatabase mockDatabase;
     @Mock

@@ -7,7 +7,7 @@ import com.jakub.bone.domain.plane.Plane;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class FuelManagerUnitTest {
+class FuelManagerTest {
     @Test
     @DisplayName("Fuel level should decrease by the consumption rate after burnFuel() call")
     void testBurnFuel() {

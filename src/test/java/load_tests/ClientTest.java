@@ -12,8 +12,8 @@ import java.util.logging.Logger;
  * Continuously spawns PlaneClient instances every 5 seconds,
  * simulating a sustained load for performance testing
  */
-public class ClientLoadTest {
-    static final Logger logger = Logger.getLogger(ClientLoadTest.class.getName());
+public class ClientTest {
+    static final Logger logger = Logger.getLogger(ClientTest.class.getName());
 
     public static void main(String[] args) {
         // Automatically stop after 60 minutes

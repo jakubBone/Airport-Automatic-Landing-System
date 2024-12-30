@@ -18,7 +18,7 @@ import static com.jakub.bone.domain.airport.Airport.runway1;
 import static org.mockito.Mockito.*;
 import static com.jakub.bone.utills.Constant.ENTRY_POINT_CORRIDOR_1;
 
-class DatabaseOperationUnitTest {
+class DatabaseOperationTest {
     @Mock
     AirportDatabase mockDatabase;
     @Mock

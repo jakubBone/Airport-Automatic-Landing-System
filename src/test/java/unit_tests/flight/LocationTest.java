@@ -7,7 +7,7 @@ import com.jakub.bone.domain.plane.Plane;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class LocationUnitTest {
+class LocationTest {
     @Test
     @DisplayName("Plane should update its location correctly")
     void testUpdateLocation() {

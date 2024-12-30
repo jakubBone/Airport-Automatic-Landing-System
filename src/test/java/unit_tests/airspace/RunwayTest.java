@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static com.jakub.bone.utills.Constant.FINAL_APPROACH_CORRIDOR_1;
 
-class RunwayUnitTest {
+class RunwayTest {
     @Mock
     AirportDatabase mockDatabase;
     @Mock

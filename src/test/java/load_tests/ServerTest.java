@@ -14,8 +14,8 @@ import java.util.logging.Logger;
 /*
  * This class tests the behavior of the server under high load conditions
  */
-public class ServerLoadTest {
-    static final Logger logger = Logger.getLogger(ClientLoadTest.class.getName());
+public class ServerTest {
+    static final Logger logger = Logger.getLogger(ClientTest.class.getName());
     public static void main(String[] args) throws IOException, SQLException {
         AirportDatabase airportDatabase = new AirportDatabase();
         ControlTower controller = new ControlTower(airportDatabase);
