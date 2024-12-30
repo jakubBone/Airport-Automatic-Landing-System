@@ -22,6 +22,6 @@ public class Runway implements Serializable {
         this.id = id;
         this.landingPoint = landingPoint;
         this.corridor = corridor;
-        this.available = true;
+        this.available = false;
     }
 }

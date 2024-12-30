@@ -1,6 +1,7 @@
 package com.jakub.bone.application;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.ThreadContext;
 
 import static com.jakub.bone.utills.Constant.COLLISION_CHECK_INTERVAL;
 
@@ -13,10 +14,11 @@ public class CollisionDetector extends Thread {
 
     @Override
     public void run() {
+        ThreadContext.put("type", "Server");
         while(true) {
             try {
                 controlTower.checkCollision();
-                Thread.sleep(COLLISION_CHECK_INTERVAL);
+                Thread.sleep(500);
             } catch (InterruptedException ex){
                 log.error("Collision detection interrupted: {}", ex.getMessage());
                 Thread.currentThread().interrupt();

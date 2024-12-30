@@ -7,6 +7,7 @@ import com.jakub.bone.database.AirportDatabase;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.application.PlaneHandler;
+import org.apache.logging.log4j.ThreadContext;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -26,6 +27,7 @@ public class AirportServer  {
     }
 
     public void startServer(int port) throws IOException {
+        ThreadContext.put("type", "Server");
         try {
             this.serverSocket = new ServerSocket(port);
             log.info("Server started");
@@ -70,6 +72,7 @@ public class AirportServer  {
         AirportServer airportServer = new AirportServer(controlTower);
         airportServer.startServer(5000);
         airportServer.stopServer();
+        ThreadContext.clearMap(); // Usuwamy kontekst po zakończeniu
 
     }
 }

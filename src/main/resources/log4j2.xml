@@ -2,7 +2,8 @@
 <Configuration status="INFO">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level - %msg%n"/>
+            <!-- Log only "Client" or "Server" -->
+            <PatternLayout pattern="[%X{type}] - %msg%n"/>
         </Console>
     </Appenders>
     <Loggers>

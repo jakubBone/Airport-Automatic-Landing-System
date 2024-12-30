@@ -5,6 +5,7 @@ import lombok.Getter;
 import com.jakub.bone.utills.Messenger;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.domain.plane.Plane;
+import org.apache.logging.log4j.ThreadContext;
 
 import java.io.*;
 import java.util.concurrent.ExecutorService;
@@ -33,6 +34,7 @@ public class PlaneClient extends Client implements Runnable {
     }
 
     private void connectAndHandle(){
+        ThreadContext.put("type", "Client");
         try {
             establishConnection();
             initializeServices();
@@ -62,7 +64,7 @@ public class PlaneClient extends Client implements Runnable {
     private void processInstructions() throws IOException, ClassNotFoundException {
         while (!instructionHandler.isProcessCompleted()) {
             if(!communicationService.sendFuelLevel() || !communicationService.sendLocation()){
-                log.warn("Plane [{}]: lost communication due to fuel or location issues", plane.getFlightNumber());
+                log.error("Plane [{}]: lost communication due to fuel or location issues", plane.getFlightNumber());
                 return;
             }
 
@@ -70,7 +72,7 @@ public class PlaneClient extends Client implements Runnable {
             instructionHandler.processInstruction(instruction);
 
             if(plane.isDestroyed()){
-                log.warn("Plane [{}]: destroyed", plane.getFlightNumber());
+                log.info("Plane [{}]: has destroyed", plane.getFlightNumber());
                 return;
             }
         }

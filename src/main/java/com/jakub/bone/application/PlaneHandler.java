@@ -5,6 +5,8 @@ import com.jakub.bone.utills.Messenger;
 import com.jakub.bone.domain.airport.Location;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.domain.plane.Plane;
+import org.apache.logging.log4j.ThreadContext;
+import org.jooq.impl.QOM;
 
 import java.io.*;
 import java.net.Socket;
@@ -36,6 +38,7 @@ public class PlaneHandler extends Thread {
 
     @Override
     public void run() {
+        ThreadContext.put("type", "Server");
         try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
              ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
 
@@ -121,6 +124,12 @@ public class PlaneHandler extends Thread {
         }
         controlTower.getPlanes().remove(plane);
         messenger.send(COLLISION, out);
+
+        try{
+            Thread.sleep(2000);
+        } catch (InterruptedException ex){
+            ex.printStackTrace();
+        }
     }
 
     private void handleOutOfFuel(Plane plane) throws IOException {
