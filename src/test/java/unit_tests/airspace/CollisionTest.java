@@ -1,5 +1,6 @@
 package unit_tests.airspace;
 
+import com.jakub.bone.application.CollisionDetector;
 import com.jakub.bone.application.ControlTower;
 import com.jakub.bone.database.AirportDatabase;
 import com.jakub.bone.database.CollisionDAO;
@@ -27,6 +28,7 @@ class CollisionTest {
     @Mock
     CollisionDAO mockCollisionDao;
     ControlTower controlTower;
+    CollisionDetector collisionDetector;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -34,6 +36,7 @@ class CollisionTest {
         when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneDAO);
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDao);
         this.controlTower = new ControlTower(mockDatabase);
+        this.collisionDetector = new CollisionDetector(controlTower);
     }
 
     //Helper method to create a plane, set its location, and register
@@ -51,7 +54,7 @@ class CollisionTest {
         Plane plane1 = createAndRegisterPlane("TEST_PLANE_1", 5000, 5000, 4010);
         Plane plane2 = createAndRegisterPlane("TEST_PLANE_2", 5000, 5000, 4000);
 
-        controlTower.checkCollision();
+        collisionDetector.checkCollision();
 
         // Both planes should be destroyed
         assertTrue(plane1.isDestroyed(), "TEST_PLANE_1 should be destroyed after collision");
@@ -65,7 +68,7 @@ class CollisionTest {
         Plane plane1 = createAndRegisterPlane("TEST_PLANE_1", 5000, 5000, 4010);
         Plane plane2 = createAndRegisterPlane("TEST_PLANE_2", 5000, 5000, 4000);
 
-        controlTower.checkCollision();
+        collisionDetector.checkCollision();
 
         // Both planes should be destroyed
         assertTrue(plane1.isDestroyed(), "TEST_PLANE_1 should be destroyed after collision");
@@ -79,7 +82,7 @@ class CollisionTest {
         Plane plane1 = createAndRegisterPlane("TEST_PLANE_1", 5000, 5000, 4020);
         Plane plane2 = createAndRegisterPlane("TEST_PLANE_2", 5000, 5000, 4000);
 
-        controlTower.checkCollision();
+        collisionDetector.checkCollision();
 
         // Both planes should remain intact
         assertFalse(plane1.isDestroyed(), "TEST_PLANE_1 should not be destroyed after collision");

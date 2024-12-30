@@ -1,5 +1,6 @@
 package unit_tests.database;
 
+import com.jakub.bone.application.CollisionDetector;
 import com.jakub.bone.domain.airport.Airport;
 import com.jakub.bone.application.ControlTower;
 import com.jakub.bone.database.AirportDatabase;
@@ -26,13 +27,15 @@ class DatabaseOperationTest {
     @Mock
     CollisionDAO mockCollisionDAO;
     ControlTower controlTower;
+    CollisionDetector collisionDetector;
 
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
-        controlTower = new ControlTower(mockDatabase);
         when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneDAO);
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDAO);
+        controlTower = new ControlTower(mockDatabase);
+        collisionDetector = new CollisionDetector(controlTower);
     }
 
     @Test
@@ -73,7 +76,7 @@ class DatabaseOperationTest {
         controlTower.getPlanes().add(plane1);
         controlTower.getPlanes().add(plane2);
 
-        controlTower.checkCollision();
+        collisionDetector.checkCollision();
 
         // Build the IDs array that the control tower will pass to the DAO
         String[] collidedIDs = {plane1.getFlightNumber(), plane2.getFlightNumber()};
