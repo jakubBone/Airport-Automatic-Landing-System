@@ -28,10 +28,10 @@ public class Navigator {
     public Navigator(FuelManager fuelManager) {
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.fuelManager = fuelManager;
-        //this.currentIndex = 315;
-        //this.location = waypoints.get(currentIndex);
+        this.currentIndex = 315;
+        this.location = waypoints.get(currentIndex);
         this.isFirstMove = true;
-        spawnPlane();
+        //spawnPlane();
     }
 
     public void move(String id) {

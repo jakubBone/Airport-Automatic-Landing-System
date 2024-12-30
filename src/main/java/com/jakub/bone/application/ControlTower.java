@@ -70,7 +70,7 @@ public class ControlTower {
         executeWithLock(() -> planes.remove(plane));
     }
 
-    public void checkCollision() {
+    /*public void checkCollision() {
         executeWithLock(() -> {
             for (int i = 0; i < planes.size(); i++) {
                 Plane plane1 = planes.get(i);
@@ -93,7 +93,7 @@ public class ControlTower {
     }
 
 
-    /*
+    *//*
      * Checks if two planes (calculated from their center points) are too close to each other.
      *
      * The 500 meters in the X–Y regards to the model size of implemented plane.obj
@@ -101,7 +101,7 @@ public class ControlTower {
      *
      * In practice, if the horizontal distance <= 500 and the altitude difference <= 10,
      * it is considered a potential collision risk
-     */
+     *//*
     private boolean arePlanesToClose(Location loc1, Location loc2) {
         double horizontalDistance = Math.sqrt(
                 Math.pow(loc1.getX() - loc2.getX(), 2) +
@@ -109,7 +109,7 @@ public class ControlTower {
         );
         double altDiff = Math.abs(loc1.getAltitude() - loc2.getAltitude());
         return horizontalDistance <= HORIZONTAL_COLLISION_DISTANCE && altDiff <= ALTITUDE_COLLISION_DISTANCE;
-    }
+    }*/
 
     public boolean isPlaneApproachingHoldingAltitude(Plane plane) {
         return plane.getNavigator().getLocation().getAltitude() == HOLDING_ENTRY_ALTITUDE;
