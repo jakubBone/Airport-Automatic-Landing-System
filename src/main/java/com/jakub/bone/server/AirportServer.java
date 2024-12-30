@@ -38,7 +38,7 @@ public class AirportServer  {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     if (clientSocket != null) {
-                        log.info("Server connected with client at port: {}", port);
+                        log.debug("Server connected with client at port: {}", port);
                         new PlaneHandler(clientSocket, controlTower, airport).start();
                     }
                 } catch (Exception ex) {

@@ -29,7 +29,7 @@ public class PlaneCommunicationService {
         sendData(fuelLevel);
 
         if (plane.getFuelManager().isOutOfFuel()) {
-            log.info("Plane [{}] is out of fuel. Collision", plane.getFlightNumber());
+            log.info("Plane [{}]: out of fuel. Collision detected", plane.getFlightNumber());
             return false;
         }
         return true;
@@ -39,7 +39,7 @@ public class PlaneCommunicationService {
         Location location = plane.getNavigator().getLocation();
 
         if(location == null) {
-            log.info("Plane [{}] disappeared from the radar", plane.getFlightNumber());
+            log.info("Plane [{}]: disappeared from the radar", plane.getFlightNumber());
             return false;
         }
 

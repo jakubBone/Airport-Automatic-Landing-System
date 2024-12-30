@@ -21,11 +21,15 @@ public class FlightPhaseCoordinator {
     private Airport airport;
     private Messenger messenger;
     private Runway availableRunway;
+    private boolean descentLogged;
+    private boolean holdPatternLogged;
 
     public FlightPhaseCoordinator(ControlTower controlTower, Airport airport, Messenger messenger) {
         this.controlTower = controlTower;
         this.airport = airport;
         this.messenger = messenger;
+        this.descentLogged = false;
+        this.holdPatternLogged = false;
     }
 
     public void processFlightPhase(Plane plane, Location location, ObjectOutputStream out) throws IOException, ClassNotFoundException {
@@ -34,7 +38,7 @@ public class FlightPhaseCoordinator {
             case DESCENDING -> handleDescent(plane, out);
             case HOLDING -> handleHolding(plane, out);
             case LANDING -> handleLanding(plane);
-            default -> log.warn("Unknown flight phase for Plane [{}]: {}", plane.getFlightNumber(), plane.getPhase());
+            default -> log.warn("Plane [{}]: unknown flight phase for {}", plane.getFlightNumber(), plane.getPhase());
         }
     }
 
@@ -58,8 +62,6 @@ public class FlightPhaseCoordinator {
     }
 
     private void handleLanding(Plane plane) throws IOException, ClassNotFoundException {
-        log.info("Plane [{}] is landing", plane.getFlightNumber());
-
         if (controlTower.hasLandedOnRunway(plane, availableRunway)) {
             plane.setLanded(true);
             try{
@@ -68,7 +70,7 @@ public class FlightPhaseCoordinator {
                 ex.getMessage();
             }
             controlTower.removePlaneFromSpace(plane);
-            log.info("Plane [{}] has successfully landed on runway [{}]", plane.getFlightNumber(), availableRunway.getId());
+            log.info("Plane [{}]: successfully landed on runway [{}]", plane.getFlightNumber(), availableRunway.getId());
             return;
         }
         controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, availableRunway);
@@ -78,19 +80,26 @@ public class FlightPhaseCoordinator {
     private void applyDescending(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);
         plane.setPhase(DESCENDING);
-        log.info("Plane [{}] is descending", plane.getFlightNumber());
+        if (!descentLogged) {
+            log.info("Plane [{}]: instructed to {}", plane.getFlightNumber(), DESCENT);
+            descentLogged = true;
+        }
+
     }
 
     private void enterHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);
         plane.setPhase(HOLDING);
-        log.info("Plane [{}] is entering holding pattern", plane.getFlightNumber());
+        if (!holdPatternLogged) {
+            log.info("Plane [{}] enter {}", plane.getFlightNumber(), HOLDING);
+            holdPatternLogged = true;
+        }
+
     }
 
     private void applyHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(HOLD_PATTERN, out);
         plane.setPhase(HOLDING);
-        log.info("Plane [{}] is holding pattern", plane.getFlightNumber());
     }
 
     private void applyLanding(Plane plane, Runway runway, ObjectOutputStream out) throws IOException {
@@ -98,7 +107,7 @@ public class FlightPhaseCoordinator {
         plane.setPhase(LANDING);
         messenger.send(LAND, out);
         messenger.send(runway, out);
-        log.info("Plane [{}] cleared for landing on runway [{}]", plane.getFlightNumber(), runway.getId());
+        log.info("Plane [{}]: instructed to {} on runway [{}]", plane.getFlightNumber(), LAND, runway.getId());
     }
 
     private Runway getRunwayIfPlaneAtCorridor(Plane plane) {

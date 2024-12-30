@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import static com.jakub.bone.application.PlaneHandler.AirportInstruction.*;
+
 
 @Log4j2
 @Getter
@@ -21,6 +23,8 @@ public class PlaneInstructionHandler {
     private ObjectOutputStream out;
     private boolean isProcessCompleted;
     private PlaneCommunicationService communicationService;
+    private boolean descentLogged;
+    private boolean holdPatternLogged;
 
     public PlaneInstructionHandler(Plane plane, Messenger messenger, ObjectInputStream in, ObjectOutputStream out) {
         this.plane = plane;
@@ -28,6 +32,8 @@ public class PlaneInstructionHandler {
         this.in = in;
         this.out = out;
         this.communicationService = new PlaneCommunicationService(plane, messenger, out);
+        this.descentLogged = false;
+        this.holdPatternLogged = false;
     }
 
     public void processInstruction(PlaneHandler.AirportInstruction instruction) throws IOException, ClassNotFoundException {
@@ -36,9 +42,9 @@ public class PlaneInstructionHandler {
             case HOLD_PATTERN -> handleHoldPattern();
             case LAND -> handleLanding();
             case COLLISION -> handleCollision();
-            case FULL -> abortProcess("Airspace is FULL. Redirecting to another airport");
-            case RISK_ZONE -> abortProcess("Initial location in RISK ZONE. Cannot proceed");
-            default -> log.warn("Unknown instruction for Plane [{}]: [{}]", plane.getFlightNumber(), instruction);
+            case FULL -> abortProcess("No capacity in the airspace");
+            case RISK_ZONE -> abortProcess("Initial location occupied");
+            default -> log.warn("Plane [{}]: Unknown instruction: {}", plane.getFlightNumber(), instruction);
         }
     }
 
@@ -46,13 +52,12 @@ public class PlaneInstructionHandler {
         Runway runway = messenger.receiveAndParse(in, Runway.class);
         plane.setLandingPhase(runway);
 
-        log.info("Plane [{}] assigned to LAND on runway {{}]", plane.getFlightNumber(), runway.getId());
+        log.info("Plane [{}]: instructed to {} on runway {{}]", plane.getFlightNumber(), LAND, runway.getId());
         performLanding(runway);
     }
 
     private void performLanding(Runway runway) throws IOException {
         while (!isProcessCompleted) {
-
             if(!communicationService.sendFuelLevel()){
                 return;
             }
@@ -65,28 +70,34 @@ public class PlaneInstructionHandler {
 
             if (plane.isLanded()) {
                 isProcessCompleted = true;
-                log.info("Plane [{}] has successfully landed on runway {{}]", plane.getFlightNumber(), runway.getId());
+                log.info("Plane [{}]: successfully landed on runway {{}]", plane.getFlightNumber(), runway.getId());
             }
         }
     }
 
     private void handleDescent() {
-        log.info("Plane [{}] instructed to DESCENT", plane.getFlightNumber());
+        if (!descentLogged) {
+            log.info("Plane [{}]: instructed to {}", plane.getFlightNumber(), DESCENT);
+            descentLogged = true;
+        }
         plane.descend();
     }
 
     private void handleHoldPattern() {
-        log.info("Plane [{}] instructed to HOLD_PATTERN", plane.getFlightNumber());
+        if (!holdPatternLogged) {
+            log.info("Plane [{}]: instructed to {}", plane.getFlightNumber(), HOLD_PATTERN);
+            holdPatternLogged = true;
+        }
         plane.hold();
     }
 
     private void abortProcess(String message) {
-        log.info("Plane [{}]: {}", plane.getFlightNumber(), message);
+        log.info("Plane [{}]: {} Redirecting", plane.getFlightNumber(), message);
         isProcessCompleted = true;
     }
 
     private void handleCollision() {
-        log.info("COLLISION detected for Plane [{}]. Stopping communication", plane.getFlightNumber());
+        log.info("Plane [{}]: {} detected", plane.getFlightNumber(), COLLISION);
         plane.destroyPlane();
         isProcessCompleted = true;
     }

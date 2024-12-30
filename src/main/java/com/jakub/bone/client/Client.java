@@ -29,7 +29,7 @@ public class Client {
             this.out = new ObjectOutputStream(socket.getOutputStream());
             this.in = new ObjectInputStream(socket.getInputStream());
             this.isConnected = true;
-            log.info("Connection established successfully");
+            log.debug("Connection established successfully");
         } catch (IOException ex) {
             log.error("Failed to connect to server at {}:{} - {}", ip, port, ex.getMessage());
         }

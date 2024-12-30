@@ -58,7 +58,6 @@ public class Plane implements Serializable {
     public void land(Runway runway){
         assignedRunway = runway;
         navigator.move(flightNumber);
-        log.info("Plane [{}] is LANDING on runway [{}]", getFlightNumber(), runway.getId());
         if(navigator.isAtLastWaypoint()) {
             navigator.setLocation(runway.getLandingPoint());
             landed = true;

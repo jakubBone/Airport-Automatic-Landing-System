@@ -29,10 +29,10 @@ public class Navigator {
     public Navigator(FuelManager fuelManager) {
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.fuelManager = fuelManager;
-        this.currentIndex = 316;
-        this.location = waypoints.get(currentIndex);
+        //this.currentIndex = 315;
+        //this.location = waypoints.get(currentIndex);
         this.isFirstMove = true;
-        //spawnPlane();
+        spawnPlane();
     }
 
     public void move(String id) {
@@ -56,7 +56,6 @@ public class Navigator {
             }
         }
         this.isFirstMove = false;
-        log.info("Plane [{}] is moving to waypoint {}: [{}, {}, {}]", id, currentIndex, location.getX(), location.getY(), location.getAltitude());
         this.location = location;
     }
 

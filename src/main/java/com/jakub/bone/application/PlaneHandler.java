@@ -67,7 +67,7 @@ public class PlaneHandler extends Thread {
     private boolean isPlaneRegistered(Plane plane, ObjectOutputStream out) throws IOException {
         if (controlTower.isSpaceFull()) {
             messenger.send(FULL, out);
-            log.info("No capacity in airspace for Plane [{}]", plane.getFlightNumber());
+            log.info("Plane [{}]: no capacity in airspace", plane.getFlightNumber());
             return false;
         }
 
@@ -79,12 +79,12 @@ public class PlaneHandler extends Thread {
 
         if (controlTower.isAtCollisionRiskZone(plane)) {
             messenger.send(RISK_ZONE, out);
-            log.info("Initial location Plane [{}] is at risk zone", plane.getFlightNumber());
+            log.info("Plane [{}]: initial location occupied. Redirecting", plane.getFlightNumber());
             return false;
         }
         controlTower.registerPlane(plane);
 
-        log.info("Plane [{}] registered in airspace on [{}] / [{}] / [{}]", plane.getFlightNumber(), plane.getNavigator().getLocation().getX(), plane.getNavigator().getLocation().getY(), plane.getNavigator().getLocation().getAltitude());
+        log.info("Plane [{}]: registered at ({}, {}, {}) ", plane.getFlightNumber(), plane.getNavigator().getLocation().getX(), plane.getNavigator().getLocation().getY(), plane.getNavigator().getLocation().getAltitude());
         return true;
     }
 
@@ -109,14 +109,13 @@ public class PlaneHandler extends Thread {
             }
 
             if (plane.isLanded()) {
-                log.info("Plane [{}] has successfully landed", plane.getFlightNumber());
+                log.info("Plane [{}]: successfully landed", plane.getFlightNumber());
                 return;
             }
         }
     }
 
     public void handleCollision(Plane plane, ObjectOutputStream out) throws IOException {
-        log.info("COLLISION detected for Plane [{}]", plane.getFlightNumber());
         if(plane.getAssignedRunway() != null){
             controlTower.releaseRunway(plane.getAssignedRunway());
         }
@@ -127,7 +126,7 @@ public class PlaneHandler extends Thread {
     private void handleOutOfFuel(Plane plane) throws IOException {
         plane.destroyPlane();
         controlTower.removePlaneFromSpace(plane);
-        log.info("Plane [{}] is out of fuel. Disappeared from the radar ", plane.getFlightNumber());
+        log.info("Plane [{}]: out of fuel. Disappeared from the radar", plane.getFlightNumber());
     }
 }
 
