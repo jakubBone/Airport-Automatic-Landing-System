@@ -1,7 +1,7 @@
 # Airport Automatic Landing System
 
 Welcome to the Automatic Landing System with Java. This project is currently under development and demonstrates a client-server architecture
-designed to manage the automatic landing of airplanes in a simulated airspace around an airport. The system ensures safe landings by controlling the movement
+designed to manage the automatic landing of airplanes in a simulated airspace around an domain. The system ensures safe landings by controlling the movement
 of airplanes in the airspace, managing fuel levels, and preventing collisions. I am continuously adding new features and improvements as the project evolves.
 
 
@@ -18,19 +18,19 @@ AirTrafficController: Manages runway assignments and landing procedures.
 
 PlaneHandler: Handles utills between each PlaneClient and the AirportServer. 
 
-Runway: Represents a physical runway with a specific location at the airport.
+Runway: Represents a physical runway with a specific location at the domain.
 
 Location: Handles the coordinates (x, y, altitude) of the airplanes and runways within the airspace.
 
 
 ## Project Overview
-The application will allow airplanes (clients) to enter the airspace around an airport and follow a holding pattern.
+The application will allow airplanes (clients) to enter the airspace around an domain and follow a holding pattern.
 
 The server processes incoming requests from airplanes, guides them through the airspace, and ensures they land safely. 
 
 Here are the main features:
 
-Holding Pattern: Airplanes follow a circular holding pattern around the airport, gradually lowering their altitude while waiting for an available runway.
+Holding Pattern: Airplanes follow a circular holding pattern around the domain, gradually lowering their altitude while waiting for an available runway.
 
 Collision Prevention: The server monitors the airspace to prevent collisions by managing the positions of airplanes and ensuring safe distances between them.
 

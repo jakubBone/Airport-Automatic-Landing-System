@@ -51,8 +51,8 @@
             <AppenderRef ref="Console"/> <!-- All levels in console-->
         </Logger>
 
-        <!-- Logger for airport classes -->
-        <Logger name="airport" level="info" additivity="false">
+        <!-- Logger for domain classes -->
+        <Logger name="domain" level="info" additivity="false">
             <AppenderRef ref="ServerLogFile"/> <!-- Only warn and up to file server.log -->
             <AppenderRef ref="Console"/> <!-- All levels in console-->
         </Logger>

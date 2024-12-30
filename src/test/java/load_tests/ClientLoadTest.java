@@ -1,6 +1,6 @@
 package load_tests;
 
-import client.PlaneClient;
+import com.jakub.bone.client.PlaneClient;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;

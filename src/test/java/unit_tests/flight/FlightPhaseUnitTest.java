@@ -1,31 +1,31 @@
 package unit_tests.flight;
 
-import airport.Airport;
+import com.jakub.bone.domain.airport.Airport;
 
-import controller.ControlTower;
-import controller.FlightPhaseManager;
-import database.AirportDatabase;
-import database.CollisionDAO;
-import database.PlaneDAO;
-import location.Location;
-import location.WaypointGenerator;
+import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.application.FlightPhaseManager;
+import com.jakub.bone.database.AirportDatabase;
+import com.jakub.bone.database.CollisionDAO;
+import com.jakub.bone.database.PlaneDAO;
+import com.jakub.bone.domain.airport.Location;
+import com.jakub.bone.utills.WaypointGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import plane.Plane;
-import utills.Messenger;
+import com.jakub.bone.domain.plane.Plane;
+import com.jakub.bone.utills.Messenger;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static airport.Airport.runway1;
+import static com.jakub.bone.domain.airport.Airport.runway1;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static plane.Plane.FlightPhase.*;
-import static utills.Constant.FINAL_APPROACH_CORRIDOR_1;
+import static com.jakub.bone.domain.plane.Plane.FlightPhase.*;
+import static com.jakub.bone.utills.Constant.FINAL_APPROACH_CORRIDOR_1;
 
 /**
  * This class tests how a plane's flight phase changes
@@ -73,7 +73,7 @@ class FlightPhaseUnitTest {
     void testPhaseSwitchToHolding() throws IOException, ClassNotFoundException {
         // Plane has reached the end of its descent waypoints
         Plane plane = new Plane("TEST_PLANE");
-        plane.getNavigator().setCurrentIndex(WaypointGenerator.generateDescentWaypoints().size());
+        plane.getNavigator().setCurrentIndex(WaypointGenerator.getDescentWaypoints().size());
         plane.descend();
 
         // Holding altitude = 1000
