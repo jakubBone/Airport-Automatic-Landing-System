@@ -69,10 +69,6 @@ public class Navigator {
         this.location = initialWaypoint;
     }
 
-    public void setLocation(Location newLocation) {
-        this.location = newLocation;
-    }
-
     public List <Location> getRiskZoneWaypoints(){
         List <Location> nearWaypoints = new ArrayList<>();
         nearWaypoints.add(waypoints.get(currentIndex - 1));

@@ -48,7 +48,6 @@ public class CollisionDetector extends Thread {
         log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getFlightNumber(), plane2.getFlightNumber());
     }
 
-
     /*
      * Checks if two planes (calculated from their center points) are too close to each other.
      *
