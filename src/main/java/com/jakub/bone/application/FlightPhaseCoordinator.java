@@ -16,13 +16,13 @@ import static com.jakub.bone.utills.Constant.ENTRY_POINT_CORRIDOR_1;
 import static com.jakub.bone.utills.Constant.ENTRY_POINT_CORRIDOR_2;
 
 @Log4j2
-public class FlightPhaseManager {
+public class FlightPhaseCoordinator {
     private ControlTower controlTower;
     private Airport airport;
     private Messenger messenger;
     private Runway availableRunway;
 
-    public FlightPhaseManager(ControlTower controlTower, Airport airport, Messenger messenger) {
+    public FlightPhaseCoordinator(ControlTower controlTower, Airport airport, Messenger messenger) {
         this.controlTower = controlTower;
         this.airport = airport;
         this.messenger = messenger;

@@ -24,14 +24,14 @@ public class PlaneHandler extends Thread {
     private final ControlTower controlTower;
     private final Airport airport;
     private Messenger messenger;
-    private FlightPhaseManager flightPhaseManager;
+    private FlightPhaseCoordinator phaseCoordinator;
 
     public PlaneHandler(Socket clientSocket, ControlTower controlTower, Airport airport) {
         this.clientSocket = clientSocket;
         this.controlTower = controlTower;
         this.airport = airport;
         this.messenger = new Messenger();
-        this.flightPhaseManager = new FlightPhaseManager(controlTower, airport, messenger);
+        this.phaseCoordinator = new FlightPhaseCoordinator(controlTower, airport, messenger);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class PlaneHandler extends Thread {
             }
 
             Location location = messenger.receiveAndParse(in, Location.class);
-            flightPhaseManager.processFlightPhase(plane, location, out);
+            phaseCoordinator.processFlightPhase(plane, location, out);
 
             if (plane.isDestroyed()) {
                 handleCollision(plane, out);

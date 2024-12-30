@@ -3,7 +3,7 @@ package unit_tests.flight;
 import com.jakub.bone.domain.airport.Airport;
 
 import com.jakub.bone.application.ControlTower;
-import com.jakub.bone.application.FlightPhaseManager;
+import com.jakub.bone.application.FlightPhaseCoordinator;
 import com.jakub.bone.database.AirportDatabase;
 import com.jakub.bone.database.CollisionDAO;
 import com.jakub.bone.database.PlaneDAO;
@@ -39,7 +39,7 @@ class FlightPhaseUnitTest {
     @Mock
     CollisionDAO mockCollisionDAO;
     ControlTower controlTower;
-    FlightPhaseManager flightPhaseManager;
+    FlightPhaseCoordinator phaseCoordinator;
     Airport airport;
     Messenger messenger;
 
@@ -51,7 +51,7 @@ class FlightPhaseUnitTest {
         this.controlTower = new ControlTower(mockDatabase);
         this.airport = new Airport();
         this.messenger = mock(Messenger.class);
-        this.flightPhaseManager = new FlightPhaseManager(controlTower, airport, messenger);
+        this.phaseCoordinator = new FlightPhaseCoordinator(controlTower, airport, messenger);
 
     }
 
@@ -62,7 +62,7 @@ class FlightPhaseUnitTest {
         Plane plane = new Plane("TEST_PLANE");
         Location descentPoint = new Location(0, 0, 3000);
 
-        flightPhaseManager.processFlightPhase(plane, descentPoint, null);
+        phaseCoordinator.processFlightPhase(plane, descentPoint, null);
 
         assertEquals(DESCENDING, plane.getPhase(), "Flight phase should be set as DESCENDING");
     }
@@ -78,7 +78,7 @@ class FlightPhaseUnitTest {
 
         // Holding altitude = 1000
         Location holdingPoint = new Location(0, 0, 1000);
-        flightPhaseManager.processFlightPhase(plane, holdingPoint, null);
+        phaseCoordinator.processFlightPhase(plane, holdingPoint, null);
 
         assertEquals(HOLDING, plane.getPhase(), "Flight phase should be switched to HOLDING");
     }
@@ -93,7 +93,7 @@ class FlightPhaseUnitTest {
 
         // Corridor entry triggers the switch to LANDING
         Location corridorEntry = runway1.getCorridor().getEntryPoint();
-        flightPhaseManager.processFlightPhase(plane, corridorEntry, null);
+        phaseCoordinator.processFlightPhase(plane, corridorEntry, null);
 
         assertEquals(LANDING, plane.getPhase(), "Flight phase should be switched to LANDING");
     }

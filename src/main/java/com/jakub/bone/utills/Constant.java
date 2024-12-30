@@ -31,13 +31,13 @@ public class Constant {
     public static Location LANDING_POINT_RUNWAY_2 = new Location(3000, -1500, 0);
     public static Location ENTRY_POINT_CORRIDOR_1 = new Location(-5000, 3500, 1000);
     public static Location ENTRY_POINT_CORRIDOR_2 = new Location(-5000, 500, 1000);
-    //public static Location FINAL_APPROACH_CORRIDOR_1 = new Location(-2500, 1500, 600);
-    public static Location FINAL_APPROACH_CORRIDOR_1 = new Location(-1000, 1500, 300);
+    public static Location FINAL_APPROACH_CORRIDOR_1 = new Location(-500, 1500, 200);
+    //public static Location FINAL_APPROACH_CORRIDOR_1 = new Location(-1000, 1500, 300);
     //public static Location FINAL_APPROACH_CORRIDOR_1 = new Location(-2000, 1500, 500);
-    //public static Location FINAL_APPROACH_CORRIDOR_1 = new Location(-3000, 1500, 700);
-    public static Location FINAL_APPROACH_CORRIDOR_2 = new Location(-1000, -1500, 300);
+    public static Location FINAL_APPROACH_CORRIDOR_2 = new Location(-500, -1500, 200);
+    //public static Location FINAL_APPROACH_CORRIDOR_2 = new Location(-1000, -1500, 300);
     //public static Location FINAL_APPROACH_CORRIDOR_2 = new Location(-2000, -1500, 500);
-    //public static Location FINAL_APPROACH_CORRIDOR_2 = new Location(-3000, -1500, 700);
+
 
     // Holding-related
     public static int HOLDING_ALTITUDE = 1000; // in meters
