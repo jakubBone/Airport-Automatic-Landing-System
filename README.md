@@ -81,22 +81,22 @@ Before you begin, ensure you have the following tools installed:
      private final String USER = "your_user";
      private final String PASSWORD = "your_password";
 
-3. **Build the Project**
+3. **Build the Project**   
    Use Gradle to build the project:
    ```bash
    ./gradlew build
 
-5. **Run the Server** 
+5. **Run the Server**   
    Start the server to manage plane communications:
    ```bash
    java -cp build/classes/java/main com.jakub.bone.core.AirportServer
 
-6. **Run the Clients**
+6. **Run the Clients**  
    Simulate planes connecting to the server:
    ```bash
    java -cp build/classes/java/main com.jakub.bone.core.PlaneClient
 
-7. **Launch Visualization** (Optional)
+7. **Launch Visualization** (Optional)  
    Start the 3D visualization tool for real-time airplane monitoring:
    ```bash
    java -cp build/classes/java/main com.jakub.bone.core.SimulationLauncher
