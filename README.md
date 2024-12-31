@@ -86,17 +86,17 @@ Before you begin, ensure you have the following tools installed:
    ```bash
    ./gradlew build
 
-4. **Run the Server** 
+5. **Run the Server** 
    Start the server to manage plane communications:
    ```bash
    java -cp build/classes/java/main com.jakub.bone.core.AirportServer
 
-5. **Run the Clients**
+6. **Run the Clients**
    Simulate planes connecting to the server:
    ```bash
    java -cp build/classes/java/main com.jakub.bone.core.PlaneClient
 
-6. **Launch Visualization** (Optional)
+7. **Launch Visualization** (Optional)
    Start the 3D visualization tool for real-time airplane monitoring:
    ```bash
    java -cp build/classes/java/main com.jakub.bone.core.SimulationLauncher
