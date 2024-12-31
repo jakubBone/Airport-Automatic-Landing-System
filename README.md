@@ -1,74 +1,123 @@
-# Airport Automatic Landing System
+# ✈️ Airport Automatic Landing System
 
-Welcome to the Automatic Landing System with Java. This project is currently under development and demonstrates a client-server architecture
-designed to manage the automatic landing of airplanes in a simulated airspace around an domain. The system ensures safe landings by controlling the movement
-of airplanes in the airspace, managing fuel levels, and preventing collisions. I am continuously adding new features and improvements as the project evolves.
-
-
-## Project Structure
-The project now is divided into several key components:
-
-PlaneClient (Client): Represents an airplane and handles the airplane's movement, utills with the server, and fuel management.
-
-AirportServer (Server): Manages airplane connections, processes landing requests, and ensures safe landing by controlling runway availability.
-
-AirSpace: Manages the airspace, including tracking airplanes, collision detection, and enforcing airspace capacity limits.
-
-AirTrafficController: Manages runway assignments and landing procedures.
-
-PlaneHandler: Handles utills between each PlaneClient and the AirportServer. 
-
-Runway: Represents a physical runway with a specific location at the domain.
-
-Location: Handles the coordinates (x, y, altitude) of the airplanes and runways within the airspace.
+Welcome to the Airport Automatic Landing System! This project showcases a robust and safe solution for automating airplane landings, 
+utilizing client-server architecture, collision detection, and real-time monitoring. The system is designed to handle multiple planes, 
+prevent collisions, and ensure efficient usage of runways.
 
 
-## Project Overview
-The application will allow airplanes (clients) to enter the airspace around an domain and follow a holding pattern.
+## 🎯 Features
 
-The server processes incoming requests from airplanes, guides them through the airspace, and ensures they land safely. 
+- **Collision Detection**: Prevents crashes by continuously monitoring airplane positions
 
-Here are the main features:
+- **Runway Assignment**: Dynamically allocates available runways for landing
 
-Holding Pattern: Airplanes follow a circular holding pattern around the domain, gradually lowering their altitude while waiting for an available runway.
+- **Fuel Monitoring**: Ensures planes are directed appropriately based on fuel levels
 
-Collision Prevention: The server monitors the airspace to prevent collisions by managing the positions of airplanes and ensuring safe distances between them.
+- **Client-Server Communication**: Planes (clients) communicate with the control tower (server) via sockets
 
-Landing Management: When a runway is available, the server guides an airplane out of its holding pattern and onto the runway for landing.
+- **Database Integration**: Logs airspace registrations, landings, collisions, and plane details for analysis
 
-Fuel Management: The system tracks the fuel levels of each airplane. If a plane runs out of fuel before landing, an emergency is triggered.
-
-Database Operations: The application uses a database to store records of successful landings, collisions, and other important events in the airspace.
+- **Visualization**: A 3D interface using JavaFX for visualizing airplane movements
 
 
-## How to Run
+## 🚀 Technologies Used
 
-To run the Automatic Landing System, ensure you have the Java Development Kit (JDK) installed on your system. 
-Follow these steps:
+- **Java 21**: Core programming language for client-server logic
 
-### Clone this repository to your computer:
-<https://github.com/jakubBone/Automatic-Landing-System>
+- **PostgreSQL**: Backend database for logging data
 
-### Navigate to the project directory:
-cd AirportAutomatic-Landing-System
+- **JOOQ**: SQL builder for database interactions
 
-### Compile and run the server:
-javac AirportServer.java
-java AirportServer
+- **JavaFX**: 3D visualization of the airport and planes
 
-### Compile and run the client:
-javac PlaneClient.java
-java PlaneClient
+- **Log4j2**: Logging system for debugging and information tracking
+
+- **Gradle**: Build automation and dependency management
 
 
-## Requirements
-To compile and run the application, you'll need Java Development Kit (JDK) installed on your system.
+## 📂 Project Structure
+
+```
+src
+├── com.jakub.bone.application    # Core application logic
+├── com.jakub.bone.client         # Client-side logic 
+├── com.jakub.bone.core           # Simulation entry point
+├── com.jakub.bone.database       # Database integration using JOOQ
+├── com.jakub.bone.domain         # Domain models for airport and airplane
+├── com.jakub.bone.server         # Server-side logic 
+├── com.jakub.bone.ui             # Visualization components
+└── com.jakub.bone.utills          # Utilities and constants  
+``` 
 
 
-## Future Developments
-This project is a work in progress, with ongoing updates focused on enhancing functionality.
+## 🚀 Getting Started
+
+Follow these steps to set up and run the project:
+
+### Prerequisites
+
+Before you begin, ensure you have the following tools installed:
+- **Java Development Kit (JDK)** 21 or higher
+- **Gradle** for dependency management
+- **PostgreSQL** database
+- **JavaFX** library for visualization
+
+### Setup Instructions
+
+1. **Clone the Repository**  
+   Download the project files to your local machine:
+   ```bash
+   git clone https://github.com/jakubBone/Airport-Automatic-Landing-System.git
+   cd Airport-Automatic-Landing-System
+
+2. **Configure the Database**  
+   Set up a PostgreSQL database:
+   - Create a database named airport_system.
+   - Update the database credentials in the `AirportDatabase.java` file located at:
+     `src/com/jakub/bone/database/AirportDatabase.java`.
+     Replace the placeholders with your database credentials:
+     ```java
+     private final String USER = "your_user";
+     private final String PASSWORD = "your_password";
+
+3. **Build the Project**
+   Use Gradle to build the project:
+   ```bash
+   ./gradlew build
+
+4. **Run the Server** 
+   Start the server to manage plane communications:
+   ```bash
+   java -cp build/classes/java/main com.jakub.bone.core.AirportServer
+
+5. **Run the Clients**
+   Simulate planes connecting to the server:
+   ```bash
+   java -cp build/classes/java/main com.jakub.bone.core.PlaneClient
+
+6. **Launch Visualization** (Optional)
+   Start the 3D visualization tool for real-time airplane monitoring:
+   ```bash
+   java -cp build/classes/java/main com.jakub.bone.core.SimulationLauncher
 
 
-## Logging
-The application uses Log4j2 for logging. The application generates detailed logs that are useful
-for developers during troubleshooting. Access to the source code is essential for a full analysis and repair.
+## 🎨 Interactive Visualization
+
+Experience the airport operations in 3D! Planes move dynamically, and collisions or landings are visually represented. 
+Control the camera with keyboard inputs:
+
+- **W/A/S/D**: Move the camera
+  
+- **Z/X**: Zoom in/out
+  
+- **Arrow Keys**: Rotate the camera
+
+## 📧 Contact
+
+If you have any questions, feedback, or suggestions, feel free to reach out to me:
+
+- **Email**: [jakub.bone1990@gmail.com](mailto:jakub.bone1990@gmail,com)
+- **Blog**: [javamPokaze.pl](https://javampokaze.pl)  
+- **LinkedIn**: [Jakub Bone](https://www.linkedin.com/in/jakub-bone)  
+
+Let's connect and discuss this project further! 🚀
