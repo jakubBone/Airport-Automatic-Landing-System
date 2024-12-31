@@ -47,7 +47,7 @@ src
 ├── com.jakub.bone.domain         # Domain models for airport and airplane
 ├── com.jakub.bone.server         # Server-side logic 
 ├── com.jakub.bone.ui             # Visualization components
-└── com.jakub.bone.utills          # Utilities and constants  
+└── com.jakub.bone.utills         # Utilities and constants  
 ``` 
 
 
