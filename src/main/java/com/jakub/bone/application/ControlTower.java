@@ -2,7 +2,6 @@ package com.jakub.bone.application;
 
 import com.jakub.bone.domain.airport.Runway;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.domain.airport.Location;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.domain.plane.Plane;
