@@ -73,9 +73,9 @@ Before you begin, ensure you have the following tools installed:
 
 2. **Configure the Database**  
    Set up a PostgreSQL database:
-   - Create a database named airport_system.
+   - Create a database named airport_system
    - Update the database credentials in the `AirportDatabase.java` file located at:
-     `src/com/jakub/bone/database/AirportDatabase.java`.
+     `src/com/jakub/bone/database/AirportDatabase.java`
      Replace the placeholders with your database credentials:
      ```java
      private final String USER = "your_user";
@@ -104,7 +104,7 @@ Before you begin, ensure you have the following tools installed:
 
 ## 🎨 Interactive Visualization
 
-Experience the airport operations in 3D! Planes move dynamically, and collisions or landings are visually represented. 
+Experience the airport operations in 3D! Planes move dynamically, and collisions or landings are visually represented.
 Control the camera with keyboard inputs:
 
 - **W/A/S/D**: Move the camera
