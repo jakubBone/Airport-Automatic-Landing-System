@@ -31,7 +31,7 @@ prevent collisions, and ensure efficient usage of runways.
 
 - **JavaFX**: 3D visualization of the airport and planes
 
-- **JUnit** - unit and integration testing
+- **JUnit**: unit and integration testing
 
 - **Log4j2**: Logging system for debugging and information tracking
 
