@@ -4,8 +4,8 @@ import com.jakub.bone.domain.airport.Airport;
 
 import com.jakub.bone.application.ControlTower;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionDAO;
-import com.jakub.bone.database.PlaneDAO;
+import com.jakub.bone.database.CollisionRepository;
+import com.jakub.bone.database.PlaneRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,17 +26,17 @@ class RunwayTest {
     @Mock
     AirportDatabase mockDatabase;
     @Mock
-    PlaneDAO mockPlaneDAO;
+    PlaneRepository mockPlaneRepository;
     @Mock
-    CollisionDAO mockCollisionDAO;
+    CollisionRepository mockCollisionRepository;
     ControlTower controlTower;
     Airport airport;
 
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneDAO);
-        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDAO);
+        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneRepository);
+        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionRepository);
         controlTower = new ControlTower(mockDatabase);
         airport = new Airport();
     }

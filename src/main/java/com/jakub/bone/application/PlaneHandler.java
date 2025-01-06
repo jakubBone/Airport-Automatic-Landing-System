@@ -16,7 +16,6 @@ import static com.jakub.bone.domain.plane.Plane.FlightPhase.DESCENDING;
 
 @Log4j2
 public class PlaneHandler extends Thread {
-
     public enum AirportInstruction {
         DESCENT, HOLD_PATTERN, LAND, FULL, COLLISION, RISK_ZONE
     }

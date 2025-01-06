@@ -32,28 +32,18 @@ public class Camera {
 
         scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {
-                // Unit setting
                 case X -> zoom(-200);   // Zoom in
                 case Z -> zoom(200);    // Zoom out
-                case W -> rotateCamera(-5, 0);   // Upward
-                case S -> rotateCamera(5, 0);  // Downward
-                case D -> rotateCamera(0, -5); // Left
-                case A -> rotateCamera(0, 5); // Right
 
-                // View setting
                 case UP -> rotateX.setAngle(rotateX.getAngle() + 25); // Rotation by X
                 case DOWN -> rotateX.setAngle(rotateX.getAngle() - 25); // Rotation by X
                 case LEFT -> rotateY.setAngle(rotateY.getAngle() - 25); // Rotation by Y
                 case RIGHT -> rotateY.setAngle(rotateY.getAngle() + 25); // Rotation by Y
-                case C -> getView(-45.0, 0.0, 0.0, -5000.0, -4200.0);
-                case V -> getView(-60.0, 0.0, 0.0, -5000.0, -2200);
+
+                case C -> getView(-45.0, 0.0, 0.0, -5000.0, -4200.0); // Scene 1
+                case V -> getView(-60.0, 0.0, 0.0, -5000.0, -2200); // Scene 2
             }
         });
-    }
-
-    private void rotateCamera(double angleX, double angleY) {
-        rotateX.setAngle(rotateX.getAngle() + angleX);
-        rotateY.setAngle(rotateY.getAngle() + angleY);
     }
 
     private void getView(double rotationX, double rotationY, double translationX, double translationY, double translationZ) {

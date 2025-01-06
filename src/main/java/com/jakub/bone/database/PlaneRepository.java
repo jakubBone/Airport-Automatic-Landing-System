@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 
 import static org.jooq.impl.DSL.*;
 
-public class PlaneDAO {
+public class PlaneRepository {
     private final DSLContext CONTEXT;
-    public PlaneDAO(DSLContext context) {
+    public PlaneRepository(DSLContext context) {
         CONTEXT = context;
     }
 

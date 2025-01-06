@@ -10,8 +10,6 @@ import java.util.List;
 import static com.jakub.bone.utills.Constant.*;
 
 public class WaypointGenerator implements Serializable {
-
-
     public static List<Location> getDescentWaypoints() {
         List<Location> waypoints = new ArrayList<>();
         int radius = 5000;
@@ -76,7 +74,6 @@ public class WaypointGenerator implements Serializable {
         for (int y = -3000; y <= -500; y += step) {
             waypoints.add(new Location(5000, y, HOLDING_ALTITUDE));
         }
-
         return waypoints;
     }
 
@@ -97,7 +94,6 @@ public class WaypointGenerator implements Serializable {
             arcPoints.add(new Location(x, y, altitude));
             altitude -= altitudeDecrement;
         }
-
         return arcPoints;
     }
 
@@ -129,7 +125,6 @@ public class WaypointGenerator implements Serializable {
         for (int x = 1000; x <= 3000; x += 250) {
             waypoints.add(new Location(x, runway.getLandingPoint().getY(), altitude));
         }
-
         return waypoints;
     }
 }

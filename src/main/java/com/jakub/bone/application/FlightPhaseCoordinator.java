@@ -93,7 +93,6 @@ public class FlightPhaseCoordinator {
         }
     }
 
-
     private void applyHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(HOLD_PATTERN, out);
         plane.setPhase(HOLDING);

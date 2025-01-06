@@ -3,8 +3,8 @@ package unit_tests.airspace;
 import com.jakub.bone.application.CollisionDetector;
 import com.jakub.bone.application.ControlTower;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionDAO;
-import com.jakub.bone.database.PlaneDAO;
+import com.jakub.bone.database.CollisionRepository;
+import com.jakub.bone.database.PlaneRepository;
 import com.jakub.bone.domain.airport.Location;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,17 +24,17 @@ class CollisionTest {
     @Mock
     AirportDatabase mockDatabase;
     @Mock
-    PlaneDAO mockPlaneDAO;
+    PlaneRepository mockPlaneRepository;
     @Mock
-    CollisionDAO mockCollisionDao;
+    CollisionRepository mockCollisionRepository;
     ControlTower controlTower;
     CollisionDetector collisionDetector;
 
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneDAO);
-        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDao);
+        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneRepository);
+        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionRepository);
         this.controlTower = new ControlTower(mockDatabase);
         this.collisionDetector = new CollisionDetector(controlTower);
     }

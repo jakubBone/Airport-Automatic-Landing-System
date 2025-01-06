@@ -4,8 +4,8 @@ import com.jakub.bone.application.CollisionDetector;
 import com.jakub.bone.domain.airport.Airport;
 import com.jakub.bone.application.ControlTower;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionDAO;
-import com.jakub.bone.database.PlaneDAO;
+import com.jakub.bone.database.CollisionRepository;
+import com.jakub.bone.database.PlaneRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,17 +23,17 @@ class DatabaseOperationTest {
     @Mock
     AirportDatabase mockDatabase;
     @Mock
-    PlaneDAO mockPlaneDAO;
+    PlaneRepository mockPlaneRepository;
     @Mock
-    CollisionDAO mockCollisionDAO;
+    CollisionRepository mockCollisionRepository;
     ControlTower controlTower;
     CollisionDetector collisionDetector;
 
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneDAO);
-        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionDAO);
+        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneRepository);
+        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionRepository);
         controlTower = new ControlTower(mockDatabase);
         collisionDetector = new CollisionDetector(controlTower);
     }
@@ -46,7 +46,7 @@ class DatabaseOperationTest {
         // Registration should trigger a DB operation
         controlTower.registerPlane(plane);
 
-        verify(mockPlaneDAO, times(1)).registerPlaneInDB(plane);
+        verify(mockPlaneRepository, times(1)).registerPlaneInDB(plane);
     }
 
     @Test
@@ -60,7 +60,7 @@ class DatabaseOperationTest {
         // Inform control tower that plane has landed
         controlTower.hasLandedOnRunway(plane, runway1);
 
-        verify(mockPlaneDAO, times(1)).registerLandingInDB(plane);
+        verify(mockPlaneRepository, times(1)).registerLandingInDB(plane);
     }
 
     @Test
@@ -81,6 +81,6 @@ class DatabaseOperationTest {
         // Build the IDs array that the control tower will pass to the DAO
         String[] collidedIDs = {plane1.getFlightNumber(), plane2.getFlightNumber()};
 
-        verify(mockCollisionDAO, times(1)).registerCollisionToDB(collidedIDs);
+        verify(mockCollisionRepository, times(1)).registerCollisionToDB(collidedIDs);
     }
 }

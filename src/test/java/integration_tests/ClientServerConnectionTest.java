@@ -3,8 +3,8 @@ package integration_tests;
 import com.jakub.bone.client.PlaneClient;
 import com.jakub.bone.application.ControlTower;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionDAO;
-import com.jakub.bone.database.PlaneDAO;
+import com.jakub.bone.database.CollisionRepository;
+import com.jakub.bone.database.PlaneRepository;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -22,17 +22,17 @@ class ClientServerConnectionTest {
     @Mock
     AirportDatabase mockDatabase;
     @Mock
-    PlaneDAO planeDAO;
+    PlaneRepository planeRepository;
     @Mock
-    CollisionDAO collisionDAO;
+    CollisionRepository collisionRepository;
     ControlTower controlTower;
     AirportServer server;
 
     @BeforeEach
     void setUp() throws IOException, SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_DAO()).thenReturn(planeDAO);
-        when(mockDatabase.getCOLLISION_DAO()).thenReturn(collisionDAO);
+        when(mockDatabase.getPLANE_DAO()).thenReturn(planeRepository);
+        when(mockDatabase.getCOLLISION_DAO()).thenReturn(collisionRepository);
 
         this.controlTower = new ControlTower(mockDatabase);
             new Thread(() -> {

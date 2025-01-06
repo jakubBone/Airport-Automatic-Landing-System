@@ -49,10 +49,10 @@ public class CollisionDetector extends Thread {
     }
 
     /*
-     * Checks if two planes (calculated from their center points) are too close to each other.
+     * Checks if two planes are too close to each other
      *
-     * The 500 meters in the X–Y regards to the model size of implemented plane.obj
-     * providing a safety margin for plane length wings, etc.
+     * Because the animation uses scaled aircraft models, the system has been adjusted to their size
+     * Introduced a 500-meter offset, ensuring collisions visually occur when the models actually touch
      *
      * In practice, if the horizontal distance <= 500 and the altitude difference <= 10,
      * it is considered a potential collision risk

@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 
 import static org.jooq.impl.DSL.*;
 
-public class CollisionDAO {
+public class CollisionRepository {
     private final DSLContext CONTEXT;
-    public CollisionDAO(DSLContext CONTEXT) {
+    public CollisionRepository(DSLContext CONTEXT) {
         this.CONTEXT = CONTEXT;
     }
 
