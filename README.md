@@ -1,6 +1,5 @@
 # ✈️ Airport Automatic Landing System
-
-<img src="src/main/resources/images/airport_automatic_landing_system.png" alt="Airport Automatic Landing System" width="50%">
+![Airport Automatic Landing System](src/main/resources/images/airport_automatic_landing_system.png)
 
 Welcome to the Airport Automatic Landing System! This project showcases a robust and safe solution for automating airplane landings, 
 utilizing client-server architecture, collision detection, and real-time monitoring. The system is designed to handle multiple planes, 
@@ -32,6 +31,8 @@ prevent collisions, and ensure efficient usage of runways.
 
 - **JavaFX**: 3D visualization of the airport and planes
 
+- **JUnit**: unit and integration testing
+
 - **Log4j2**: Logging system for debugging and information tracking
 
 - **Gradle**: Build automation and dependency management
@@ -48,7 +49,7 @@ src
 ├── com.jakub.bone.domain         # Domain models for airport and airplane
 ├── com.jakub.bone.server         # Server-side logic 
 ├── com.jakub.bone.ui             # Visualization components
-└── com.jakub.bone.utills          # Utilities and constants  
+└── com.jakub.bone.utills         # Utilities and constants  
 ``` 
 
 
@@ -74,30 +75,30 @@ Before you begin, ensure you have the following tools installed:
 
 2. **Configure the Database**  
    Set up a PostgreSQL database:
-   - Create a database named airport_system.
+   - Create a database named airport_system
    - Update the database credentials in the `AirportDatabase.java` file located at:
-     `src/com/jakub/bone/database/AirportDatabase.java`.
+     `src/com/jakub/bone/database/AirportDatabase.java`
      Replace the placeholders with your database credentials:
      ```java
      private final String USER = "your_user";
      private final String PASSWORD = "your_password";
 
-3. **Build the Project**
+3. **Build the Project**   
    Use Gradle to build the project:
    ```bash
    ./gradlew build
 
-4. **Run the Server** 
+5. **Run the Server**   
    Start the server to manage plane communications:
    ```bash
    java -cp build/classes/java/main com.jakub.bone.core.AirportServer
 
-5. **Run the Clients**
+6. **Run the Clients**  
    Simulate planes connecting to the server:
    ```bash
    java -cp build/classes/java/main com.jakub.bone.core.PlaneClient
 
-6. **Launch Visualization** (Optional)
+7. **Launch Visualization** (Optional)  
    Start the 3D visualization tool for real-time airplane monitoring:
    ```bash
    java -cp build/classes/java/main com.jakub.bone.core.SimulationLauncher
@@ -105,7 +106,7 @@ Before you begin, ensure you have the following tools installed:
 
 ## 🎨 Interactive Visualization
 
-Experience the airport operations in 3D! Planes move dynamically, and collisions or landings are visually represented. 
+Experience the airport operations in 3D! Planes move dynamically, and collisions or landings are visually represented.
 Control the camera with keyboard inputs:
 
 - **W/A/S/D**: Move the camera
