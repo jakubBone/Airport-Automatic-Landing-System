@@ -108,8 +108,6 @@ Before you begin, ensure you have the following tools installed:
 
 Experience the airport operations in 3D! Planes move dynamically, and collisions or landings are visually represented.
 Control the camera with keyboard inputs:
-
-- **W/A/S/D**: Move the camera
   
 - **Z/X**: Zoom in/out
   
