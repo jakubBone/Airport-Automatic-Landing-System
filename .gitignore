@@ -97,4 +97,4 @@ libs/javafx-sdk-21.0.5/legal
 ##############################
 ## JOOQ
 ##############################
-src/java/com/jakub/bone/generated
+src/java/com/jakub/bone/generated/
