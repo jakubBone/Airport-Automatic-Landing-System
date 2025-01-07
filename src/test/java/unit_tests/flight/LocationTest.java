@@ -19,7 +19,7 @@ class LocationTest {
         plane.getNavigator().setLocation(initLocation);
 
         // Update location
-        plane.getNavigator().updateLocation(newLocation, plane.getFlightNumber());
+        plane.getNavigator().updateLocation(newLocation);
 
         assertNotEquals(plane.getNavigator().getLocation(), initLocation, "Plane should not remain at the initial location");
         assertEquals(plane.getNavigator().getLocation(), newLocation, "Plane should have the new location after update");
