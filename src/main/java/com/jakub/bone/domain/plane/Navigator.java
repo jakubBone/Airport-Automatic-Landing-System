@@ -44,7 +44,7 @@ public class Navigator {
         return currentIndex == waypoints.size();
     }
 
-    public void updateLocation(Location location, String id) {
+    public void updateLocation(Location location) {
         if(!isFirstMove){
             try {
                 Thread.sleep(1000);
