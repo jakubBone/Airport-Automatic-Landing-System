@@ -24,7 +24,7 @@ prevent collisions, and ensure efficient usage of runways.
 
 ## 🚀 Technologies Used
 
-- **Java 21**: Core programming language for client-server logic
+- **Java 17**: Core programming language for client-server logic
 
 - **PostgreSQL**: Backend database for logging data
 
@@ -32,7 +32,7 @@ prevent collisions, and ensure efficient usage of runways.
 
 - **JavaFX**: 3D visualization of the airport and planes
 
-- **JUnit**: unit and integration testing
+- **JUnit**: Unit and integration testing
 
 - **Log4j2**: Logging system for debugging and information tracking
 
