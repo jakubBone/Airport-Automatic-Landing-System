@@ -36,6 +36,29 @@ public class Client {
     }
 
     protected void stopConnection() {
+        closeResources(out, in);
+        if (socket != null && !socket.isClosed()) {
+            try {
+                socket.close();
+            } catch (IOException ex) {
+                log.error("Failed to close socket: {}", ex.getMessage(), ex);
+            }
+        }
+    }
+
+    private void closeResources(AutoCloseable... resources) {
+        for (AutoCloseable resource : resources) {
+            if (resource != null) {
+                try {
+                    resource.close();
+                } catch (Exception ex) {
+                    log.error("Failed to close resource: {}", ex.getMessage(), ex);
+                }
+            }
+        }
+    }
+
+    /*protected void stopConnection() {
         try {
             if(socket != null && !socket.isClosed()){
                 socket.close();
@@ -49,5 +72,5 @@ public class Client {
         } catch (IOException ex) {
             log.error("Error occurred while closing resources: {}", ex.getMessage());
         }
-    }
+    }*/
 }
