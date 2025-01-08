@@ -37,16 +37,19 @@ public class PlaneHandler extends Thread {
     @Override
     public void run() {
         ThreadContext.put("type", "Server");
-        try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
-             ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
+        ObjectInputStream in = null;
+        ObjectOutputStream out = null;
 
+        try {
+            in = new ObjectInputStream(clientSocket.getInputStream());
+            out = new ObjectOutputStream(clientSocket.getOutputStream());
             handleClient(in, out);
-
         } catch (EOFException | SocketException ex) {
             log.warn("Connection to client lost. Client disconnected: {}", ex.getMessage());
         } catch (IOException | ClassNotFoundException ex) {
             log.error("Error occurred while handling client request: {}", ex.getMessage(), ex);
         } finally {
+            closeResources(in, out);
             try {
                 clientSocket.close();
             } catch (IOException ex) {
@@ -72,9 +75,9 @@ public class PlaneHandler extends Thread {
             return false;
         }
 
-        try{
+        try {
             Thread.sleep(1000);
-        } catch (InterruptedException ex){
+        } catch (InterruptedException ex) {
             ex.getMessage();
         }
 
@@ -117,15 +120,15 @@ public class PlaneHandler extends Thread {
     }
 
     private void handleCollision(Plane plane, ObjectOutputStream out) throws IOException {
-        if(plane.getAssignedRunway() != null){
+        if (plane.getAssignedRunway() != null) {
             controlTower.releaseRunway(plane.getAssignedRunway());
         }
         controlTower.getPlanes().remove(plane);
         messenger.send(COLLISION, out);
 
-        try{
+        try {
             Thread.sleep(2000);
-        } catch (InterruptedException ex){
+        } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
     }
@@ -135,5 +138,18 @@ public class PlaneHandler extends Thread {
         controlTower.removePlaneFromSpace(plane);
         log.info("Plane [{}]: out of fuel. Disappeared from the radar", plane.getFlightNumber());
     }
+
+    private void closeResources(AutoCloseable... resources) {
+        for (AutoCloseable resource : resources) {
+            if (resource != null) {
+                try {
+                    resource.close();
+                } catch (Exception ex) {
+                    log.error("Failed to close resource: {}", ex.getMessage(), ex);
+                }
+            }
+        }
+    }
 }
+
 
