@@ -37,7 +37,7 @@ public class Plane implements Serializable {
     }
 
     public void descend(){
-        navigator.move(flightNumber);
+        navigator.move();
         if (navigator.isAtLastWaypoint()) {
             setPhase(FlightPhase.HOLDING);
             navigator.setWaypoints(WaypointGenerator.getHoldingPatternWaypoints());
@@ -47,7 +47,7 @@ public class Plane implements Serializable {
 
     public void hold(){
         setPhase(FlightPhase.HOLDING);
-        navigator.move(flightNumber);
+        navigator.move();
         if (navigator.isAtLastWaypoint()) {
             navigator.setCurrentIndex(0);
         }
@@ -55,7 +55,7 @@ public class Plane implements Serializable {
 
     public void land(Runway runway){
         assignedRunway = runway;
-        navigator.move(flightNumber);
+        navigator.move();
         if(navigator.isAtLastWaypoint()) {
             navigator.setLocation(runway.getLandingPoint());
             landed = true;

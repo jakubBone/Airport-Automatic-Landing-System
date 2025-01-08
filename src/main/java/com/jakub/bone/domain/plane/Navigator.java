@@ -32,9 +32,9 @@ public class Navigator {
         spawnPlane();
     }
 
-    public void move(String id) {
+    public void move() {
         if (currentIndex < waypoints.size()) {
-            updateLocation(waypoints.get(currentIndex), id);
+            updateLocation(waypoints.get(currentIndex));
             currentIndex++;
         }
         fuelManager.burnFuel();
