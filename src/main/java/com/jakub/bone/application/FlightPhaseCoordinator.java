@@ -62,6 +62,11 @@ public class FlightPhaseCoordinator {
     }
 
     private void handleLanding(Plane plane) throws IOException, ClassNotFoundException {
+        if (availableRunway == null) {
+            log.warn("Plane [{}]: cannot proceed with landing, no available runway", plane.getFlightNumber());
+            return;
+        }
+
         if (controlTower.hasLandedOnRunway(plane, availableRunway)) {
             plane.setLanded(true);
             try{
