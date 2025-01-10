@@ -31,7 +31,7 @@ public class SimulationLauncher extends Application {
             }
         });
 
-        serverThread.isDaemon();
+        //serverThread.isDaemon();
         serverThread.start();
 
         int clientsNumber = 10000;
