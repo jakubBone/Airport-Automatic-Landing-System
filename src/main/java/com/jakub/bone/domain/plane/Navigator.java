@@ -67,15 +67,15 @@ public class Navigator {
         this.location = initialWaypoint;
     }
 
-    public List <Location> getRiskZoneWaypoints(){
-        List <Location> nearWaypoints = new ArrayList<>();
-        nearWaypoints.add(waypoints.get(currentIndex - 1));
-        nearWaypoints.add(waypoints.get(currentIndex - 2));
-        nearWaypoints.add(waypoints.get(currentIndex - 3));
-        nearWaypoints.add(waypoints.get(currentIndex));
-        nearWaypoints.add(waypoints.get(currentIndex + 1));
-        nearWaypoints.add(waypoints.get(currentIndex + 2));
-        nearWaypoints.add(waypoints.get(currentIndex + 3));
+    public List <Location> getRiskZoneWaypoints() {
+        List<Location> nearWaypoints = new ArrayList<>();
+        for (int offset = -3; offset <= 3; offset++) {
+            int index = currentIndex + offset;
+            if (index > 0 && index <= waypoints.size()) {
+                nearWaypoints.add(waypoints.get(index));
+            }
+        }
         return nearWaypoints;
     }
 }
+
