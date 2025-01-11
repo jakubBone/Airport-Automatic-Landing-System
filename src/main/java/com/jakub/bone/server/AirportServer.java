@@ -5,6 +5,7 @@ import com.jakub.bone.domain.airport.Airport;
 import com.jakub.bone.application.CollisionDetector;
 import com.jakub.bone.database.AirportDatabase;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.application.PlaneHandler;
 import org.apache.logging.log4j.ThreadContext;
@@ -16,13 +17,16 @@ import java.sql.SQLException;
 
 @Log4j2
 @Getter
+@Setter
 public class AirportServer  {
     private ServerSocket serverSocket;
+    private AirportDatabase database;
     private ControlTower controlTower;
     private Airport airport;
 
-    public AirportServer(ControlTower controller) throws SQLException {
-        this.controlTower = controller;
+    public AirportServer() throws SQLException {
+        this.database = new AirportDatabase();
+        this.controlTower = new ControlTower(database);
         this.airport = new Airport();
     }
 
@@ -52,6 +56,8 @@ public class AirportServer  {
             }
         } catch (IOException ex) {
             log.error("Failed to start AirportServer on port {}: {}", port, ex.getMessage(), ex);
+        } finally {
+            stopServer();
         }
     }
 
@@ -61,16 +67,19 @@ public class AirportServer  {
                 serverSocket.close();
                 log.info("Server closed successfully");
             }
+
+            if(database != null){
+                database.closeConnection();
+                log.info("Database closed successfully");
+            }
+
         } catch (IOException ex) {
             log.error("Error occurred while closing server socket: {}", ex.getMessage());
         }
     }
 
     public static void main(String[] args) throws IOException, SQLException {
-        AirportDatabase database = new AirportDatabase();
-        ControlTower controlTower = new ControlTower(database);
-        AirportServer airportServer = new AirportServer(controlTower);
+        AirportServer airportServer = new AirportServer();
         airportServer.startServer(5000);
-        airportServer.stopServer();
     }
 }

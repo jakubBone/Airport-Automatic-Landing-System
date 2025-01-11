@@ -1,9 +1,7 @@
 package com.jakub.bone.core;
 
 import com.jakub.bone.ui.utills.SceneRenderer;
-import com.jakub.bone.application.ControlTower;
 import com.jakub.bone.client.PlaneClient;
-import com.jakub.bone.database.AirportDatabase;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import com.jakub.bone.server.AirportServer;
@@ -12,17 +10,13 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class SimulationLauncher extends Application {
-    private ControlTower controller;
     private AirportServer airportServer;
-    private AirportDatabase database;
     @Override
     public void start(Stage primaryStage) throws Exception, SQLException {
-        this.database = new AirportDatabase();
-        this.controller = new ControlTower(database);
         this.airportServer = null;
         Thread serverThread = new Thread(() -> {
             try {
-                airportServer = new AirportServer(controller);
+                airportServer = new AirportServer();
                 airportServer.startServer(5000);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -31,8 +25,12 @@ public class SimulationLauncher extends Application {
             }
         });
 
-        //serverThread.isDaemon();
         serverThread.start();
+
+        // Wait for the server to initialize before proceeding
+        while (airportServer == null || airportServer.getControlTower() == null) {
+            Thread.sleep(100); // Wait until the server is fully initialized
+        }
 
         int clientsNumber = 10000;
 
@@ -48,7 +46,7 @@ public class SimulationLauncher extends Application {
             }
         }).start();
 
-        SceneRenderer visualization = new SceneRenderer(controller);
+        SceneRenderer visualization = new SceneRenderer(airportServer.getControlTower());
         visualization.start(primaryStage);
     }
 

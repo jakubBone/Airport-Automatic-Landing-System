@@ -22,28 +22,32 @@ class ClientServerConnectionTest {
     @Mock
     AirportDatabase mockDatabase;
     @Mock
-    PlaneRepository planeRepository;
+    PlaneRepository mockPlaneRepository;
     @Mock
-    CollisionRepository collisionRepository;
-    ControlTower controlTower;
+    CollisionRepository mockCollisionRepository;
+    @Mock
+    ControlTower mockControlTower;
     AirportServer server;
 
     @BeforeEach
     void setUp() throws IOException, SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_DAO()).thenReturn(planeRepository);
-        when(mockDatabase.getCOLLISION_DAO()).thenReturn(collisionRepository);
+        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneRepository);
+        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionRepository);
 
-        this.controlTower = new ControlTower(mockDatabase);
+        this.mockControlTower = new ControlTower(mockDatabase);
             new Thread(() -> {
                 try {
-                    this.server = new AirportServer(controlTower);
+                    this.server = new AirportServer();
+                    this.server.setDatabase(mockDatabase);
+                    this.server.setControlTower(mockControlTower);
                     this.server.startServer(5000);
                 } catch (IOException | SQLException ex) {
                     throw new RuntimeException(ex);
                 }
             }).start();
     }
+
     @AfterEach
     void tearDown() throws IOException {
         if (server != null) {
@@ -101,11 +105,8 @@ class ClientServerConnectionTest {
     @Test
     @DisplayName("Should test client registration")
     void testClientRegistration() {
-        try{
-            Thread.sleep(2000);
-        } catch (InterruptedException ex){
-            ex.printStackTrace();
-        }
+        waitForStart();
+
         PlaneClient planeClient = new PlaneClient("localhost", 5000);
         new Thread(planeClient).start();
             try{

@@ -1,7 +1,5 @@
 package load_tests;
 
-import com.jakub.bone.application.ControlTower;
-import com.jakub.bone.database.AirportDatabase;
 import com.jakub.bone.server.AirportServer;
 
 import java.io.IOException;
@@ -17,17 +15,13 @@ import java.util.logging.Logger;
 public class ServerTest {
     static final Logger logger = Logger.getLogger(ClientTest.class.getName());
     public static void main(String[] args) throws IOException, SQLException {
-        AirportDatabase airportDatabase = new AirportDatabase();
-        ControlTower controller = new ControlTower(airportDatabase);
 
         AirportServer airportServer = null;
         try {
-            airportServer = new AirportServer(controller);
+            airportServer = new AirportServer();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-        airportServer = new AirportServer(controller);
 
         // Automatically stop after 70 minutes
         Timer timer = new Timer();
