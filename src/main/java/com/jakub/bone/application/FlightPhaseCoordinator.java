@@ -3,7 +3,6 @@ package com.jakub.bone.application;
 import com.jakub.bone.domain.airport.Airport;
 import com.jakub.bone.domain.airport.Runway;
 import com.jakub.bone.domain.airport.Location;
-import com.jakub.bone.utills.Constant;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.domain.plane.Plane;
 import com.jakub.bone.utills.Messenger;
@@ -13,8 +12,7 @@ import java.io.ObjectOutputStream;
 
 import static com.jakub.bone.application.PlaneHandler.AirportInstruction.*;
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.*;
-import static com.jakub.bone.utills.Constant.ENTRY_POINT_CORRIDOR_1;
-import static com.jakub.bone.utills.Constant.ENTRY_POINT_CORRIDOR_2;
+import static com.jakub.bone.utills.Constant.*;
 
 @Log4j2
 public class FlightPhaseCoordinator {
@@ -70,11 +68,9 @@ public class FlightPhaseCoordinator {
 
         if (controlTower.hasLandedOnRunway(plane, availableRunway)) {
             plane.setLanded(true);
-            try{
-                Thread.sleep(Constant.LANDING_CHECK_DELAY);
-            } catch (InterruptedException ex){
-                ex.getMessage();
-            }
+
+            waitForUpdate(LANDING_CHECK_DELAY);
+
             controlTower.removePlaneFromSpace(plane);
             log.info("Plane [{}]: successfully landed on runway [{}]", plane.getFlightNumber(), availableRunway.getId());
             return;
@@ -121,5 +117,14 @@ public class FlightPhaseCoordinator {
             return runway = Airport.runway2;
         }
         return null;
+    }
+
+    private void waitForUpdate(int interval) {
+        try {
+            Thread.sleep(interval);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Thread was interrupted", ex);
+        }
     }
 }

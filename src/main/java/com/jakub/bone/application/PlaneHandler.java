@@ -1,7 +1,6 @@
 package com.jakub.bone.application;
 
 import com.jakub.bone.domain.airport.Airport;
-import com.jakub.bone.utills.Constant;
 import com.jakub.bone.utills.Messenger;
 import com.jakub.bone.domain.airport.Location;
 import lombok.extern.log4j.Log4j2;
@@ -14,13 +13,14 @@ import java.net.SocketException;
 
 import static com.jakub.bone.application.PlaneHandler.AirportInstruction.*;
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.DESCENDING;
+import static com.jakub.bone.utills.Constant.AFTER_COLLISION_DELAY;
+import static com.jakub.bone.utills.Constant.REGISTER_DELAY;
 
 @Log4j2
 public class PlaneHandler extends Thread {
     public enum AirportInstruction {
         DESCENT, HOLD_PATTERN, LAND, FULL, COLLISION, RISK_ZONE
     }
-
     private final Socket clientSocket;
     private final ControlTower controlTower;
     private final Airport airport;
@@ -46,7 +46,7 @@ public class PlaneHandler extends Thread {
             out = new ObjectOutputStream(clientSocket.getOutputStream());
             handleClient(in, out);
         } catch (EOFException | SocketException ex) {
-            log.warn("Connection to client lost. Client disconnected: {}", ex.getMessage());
+            log.warn("Connection to client lost. Client disconnected: {}", ex.getMessage(), ex);
         } catch (IOException | ClassNotFoundException ex) {
             log.error("Error occurred while handling client request: {}", ex.getMessage(), ex);
         } finally {
@@ -76,7 +76,7 @@ public class PlaneHandler extends Thread {
             return false;
         }
 
-        waitForUpdate(Constant.REGISTER_DELAY);
+        waitForUpdate(REGISTER_DELAY);
 
         if (controlTower.isAtCollisionRiskZone(plane)) {
             messenger.send(RISK_ZONE, out);
@@ -123,7 +123,7 @@ public class PlaneHandler extends Thread {
         controlTower.getPlanes().remove(plane);
         messenger.send(COLLISION, out);
 
-        waitForUpdate(Constant.AFTER_COLLISION_DELAY);
+        waitForUpdate(AFTER_COLLISION_DELAY);
     }
 
     private void handleOutOfFuel(Plane plane) throws IOException {
@@ -137,6 +137,7 @@ public class PlaneHandler extends Thread {
             Thread.sleep(interval);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
+            throw new RuntimeException("Thread was interrupted", ex);
         }
     }
 

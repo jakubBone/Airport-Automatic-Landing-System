@@ -42,7 +42,7 @@ public class PlaneClient extends Client implements Runnable {
             communicationService.sendInitialData();
             processInstructions();
         } catch (IOException | ClassNotFoundException ex) {
-            log.error("PlaneClient [{}]: encountered an error: {}", plane.getFlightNumber(), ex.getMessage());
+            log.error("PlaneClient [{}]: encountered an error: {}", plane.getFlightNumber(), ex.getMessage(), ex);
         } finally {
             closeConnection();
         }

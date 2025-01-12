@@ -39,7 +39,6 @@ public class AirportDatabase {
             log.info("Connection established successfully with database '{}' on port {}", DATABASE, 5432);
         } catch (SQLException ex) {
             log.error("Failed to establish connection to the database '{}'. Error: {}", DATABASE, ex.getMessage(), ex);
-            throw ex;
         }
         return connection;
     }

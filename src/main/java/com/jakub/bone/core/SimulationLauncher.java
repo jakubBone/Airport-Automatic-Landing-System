@@ -2,13 +2,15 @@ package com.jakub.bone.core;
 
 import com.jakub.bone.ui.utills.SceneRenderer;
 import com.jakub.bone.client.PlaneClient;
-import com.jakub.bone.utills.Constant;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import com.jakub.bone.server.AirportServer;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
+import static com.jakub.bone.utills.Constant.CLIENT_SPAWN_INTERVAL_DELAY;
+import static com.jakub.bone.utills.Constant.SERVER_INIT_DELAY;
 
 public class SimulationLauncher extends Application {
     private AirportServer airportServer;
@@ -19,10 +21,10 @@ public class SimulationLauncher extends Application {
             try {
                 airportServer = new AirportServer();
                 airportServer.startServer(5000);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (SQLException ex) {
+                throw new RuntimeException("Failed to initialize AirportServer due to database issues", ex);
+            } catch (IOException ex) {
+                throw new RuntimeException("Failed to initialize AirportServer due to I/O issues", ex);
             }
         });
 
@@ -30,7 +32,7 @@ public class SimulationLauncher extends Application {
 
         // Wait for the server to initialize before proceeding
         while (airportServer == null || airportServer.getControlTower() == null) {
-            Thread.sleep(Constant.SERVER_INIT_DELAY);
+            Thread.sleep(SERVER_INIT_DELAY);
         }
 
         int clientsNumber = 10000;
@@ -39,11 +41,14 @@ public class SimulationLauncher extends Application {
             for (int i = 0; i < clientsNumber; i++) {
                 PlaneClient client = new PlaneClient("localhost", 5000);
                 new Thread(client).start();
+
                 try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.sleep(CLIENT_SPAWN_INTERVAL_DELAY);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Thread was interrupted", ex);
                 }
+
             }
         }).start();
 

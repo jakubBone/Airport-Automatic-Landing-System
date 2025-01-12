@@ -74,7 +74,7 @@ public class AirportServer  {
             }
 
         } catch (IOException ex) {
-            log.error("Error occurred while closing server socket: {}", ex.getMessage());
+            log.error("Error occurred while closing server socket: {}", ex.getMessage(), ex);
         }
     }
 

@@ -31,7 +31,7 @@ public class Client {
             this.isConnected = true;
             log.debug("Connection established successfully");
         } catch (IOException ex) {
-            log.error("Failed to connect to server at {}:{} - {}", ip, port, ex.getMessage());
+            log.error("Failed to connect to server at {}:{} - {}", ip, port, ex.getMessage(), ex);
         }
     }
 
@@ -57,20 +57,4 @@ public class Client {
             }
         }
     }
-
-    /*protected void stopConnection() {
-        try {
-            if(socket != null && !socket.isClosed()){
-                socket.close();
-            }
-            if (out != null) {
-                out.close();
-            }
-            if (in != null) {
-                in.close();
-            }
-        } catch (IOException ex) {
-            log.error("Error occurred while closing resources: {}", ex.getMessage());
-        }
-    }*/
 }
