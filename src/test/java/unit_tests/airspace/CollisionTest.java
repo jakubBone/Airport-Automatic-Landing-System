@@ -9,6 +9,7 @@ import com.jakub.bone.domain.airport.Location;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import com.jakub.bone.domain.plane.Plane;
@@ -27,6 +28,7 @@ class CollisionTest {
     PlaneRepository mockPlaneRepository;
     @Mock
     CollisionRepository mockCollisionRepository;
+    @InjectMocks
     ControlTower controlTower;
     CollisionDetector collisionDetector;
 
@@ -35,7 +37,6 @@ class CollisionTest {
         MockitoAnnotations.openMocks(this);
         when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneRepository);
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionRepository);
-        this.controlTower = new ControlTower(mockDatabase);
         this.collisionDetector = new CollisionDetector(controlTower);
     }
 

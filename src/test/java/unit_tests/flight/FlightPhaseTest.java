@@ -12,6 +12,7 @@ import com.jakub.bone.utills.WaypointGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import com.jakub.bone.domain.plane.Plane;
@@ -38,6 +39,7 @@ class FlightPhaseTest {
     PlaneRepository mockPlaneRepository;
     @Mock
     CollisionRepository mockCollisionRepository;
+    @InjectMocks
     ControlTower controlTower;
     FlightPhaseCoordinator phaseCoordinator;
     Airport airport;
@@ -48,7 +50,6 @@ class FlightPhaseTest {
         MockitoAnnotations.openMocks(this);
         when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneRepository);
         when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionRepository);
-        this.controlTower = new ControlTower(mockDatabase);
         this.airport = new Airport();
         this.messenger = mock(Messenger.class);
         this.phaseCoordinator = new FlightPhaseCoordinator(controlTower, airport, messenger);
