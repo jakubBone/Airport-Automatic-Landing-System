@@ -3,6 +3,7 @@ package com.jakub.bone.application;
 import com.jakub.bone.domain.airport.Airport;
 import com.jakub.bone.domain.airport.Runway;
 import com.jakub.bone.domain.airport.Location;
+import com.jakub.bone.utills.Constant;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.domain.plane.Plane;
 import com.jakub.bone.utills.Messenger;
@@ -70,7 +71,7 @@ public class FlightPhaseCoordinator {
         if (controlTower.hasLandedOnRunway(plane, availableRunway)) {
             plane.setLanded(true);
             try{
-                Thread.sleep(500);
+                Thread.sleep(Constant.LANDING_CHECK_DELAY);
             } catch (InterruptedException ex){
                 ex.getMessage();
             }

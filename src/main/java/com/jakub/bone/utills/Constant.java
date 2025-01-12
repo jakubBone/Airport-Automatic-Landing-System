@@ -20,7 +20,14 @@ public class Constant {
     public static final double CONSUMPTION_PER_SECOND = CONSUMPTION_PER_HOUR / 3600.0; // in liters
 
     // Time-related values
-    public static final long COLLISION_CHECK_INTERVAL = 1000; // in milliseconds
+    public static final int SERVER_INIT_DELAY = 100; // in millis
+    public static final int COLLISION_CHECK_DELAY = 1000; // in millis
+    public static final int AFTER_COLLISION_DELAY = 2000; // in millis
+    public static final int REGISTER_DELAY = 1000; // in millis
+    public static final int LANDING_CHECK_DELAY = 500; // in millis
+    public static final int SCENE_UPDATE_DELAY = 500; // in millis
+
+
 
     // Landing-related values
     public static int LANDING_ALTITUDE = 700; // in meters
@@ -35,4 +42,5 @@ public class Constant {
     // Holding-related
     public static int HOLDING_ALTITUDE = 1000; // in meters
     public static int HOLDING_ENTRY_ALTITUDE = 1013; // in meters
+
 }

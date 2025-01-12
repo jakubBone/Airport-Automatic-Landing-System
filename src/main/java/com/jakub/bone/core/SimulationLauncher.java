@@ -2,6 +2,7 @@ package com.jakub.bone.core;
 
 import com.jakub.bone.ui.utills.SceneRenderer;
 import com.jakub.bone.client.PlaneClient;
+import com.jakub.bone.utills.Constant;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import com.jakub.bone.server.AirportServer;
@@ -29,7 +30,7 @@ public class SimulationLauncher extends Application {
 
         // Wait for the server to initialize before proceeding
         while (airportServer == null || airportServer.getControlTower() == null) {
-            Thread.sleep(100); // Wait until the server is fully initialized
+            Thread.sleep(Constant.SERVER_INIT_DELAY);
         }
 
         int clientsNumber = 10000;

@@ -2,6 +2,7 @@ package com.jakub.bone.ui.utills;
 
 import com.jakub.bone.ui.model.PlaneModel;
 import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.utills.Constant;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Group;
@@ -40,7 +41,7 @@ public class SceneUpdater {
         for (Plane plane : planes) {
             if(isFirstPlane){
                 try{
-                    Thread.sleep(500);
+                    Thread.sleep(Constant.SCENE_UPDATE_DELAY);
                 } catch (InterruptedException ex){
                     ex.getMessage();
                 }

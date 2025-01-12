@@ -1,6 +1,7 @@
 package com.jakub.bone.application;
 
 import com.jakub.bone.domain.airport.Airport;
+import com.jakub.bone.utills.Constant;
 import com.jakub.bone.utills.Messenger;
 import com.jakub.bone.domain.airport.Location;
 import lombok.extern.log4j.Log4j2;
@@ -75,11 +76,7 @@ public class PlaneHandler extends Thread {
             return false;
         }
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            ex.getMessage();
-        }
+        waitForUpdate(Constant.REGISTER_DELAY);
 
         if (controlTower.isAtCollisionRiskZone(plane)) {
             messenger.send(RISK_ZONE, out);
@@ -126,17 +123,21 @@ public class PlaneHandler extends Thread {
         controlTower.getPlanes().remove(plane);
         messenger.send(COLLISION, out);
 
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
+        waitForUpdate(Constant.AFTER_COLLISION_DELAY);
     }
 
     private void handleOutOfFuel(Plane plane) throws IOException {
         plane.destroyPlane();
         controlTower.removePlaneFromSpace(plane);
         log.info("Plane [{}]: out of fuel. Disappeared from the radar", plane.getFlightNumber());
+    }
+
+    private void waitForUpdate(int interval) {
+        try {
+            Thread.sleep(interval);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void closeResources(AutoCloseable... resources) {
