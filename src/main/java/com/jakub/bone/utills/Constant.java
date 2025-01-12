@@ -26,8 +26,7 @@ public class Constant {
     public static final int REGISTER_DELAY = 1000; // in millis
     public static final int LANDING_CHECK_DELAY = 500; // in millis
     public static final int SCENE_UPDATE_DELAY = 500; // in millis
-
-
+    public static final int CLIENT_SPAWN_INTERVAL_DELAY = 5000; // in millis
 
     // Landing-related values
     public static int LANDING_ALTITUDE = 700; // in meters
@@ -37,7 +36,6 @@ public class Constant {
     public static Location ENTRY_POINT_CORRIDOR_2 = new Location(-5000, 500, 1000);
     public static Location FINAL_APPROACH_CORRIDOR_1 = new Location(-2000, 1500, 500);
     public static Location FINAL_APPROACH_CORRIDOR_2 = new Location(-2000, -1500, 500);
-
 
     // Holding-related
     public static int HOLDING_ALTITUDE = 1000; // in meters

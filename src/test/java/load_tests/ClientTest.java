@@ -1,6 +1,8 @@
 package load_tests;
 
 import com.jakub.bone.client.PlaneClient;
+import com.jakub.bone.utills.Constant;
+
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
@@ -34,7 +36,7 @@ public class ClientTest {
                 executorService.execute(client);
 
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(Constant.CLIENT_SPAWN_INTERVAL_DELAY);
                 } catch (InterruptedException ex) {
                     logger.log(Level.WARNING, "Client thread interrupted", ex);
                     Thread.currentThread().interrupt();
