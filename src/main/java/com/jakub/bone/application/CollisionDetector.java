@@ -19,11 +19,14 @@ public class CollisionDetector extends Thread {
         ThreadContext.put("type", "Server");
         while(true) {
             try {
-                checkCollision();
-                Thread.sleep(COLLISION_CHECK_DELAY);
-            } catch (InterruptedException ex){
+                while (!Thread.currentThread().isInterrupted()) {
+                    checkCollision();
+                    Thread.sleep(COLLISION_CHECK_DELAY);
+                }
+            } catch (InterruptedException ex) {
+                log.warn("Collision detection interrupted: {}", ex.getMessage());
                 Thread.currentThread().interrupt();
-                throw new RuntimeException("Thread was interrupted", ex);
+                log.info("Restarting collision detection process...");
             }
         }
     }
