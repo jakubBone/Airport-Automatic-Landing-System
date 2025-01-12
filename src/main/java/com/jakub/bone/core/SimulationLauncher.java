@@ -56,6 +56,16 @@ public class SimulationLauncher extends Application {
         visualization.start(primaryStage);
     }
 
+    @Override
+    public void stop() {
+        try {
+            airportServer.getDatabase().getSCHEMA().clearTables();
+            System.out.println("Database cleared during application shutdown");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
