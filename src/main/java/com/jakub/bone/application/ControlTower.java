@@ -7,10 +7,10 @@ import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.domain.plane.Plane;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import java.util.List;
 
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -25,7 +25,7 @@ public class ControlTower {
     private AirportDatabase database;
 
     public ControlTower(AirportDatabase database) throws SQLException {
-        this.planes = new ArrayList<>();
+        this.planes = new CopyOnWriteArrayList<>();
         this.lock = new ReentrantLock();
         this.database = database;
     }
