@@ -3,42 +3,65 @@ package com.jakub.bone.utills;
 import com.jakub.bone.domain.airport.Location;
 
 public class Constant {
-    // Runway dimensions
-    public static final int RUNWAY_WIDTH = 5000; // in meters
-    public static final int RUNWAY_HEIGHT = 1000; // in meters
+    // Runway properties
+    public static final int RUNWAY_WIDTH = ConfigLoader.getInt("runway.width");
+    public static final int RUNWAY_HEIGHT = ConfigLoader.getInt("runway.height");
 
-    // Airplane limitations
-    public static final int MAX_CAPACITY = 100; // max number of airplanes in airspace
-    public static final int MAX_ALTITUDE = 5000; // in meters
-    public static final int MIN_ALTITUDE = 2000; // in meters
-    public static final double ALTITUDE_COLLISION_DISTANCE = 10.0; // in meters
-    public static final double HORIZONTAL_COLLISION_DISTANCE = 500.0; // in meters
+    // Plane properties
+    public static final int MAX_CAPACITY = ConfigLoader.getInt("airplane.max-capacity");
+    public static final int MAX_ALTITUDE = ConfigLoader.getInt("airplane.max-altitude");
+    public static final int MIN_ALTITUDE = ConfigLoader.getInt("airplane.min-altitude");
 
-    // Fuel-related values
-    public static final double CONSUMPTION_PER_HOUR = 2000; // in liters
-    public static final double INITIAL_FUEL_LEVEL = 6000; // for 3 hours in liters
-    public static final double CONSUMPTION_PER_SECOND = CONSUMPTION_PER_HOUR / 3600.0; // in liters
+    // Collision properties
+    public static final double ALTITUDE_COLLISION_DISTANCE = ConfigLoader.getDouble("collision.altitude-distance");
+    public static final double HORIZONTAL_COLLISION_DISTANCE = ConfigLoader.getDouble("collision.horizontal-distance");
 
-    // Time-related values
-    public static final int UPDATE_DELAY = 1000; // in millis
-    public static final int SERVER_INIT_DELAY = 100; // in millis
-    public static final int COLLISION_CHECK_DELAY = 1000; // in millis
-    public static final int AFTER_COLLISION_DELAY = 2000; // in millis
-    public static final int LANDING_CHECK_DELAY = 500; // in millis
-    public static final int SCENE_UPDATE_DELAY = 500; // in millis
-    public static final int CLIENT_SPAWN_DELAY = 5000; // in millis
+    // Fuel properties
+    public static final double CONSUMPTION_PER_HOUR = ConfigLoader.getDouble("fuel.consumption-per-hour");
+    public static final double INITIAL_FUEL_LEVEL = ConfigLoader.getDouble("fuel.initial-fuel-level");
+    public static final double CONSUMPTION_PER_SECOND = CONSUMPTION_PER_HOUR / 3600.0;
 
-    // Landing-related values
-    public static int LANDING_ALTITUDE = 700; // in meters
-    public  static Location LANDING_POINT_RUNWAY_1 = new Location(3000, 1500, 0);
-    public static Location LANDING_POINT_RUNWAY_2 = new Location(3000, -1500, 0);
-    public static Location ENTRY_POINT_CORRIDOR_1 = new Location(-5000, 3500, 1000);
-    public static Location ENTRY_POINT_CORRIDOR_2 = new Location(-5000, 500, 1000);
-    public static Location FINAL_APPROACH_CORRIDOR_1 = new Location(-2000, 1500, 500);
-    public static Location FINAL_APPROACH_CORRIDOR_2 = new Location(-2000, -1500, 500);
+    // Delays
+    public static final int UPDATE_DELAY = ConfigLoader.getInt("delays.update");
+    public static final int SERVER_INIT_DELAY = ConfigLoader.getInt("delays.server-init");
+    public static final int COLLISION_CHECK_DELAY = ConfigLoader.getInt("delays.collision-check");
+    public static final int AFTER_COLLISION_DELAY = ConfigLoader.getInt("delays.after-collision");
+    public static final int LANDING_CHECK_DELAY = ConfigLoader.getInt("delays.landing-check");
+    public static final int SCENE_UPDATE_DELAY = ConfigLoader.getInt("delays.scene-update");
+    public static final int CLIENT_SPAWN_DELAY = ConfigLoader.getInt("delays.client-spawn");
 
-    // Holding-related
-    public static int HOLDING_ALTITUDE = 1000; // in meters
-    public static int HOLDING_ENTRY_ALTITUDE = 1013; // in meters
+    // Landing properties
+    public static final int LANDING_ALTITUDE = ConfigLoader.getInt("landing.altitude");
+    public static final Location LANDING_POINT_RUNWAY_1 = new Location(
+            ConfigLoader.getInt("landing.point.runway-1.x"),
+            ConfigLoader.getInt("landing.point.runway-1.y"),
+            ConfigLoader.getInt("landing.point.runway-1.altitude")
+    );
+    public static final Location LANDING_POINT_RUNWAY_2 = new Location(
+            ConfigLoader.getInt("landing.point.runway-2.x"),
+            ConfigLoader.getInt("landing.point.runway-2.y"),
+            ConfigLoader.getInt("landing.point.runway-2.altitude")
+    );
+
+    public static Location ENTRY_POINT_CORRIDOR_1 = new Location(
+            ConfigLoader.getInt("landing.entry.corridor-1.x"),
+            ConfigLoader.getInt("landing.entry.corridor-1.y"),
+            ConfigLoader.getInt("landing.entry.corridor-1.altitude"));
+    public static Location ENTRY_POINT_CORRIDOR_2 = new Location(
+            ConfigLoader.getInt("landing.entry.corridor-2.x"),
+            ConfigLoader.getInt("landing.entry.corridor-2.y"),
+            ConfigLoader.getInt("landing.entry.corridor-2.altitude"));
+    public static Location FINAL_APPROACH_CORRIDOR_1 = new Location(
+            ConfigLoader.getInt("landing.final.corridor-1.x"),
+            ConfigLoader.getInt("landing.final.corridor-1.y"),
+            ConfigLoader.getInt("landing.final.corridor-1.altitude"));
+    public static Location FINAL_APPROACH_CORRIDOR_2 = new Location(
+            ConfigLoader.getInt("landing.final.corridor-2.x"),
+            ConfigLoader.getInt("landing.final.corridor-2.y"),
+            ConfigLoader.getInt("landing.final.corridor-2.altitude"));
+
+    // Holding properties
+    public static int HOLDING_ALTITUDE = ConfigLoader.getInt("holding.altitude");
+    public static int HOLDING_ENTRY_ALTITUDE = ConfigLoader.getInt("holding.entry-altitude");
 
 }
