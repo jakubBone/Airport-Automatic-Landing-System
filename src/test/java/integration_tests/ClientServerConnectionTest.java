@@ -33,8 +33,8 @@ class ClientServerConnectionTest {
     @BeforeEach
     void setUp() throws IOException, SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneRepository);
-        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionRepository);
+        when(mockDatabase.getPLANE_REPOSITORY()).thenReturn(mockPlaneRepository);
+        when(mockDatabase.getCOLLISION_REPOSITORY()).thenReturn(mockCollisionRepository);
 
             new Thread(() -> {
                 try {

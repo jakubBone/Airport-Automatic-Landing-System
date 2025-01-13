@@ -34,8 +34,8 @@ class DatabaseOperationTest {
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneRepository);
-        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionRepository);
+        when(mockDatabase.getPLANE_REPOSITORY()).thenReturn(mockPlaneRepository);
+        when(mockDatabase.getCOLLISION_REPOSITORY()).thenReturn(mockCollisionRepository);
         collisionDetector = new CollisionDetector(controlTower);
     }
 

@@ -18,15 +18,15 @@ public class AirportDatabase {
     private final String URL = String.format("jdbc:postgresql://localhost:%d/%s", 5432, DATABASE);;
     private final DSLContext CONTEXT;
     private final DatabaseSchema SCHEMA;
-    private final PlaneRepository PLANE_DAO;
-    private final CollisionRepository COLLISION_DAO;
+    private final PlaneRepository PLANE_REPOSITORY;
+    private final CollisionRepository COLLISION_REPOSITORY;
     private Connection connection;
 
     public AirportDatabase() throws SQLException {
         this.connection = getDatabaseConnection();
         this.CONTEXT = DSL.using(connection);
-        this.PLANE_DAO = new PlaneRepository(CONTEXT);
-        this.COLLISION_DAO = new CollisionRepository(CONTEXT);
+        this.PLANE_REPOSITORY = new PlaneRepository(CONTEXT);
+        this.COLLISION_REPOSITORY = new CollisionRepository(CONTEXT);
         this.SCHEMA = new DatabaseSchema(CONTEXT);
     }
 

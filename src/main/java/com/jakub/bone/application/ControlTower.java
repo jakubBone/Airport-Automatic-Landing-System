@@ -33,7 +33,7 @@ public class ControlTower {
     public void registerPlane(Plane plane) {
         executeWithLock(() -> {
             planes.add(plane);
-            database.getPLANE_DAO().registerPlaneInDB(plane);
+            database.getPLANE_REPOSITORY().registerPlaneInDB(plane);
         });
     }
 
@@ -76,7 +76,7 @@ public class ControlTower {
     public boolean hasLandedOnRunway(Plane plane, Runway runway){
         boolean hasLanded = plane.getNavigator().getLocation().equals(runway.getLandingPoint());
         if (hasLanded) {
-            database.getPLANE_DAO().registerLandingInDB(plane);
+            database.getPLANE_REPOSITORY().registerLandingInDB(plane);
         }
         return hasLanded;
     }

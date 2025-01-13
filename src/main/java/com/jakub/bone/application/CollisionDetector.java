@@ -45,7 +45,7 @@ public class CollisionDetector extends Thread {
 
     private void handleCollision(Plane plane1, Plane plane2){
         String[] collidedIDs = {plane1.getFlightNumber(), plane2.getFlightNumber()};
-        controlTower.getDatabase().getCOLLISION_DAO().registerCollisionToDB(collidedIDs);
+        controlTower.getDatabase().getCOLLISION_REPOSITORY().registerCollisionToDB(collidedIDs);
         plane1.setDestroyed(true);
         plane2.setDestroyed(true);
         log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getFlightNumber(), plane2.getFlightNumber());

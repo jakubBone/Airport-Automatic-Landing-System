@@ -23,7 +23,7 @@ public class DatabaseSchema {
 
         CONTEXT.createTableIfNotExists("collisions")
                 .column("id", SQLDataType.INTEGER.identity(true))
-                .column("involved_planes", SQLDataType.INTEGER.getArrayDataType())
+                .column("involved_planes", SQLDataType.VARCHAR(255).getArrayDataType())
                 .column("time", SQLDataType.LOCALDATETIME(1))
                 .constraints(
                         DSL.constraint("PK_COLLISIONS").primaryKey("id"))
