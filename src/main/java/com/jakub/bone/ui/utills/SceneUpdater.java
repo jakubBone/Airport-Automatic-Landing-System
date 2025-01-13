@@ -11,11 +11,13 @@ import javafx.util.Duration;
 
 import com.jakub.bone.domain.airport.Location;
 import com.jakub.bone.domain.plane.Plane;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.*;
 
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.LANDING;
 
+@Log4j2
 public class SceneUpdater {
     private final Group root;
     private ControlTower controller;
@@ -43,7 +45,8 @@ public class SceneUpdater {
                 try{
                     Thread.sleep(Constant.SCENE_UPDATE_DELAY);
                 } catch (InterruptedException ex){
-                    ex.getMessage();
+                    log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
+                    Thread.currentThread().interrupt();
                 }
                 isFirstPlane = false;
             }

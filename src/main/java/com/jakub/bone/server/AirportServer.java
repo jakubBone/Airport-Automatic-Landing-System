@@ -58,7 +58,6 @@ public class AirportServer  {
             log.error("Failed to start AirportServer on port {}: {}", port, ex.getMessage(), ex);
         } finally {
             stopServer();
-            database.getSCHEMA().clearTables();
         }
     }
 

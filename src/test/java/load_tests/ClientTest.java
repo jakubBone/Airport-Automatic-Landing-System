@@ -36,7 +36,7 @@ public class ClientTest {
                 executorService.execute(client);
 
                 try {
-                    Thread.sleep(Constant.CLIENT_SPAWN_INTERVAL_DELAY);
+                    Thread.sleep(Constant.CLIENT_SPAWN_DELAY);
                 } catch (InterruptedException ex) {
                     logger.log(Level.WARNING, "Client thread interrupted", ex);
                     Thread.currentThread().interrupt();

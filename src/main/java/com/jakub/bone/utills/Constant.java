@@ -20,13 +20,13 @@ public class Constant {
     public static final double CONSUMPTION_PER_SECOND = CONSUMPTION_PER_HOUR / 3600.0; // in liters
 
     // Time-related values
+    public static final int UPDATE_DELAY = 1000; // in millis
     public static final int SERVER_INIT_DELAY = 100; // in millis
     public static final int COLLISION_CHECK_DELAY = 1000; // in millis
     public static final int AFTER_COLLISION_DELAY = 2000; // in millis
-    public static final int REGISTER_DELAY = 1000; // in millis
     public static final int LANDING_CHECK_DELAY = 500; // in millis
     public static final int SCENE_UPDATE_DELAY = 500; // in millis
-    public static final int CLIENT_SPAWN_INTERVAL_DELAY = 5000; // in millis
+    public static final int CLIENT_SPAWN_DELAY = 5000; // in millis
 
     // Landing-related values
     public static int LANDING_ALTITUDE = 700; // in meters

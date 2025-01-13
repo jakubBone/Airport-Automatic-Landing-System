@@ -24,7 +24,7 @@ public class CollisionDetector extends Thread {
                     Thread.sleep(COLLISION_CHECK_DELAY);
                 }
             } catch (InterruptedException ex) {
-                log.warn("Collision detection interrupted: {}", ex.getMessage());
+                log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
                 log.info("Restarting collision detection process...");
             }

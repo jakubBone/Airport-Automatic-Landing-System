@@ -123,8 +123,8 @@ public class FlightPhaseCoordinator {
         try {
             Thread.sleep(interval);
         } catch (InterruptedException ex) {
+            log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Thread was interrupted", ex);
         }
     }
 }

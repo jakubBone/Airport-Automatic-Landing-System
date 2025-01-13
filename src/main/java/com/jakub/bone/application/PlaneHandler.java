@@ -13,8 +13,7 @@ import java.net.SocketException;
 
 import static com.jakub.bone.application.PlaneHandler.AirportInstruction.*;
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.DESCENDING;
-import static com.jakub.bone.utills.Constant.AFTER_COLLISION_DELAY;
-import static com.jakub.bone.utills.Constant.REGISTER_DELAY;
+import static com.jakub.bone.utills.Constant.*;
 
 @Log4j2
 public class PlaneHandler extends Thread {
@@ -76,7 +75,7 @@ public class PlaneHandler extends Thread {
             return false;
         }
 
-        waitForUpdate(REGISTER_DELAY);
+        waitForUpdate(UPDATE_DELAY);
 
         if (controlTower.isAtCollisionRiskZone(plane)) {
             messenger.send(RISK_ZONE, out);
@@ -136,8 +135,8 @@ public class PlaneHandler extends Thread {
         try {
             Thread.sleep(interval);
         } catch (InterruptedException ex) {
+            log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Thread was interrupted", ex);
         }
     }
 

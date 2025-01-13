@@ -5,13 +5,15 @@ import com.jakub.bone.client.PlaneClient;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import com.jakub.bone.server.AirportServer;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static com.jakub.bone.utills.Constant.CLIENT_SPAWN_INTERVAL_DELAY;
+import static com.jakub.bone.utills.Constant.CLIENT_SPAWN_DELAY;
 import static com.jakub.bone.utills.Constant.SERVER_INIT_DELAY;
 
+@Log4j2
 public class SimulationLauncher extends Application {
     private AirportServer airportServer;
     @Override
@@ -32,7 +34,12 @@ public class SimulationLauncher extends Application {
 
         // Wait for the server to initialize before proceeding
         while (airportServer == null || airportServer.getControlTower() == null) {
-            Thread.sleep(SERVER_INIT_DELAY);
+            try {
+                Thread.sleep(SERVER_INIT_DELAY);
+            } catch (InterruptedException ex) {
+                log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
+                Thread.currentThread().interrupt();
+            }
         }
 
         int clientsNumber = 10000;
@@ -43,10 +50,10 @@ public class SimulationLauncher extends Application {
                 new Thread(client).start();
 
                 try {
-                    Thread.sleep(CLIENT_SPAWN_INTERVAL_DELAY);
+                    Thread.sleep(CLIENT_SPAWN_DELAY);
                 } catch (InterruptedException ex) {
+                    log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
                     Thread.currentThread().interrupt();
-                    throw new RuntimeException("Thread was interrupted", ex);
                 }
 
             }
@@ -61,8 +68,8 @@ public class SimulationLauncher extends Application {
         try {
             airportServer.getDatabase().getSCHEMA().clearTables();
             System.out.println("Database cleared during application shutdown");
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            log.error("Error occurred while clearing the database: {}", ex.getMessage(), ex);
         }
     }
 

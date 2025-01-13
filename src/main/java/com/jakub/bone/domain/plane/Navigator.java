@@ -12,8 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
-import static com.jakub.bone.utills.Constant.MAX_ALTITUDE;
-import static com.jakub.bone.utills.Constant.MIN_ALTITUDE;
+import static com.jakub.bone.utills.Constant.*;
 
 @Getter
 @Setter
@@ -47,8 +46,9 @@ public class Navigator {
     public void updateLocation(Location location) {
         if(!isFirstMove){
             try {
-                Thread.sleep(1000);
+                Thread.sleep(UPDATE_DELAY);
             } catch (InterruptedException ex) {
+                log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
             }
         }

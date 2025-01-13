@@ -99,9 +99,10 @@ public class PlaneClient extends Client implements Runnable {
         for (int i = 0; i < numberOfClients; i++) {
             PlaneClient client = new PlaneClient("localhost", 5000);
             try{
-                Thread.sleep(Constant.CLIENT_SPAWN_INTERVAL_DELAY);
+                Thread.sleep(Constant.CLIENT_SPAWN_DELAY);
             } catch (InterruptedException ex){
-                ex.printStackTrace();
+                log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
+                Thread.currentThread().interrupt();
             }
             executorService.execute(client);
         }
