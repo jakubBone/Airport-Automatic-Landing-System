@@ -22,11 +22,14 @@ public class CollisionDetector extends Thread {
         ThreadContext.put("type", "Server");
         while(true) {
             try {
-                checkCollision();
-                Thread.sleep(COLLISION_CHECK_INTERVAL);
-            } catch (InterruptedException ex){
-                log.error("Collision detection interrupted: {}", ex.getMessage());
+                while (!Thread.currentThread().isInterrupted()) {
+                    checkCollision();
+                    Thread.sleep(COLLISION_CHECK_DELAY);
+                }
+            } catch (InterruptedException ex) {
+                log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
+                log.info("Restarting collision detection process...");
             }
         }
     }
@@ -45,7 +48,7 @@ public class CollisionDetector extends Thread {
 
     private void handleCollision(Plane plane1, Plane plane2){
         String[] collidedIDs = {plane1.getFlightNumber(), plane2.getFlightNumber()};
-        controlTower.getDatabase().getCOLLISION_DAO().registerCollisionToDB(collidedIDs);
+        controlTower.getDatabase().getCOLLISION_REPOSITORY().registerCollisionToDB(collidedIDs);
         plane1.setDestroyed(true);
         plane2.setDestroyed(true);
         log.info("Collision detected between Plane [{}] and Plane [{}]", plane1.getFlightNumber(), plane2.getFlightNumber());
@@ -82,10 +85,10 @@ import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.domain.plane.Plane;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import java.util.List;
 
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -100,7 +103,7 @@ public class ControlTower {
     private AirportDatabase database;
 
     public ControlTower(AirportDatabase database) throws SQLException {
-        this.planes = new ArrayList<>();
+        this.planes = new CopyOnWriteArrayList<>();
         this.lock = new ReentrantLock();
         this.database = database;
     }
@@ -108,7 +111,7 @@ public class ControlTower {
     public void registerPlane(Plane plane) {
         executeWithLock(() -> {
             planes.add(plane);
-            database.getPLANE_DAO().registerPlaneInDB(plane);
+            database.getPLANE_REPOSITORY().registerPlaneInDB(plane);
         });
     }
 
@@ -151,7 +154,7 @@ public class ControlTower {
     public boolean hasLandedOnRunway(Plane plane, Runway runway){
         boolean hasLanded = plane.getNavigator().getLocation().equals(runway.getLandingPoint());
         if (hasLanded) {
-            database.getPLANE_DAO().registerLandingInDB(plane);
+            database.getPLANE_REPOSITORY().registerLandingInDB(plane);
         }
         return hasLanded;
     }
@@ -201,8 +204,7 @@ import java.io.ObjectOutputStream;
 
 import static com.jakub.bone.application.PlaneHandler.AirportInstruction.*;
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.*;
-import static com.jakub.bone.utills.Constant.ENTRY_POINT_CORRIDOR_1;
-import static com.jakub.bone.utills.Constant.ENTRY_POINT_CORRIDOR_2;
+import static com.jakub.bone.utills.Constant.*;
 
 @Log4j2
 public class FlightPhaseCoordinator {
@@ -251,13 +253,16 @@ public class FlightPhaseCoordinator {
     }
 
     private void handleLanding(Plane plane) throws IOException, ClassNotFoundException {
+        if (availableRunway == null) {
+            log.warn("Plane [{}]: cannot proceed with landing, no available runway", plane.getFlightNumber());
+            return;
+        }
+
         if (controlTower.hasLandedOnRunway(plane, availableRunway)) {
             plane.setLanded(true);
-            try{
-                Thread.sleep(500);
-            } catch (InterruptedException ex){
-                ex.getMessage();
-            }
+
+            waitForUpdate(LANDING_CHECK_DELAY);
+
             controlTower.removePlaneFromSpace(plane);
             log.info("Plane [{}]: successfully landed on runway [{}]", plane.getFlightNumber(), availableRunway.getId());
             return;
@@ -305,6 +310,15 @@ public class FlightPhaseCoordinator {
         }
         return null;
     }
+
+    private void waitForUpdate(int interval) {
+        try {
+            Thread.sleep(interval);
+        } catch (InterruptedException ex) {
+            log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
+            Thread.currentThread().interrupt();
+        }
+    }
 }
 
 ====================
@@ -325,13 +339,13 @@ import java.net.SocketException;
 
 import static com.jakub.bone.application.PlaneHandler.AirportInstruction.*;
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.DESCENDING;
+import static com.jakub.bone.utills.Constant.*;
 
 @Log4j2
 public class PlaneHandler extends Thread {
     public enum AirportInstruction {
         DESCENT, HOLD_PATTERN, LAND, FULL, COLLISION, RISK_ZONE
     }
-
     private final Socket clientSocket;
     private final ControlTower controlTower;
     private final Airport airport;
@@ -349,16 +363,19 @@ public class PlaneHandler extends Thread {
     @Override
     public void run() {
         ThreadContext.put("type", "Server");
-        try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
-             ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream())) {
+        ObjectInputStream in = null;
+        ObjectOutputStream out = null;
 
+        try {
+            in = new ObjectInputStream(clientSocket.getInputStream());
+            out = new ObjectOutputStream(clientSocket.getOutputStream());
             handleClient(in, out);
-
         } catch (EOFException | SocketException ex) {
-            log.warn("Connection to client lost. Client disconnected: {}", ex.getMessage());
+            log.warn("Connection to client lost. Client disconnected: {}", ex.getMessage(), ex);
         } catch (IOException | ClassNotFoundException ex) {
             log.error("Error occurred while handling client request: {}", ex.getMessage(), ex);
         } finally {
+            closeResources(in, out);
             try {
                 clientSocket.close();
             } catch (IOException ex) {
@@ -384,11 +401,7 @@ public class PlaneHandler extends Thread {
             return false;
         }
 
-        try{
-            Thread.sleep(1000);
-        } catch (InterruptedException ex){
-            ex.getMessage();
-        }
+        waitForUpdate(UPDATE_DELAY);
 
         if (controlTower.isAtCollisionRiskZone(plane)) {
             messenger.send(RISK_ZONE, out);
@@ -429,17 +442,13 @@ public class PlaneHandler extends Thread {
     }
 
     private void handleCollision(Plane plane, ObjectOutputStream out) throws IOException {
-        if(plane.getAssignedRunway() != null){
+        if (plane.getAssignedRunway() != null) {
             controlTower.releaseRunway(plane.getAssignedRunway());
         }
         controlTower.getPlanes().remove(plane);
         messenger.send(COLLISION, out);
 
-        try{
-            Thread.sleep(2000);
-        } catch (InterruptedException ex){
-            ex.printStackTrace();
-        }
+        waitForUpdate(AFTER_COLLISION_DELAY);
     }
 
     private void handleOutOfFuel(Plane plane) throws IOException {
@@ -447,7 +456,29 @@ public class PlaneHandler extends Thread {
         controlTower.removePlaneFromSpace(plane);
         log.info("Plane [{}]: out of fuel. Disappeared from the radar", plane.getFlightNumber());
     }
+
+    private void waitForUpdate(int interval) {
+        try {
+            Thread.sleep(interval);
+        } catch (InterruptedException ex) {
+            log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private void closeResources(AutoCloseable... resources) {
+        for (AutoCloseable resource : resources) {
+            if (resource != null) {
+                try {
+                    resource.close();
+                } catch (Exception ex) {
+                    log.error("Failed to close resource: {}", ex.getMessage(), ex);
+                }
+            }
+        }
+    }
 }
+
 
 
 ====================
@@ -486,23 +517,30 @@ public class Client {
             this.isConnected = true;
             log.debug("Connection established successfully");
         } catch (IOException ex) {
-            log.error("Failed to connect to server at {}:{} - {}", ip, port, ex.getMessage());
+            log.error("Failed to connect to server at {}:{} - {}", ip, port, ex.getMessage(), ex);
         }
     }
 
     protected void stopConnection() {
-        try {
-            if(socket != null && !socket.isClosed()){
+        closeResources(out, in);
+        if (socket != null && !socket.isClosed()) {
+            try {
                 socket.close();
+            } catch (IOException ex) {
+                log.error("Failed to close socket: {}", ex.getMessage(), ex);
             }
-            if (out != null) {
-                out.close();
+        }
+    }
+
+    private void closeResources(AutoCloseable... resources) {
+        for (AutoCloseable resource : resources) {
+            if (resource != null) {
+                try {
+                    resource.close();
+                } catch (Exception ex) {
+                    log.error("Failed to close resource: {}", ex.getMessage(), ex);
+                }
             }
-            if (in != null) {
-                in.close();
-            }
-        } catch (IOException ex) {
-            log.error("Error occurred while closing resources: {}", ex.getMessage());
         }
     }
 }
@@ -513,6 +551,7 @@ FILE: PlaneClient.java
 package com.jakub.bone.client;
 
 import com.jakub.bone.application.PlaneHandler;
+import com.jakub.bone.utills.Constant;
 import lombok.Getter;
 import com.jakub.bone.utills.Messenger;
 import lombok.extern.log4j.Log4j2;
@@ -553,7 +592,7 @@ public class PlaneClient extends Client implements Runnable {
             communicationService.sendInitialData();
             processInstructions();
         } catch (IOException | ClassNotFoundException ex) {
-            log.error("PlaneClient [{}]: encountered an error: {}", plane.getFlightNumber(), ex.getMessage());
+            log.error("PlaneClient [{}]: encountered an error: {}", plane.getFlightNumber(), ex.getMessage(), ex);
         } finally {
             closeConnection();
         }
@@ -596,6 +635,7 @@ public class PlaneClient extends Client implements Runnable {
         return code + number;
     }
 
+
     private void closeConnection() {
         stopConnection();
         log.debug("Plane [{}]: connection stopped", plane.getFlightNumber());
@@ -609,9 +649,10 @@ public class PlaneClient extends Client implements Runnable {
         for (int i = 0; i < numberOfClients; i++) {
             PlaneClient client = new PlaneClient("localhost", 5000);
             try{
-                Thread.sleep(5000);
+                Thread.sleep(Constant.CLIENT_SPAWN_DELAY);
             } catch (InterruptedException ex){
-                ex.printStackTrace();
+                log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
+                Thread.currentThread().interrupt();
             }
             executorService.execute(client);
         }
@@ -790,38 +831,46 @@ FILE: SimulationLauncher.java
 package com.jakub.bone.core;
 
 import com.jakub.bone.ui.utills.SceneRenderer;
-import com.jakub.bone.application.ControlTower;
 import com.jakub.bone.client.PlaneClient;
-import com.jakub.bone.database.AirportDatabase;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import com.jakub.bone.server.AirportServer;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
+import static com.jakub.bone.utills.Constant.CLIENT_SPAWN_DELAY;
+import static com.jakub.bone.utills.Constant.SERVER_INIT_DELAY;
+
+@Log4j2
 public class SimulationLauncher extends Application {
-    private ControlTower controller;
     private AirportServer airportServer;
-    private AirportDatabase database;
     @Override
     public void start(Stage primaryStage) throws Exception, SQLException {
-        this.database = new AirportDatabase();
-        this.controller = new ControlTower(database);
         this.airportServer = null;
         Thread serverThread = new Thread(() -> {
             try {
-                airportServer = new AirportServer(controller);
+                airportServer = new AirportServer();
                 airportServer.startServer(5000);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (SQLException ex) {
+                throw new RuntimeException("Failed to initialize AirportServer due to database issues", ex);
+            } catch (IOException ex) {
+                throw new RuntimeException("Failed to initialize AirportServer due to I/O issues", ex);
             }
         });
 
-        serverThread.isDaemon();
         serverThread.start();
+
+        // Wait for the server to initialize before proceeding
+        while (airportServer == null || airportServer.getControlTower() == null) {
+            try {
+                Thread.sleep(SERVER_INIT_DELAY);
+            } catch (InterruptedException ex) {
+                log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
+                Thread.currentThread().interrupt();
+            }
+        }
 
         int clientsNumber = 10000;
 
@@ -829,16 +878,29 @@ public class SimulationLauncher extends Application {
             for (int i = 0; i < clientsNumber; i++) {
                 PlaneClient client = new PlaneClient("localhost", 5000);
                 new Thread(client).start();
+
                 try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.sleep(CLIENT_SPAWN_DELAY);
+                } catch (InterruptedException ex) {
+                    log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
+                    Thread.currentThread().interrupt();
                 }
+
             }
         }).start();
 
-        SceneRenderer visualization = new SceneRenderer(controller);
+        SceneRenderer visualization = new SceneRenderer(airportServer.getControlTower());
         visualization.start(primaryStage);
+    }
+
+    @Override
+    public void stop() {
+        try {
+            airportServer.getDatabase().getSCHEMA().clearTables();
+            System.out.println("Database cleared during application shutdown");
+        } catch (Exception ex) {
+            log.error("Error occurred while clearing the database: {}", ex.getMessage(), ex);
+        }
     }
 
     public static void main(String[] args) {
@@ -871,15 +933,15 @@ public class AirportDatabase {
     private final String URL = String.format("jdbc:postgresql://localhost:%d/%s", 5432, DATABASE);;
     private final DSLContext CONTEXT;
     private final DatabaseSchema SCHEMA;
-    private final PlaneRepository PLANE_DAO;
-    private final CollisionRepository COLLISION_DAO;
+    private final PlaneRepository PLANE_REPOSITORY;
+    private final CollisionRepository COLLISION_REPOSITORY;
     private Connection connection;
 
     public AirportDatabase() throws SQLException {
         this.connection = getDatabaseConnection();
         this.CONTEXT = DSL.using(connection);
-        this.PLANE_DAO = new PlaneRepository(CONTEXT);
-        this.COLLISION_DAO = new CollisionRepository(CONTEXT);
+        this.PLANE_REPOSITORY = new PlaneRepository(CONTEXT);
+        this.COLLISION_REPOSITORY = new CollisionRepository(CONTEXT);
         this.SCHEMA = new DatabaseSchema(CONTEXT);
     }
 
@@ -892,7 +954,6 @@ public class AirportDatabase {
             log.info("Connection established successfully with database '{}' on port {}", DATABASE, 5432);
         } catch (SQLException ex) {
             log.error("Failed to establish connection to the database '{}'. Error: {}", DATABASE, ex.getMessage(), ex);
-            throw ex;
         }
         return connection;
     }
@@ -964,7 +1025,7 @@ public class DatabaseSchema {
 
         CONTEXT.createTableIfNotExists("collisions")
                 .column("id", SQLDataType.INTEGER.identity(true))
-                .column("involved_planes", SQLDataType.INTEGER.getArrayDataType())
+                .column("involved_planes", SQLDataType.VARCHAR(255).getArrayDataType())
                 .column("time", SQLDataType.LOCALDATETIME(1))
                 .constraints(
                         DSL.constraint("PK_COLLISIONS").primaryKey("id"))
@@ -972,8 +1033,8 @@ public class DatabaseSchema {
     }
 
     public void clearTables(){
-        CONTEXT.truncate("planes").execute();
-        CONTEXT.truncate("collisions").execute();
+        CONTEXT.truncate("planes").restartIdentity().execute();
+        CONTEXT.truncate("collisions").restartIdentity().execute();
     }
 }
 
@@ -1178,8 +1239,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
-import static com.jakub.bone.utills.Constant.MAX_ALTITUDE;
-import static com.jakub.bone.utills.Constant.MIN_ALTITUDE;
+import static com.jakub.bone.utills.Constant.*;
 
 @Getter
 @Setter
@@ -1194,15 +1254,13 @@ public class Navigator {
     public Navigator(FuelManager fuelManager) {
         this.waypoints = WaypointGenerator.getDescentWaypoints();
         this.fuelManager = fuelManager;
-        this.currentIndex = 315;
-        this.location = waypoints.get(currentIndex);
         this.isFirstMove = true;
-        //spawnPlane();
+        spawnPlane();
     }
 
-    public void move(String id) {
+    public void move() {
         if (currentIndex < waypoints.size()) {
-            updateLocation(waypoints.get(currentIndex), id);
+            updateLocation(waypoints.get(currentIndex));
             currentIndex++;
         }
         fuelManager.burnFuel();
@@ -1212,11 +1270,12 @@ public class Navigator {
         return currentIndex == waypoints.size();
     }
 
-    public void updateLocation(Location location, String id) {
+    public void updateLocation(Location location) {
         if(!isFirstMove){
             try {
-                Thread.sleep(1000);
+                Thread.sleep(UPDATE_DELAY);
             } catch (InterruptedException ex) {
+                log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
             }
         }
@@ -1235,18 +1294,18 @@ public class Navigator {
         this.location = initialWaypoint;
     }
 
-    public List <Location> getRiskZoneWaypoints(){
-        List <Location> nearWaypoints = new ArrayList<>();
-        nearWaypoints.add(waypoints.get(currentIndex - 1));
-        nearWaypoints.add(waypoints.get(currentIndex - 2));
-        nearWaypoints.add(waypoints.get(currentIndex - 3));
-        nearWaypoints.add(waypoints.get(currentIndex));
-        nearWaypoints.add(waypoints.get(currentIndex + 1));
-        nearWaypoints.add(waypoints.get(currentIndex + 2));
-        nearWaypoints.add(waypoints.get(currentIndex + 3));
+    public List <Location> getRiskZoneWaypoints() {
+        List<Location> nearWaypoints = new ArrayList<>();
+        for (int offset = -3; offset <= 3; offset++) {
+            int index = currentIndex + offset;
+            if (index > 0 && index <= waypoints.size()) {
+                nearWaypoints.add(waypoints.get(index));
+            }
+        }
         return nearWaypoints;
     }
 }
+
 
 ====================
 FILE: Plane.java
@@ -1290,7 +1349,7 @@ public class Plane implements Serializable {
     }
 
     public void descend(){
-        navigator.move(flightNumber);
+        navigator.move();
         if (navigator.isAtLastWaypoint()) {
             setPhase(FlightPhase.HOLDING);
             navigator.setWaypoints(WaypointGenerator.getHoldingPatternWaypoints());
@@ -1300,7 +1359,7 @@ public class Plane implements Serializable {
 
     public void hold(){
         setPhase(FlightPhase.HOLDING);
-        navigator.move(flightNumber);
+        navigator.move();
         if (navigator.isAtLastWaypoint()) {
             navigator.setCurrentIndex(0);
         }
@@ -1308,7 +1367,7 @@ public class Plane implements Serializable {
 
     public void land(Runway runway){
         assignedRunway = runway;
-        navigator.move(flightNumber);
+        navigator.move();
         if(navigator.isAtLastWaypoint()) {
             navigator.setLocation(runway.getLandingPoint());
             landed = true;
@@ -1327,892 +1386,6 @@ public class Plane implements Serializable {
 }
 
 ====================
-FILE: DefaultCatalog.java
-
-/*
- * This file is generated by jOOQ.
- */
-package jooq;
-
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.jooq.Constants;
-import org.jooq.Schema;
-import org.jooq.impl.CatalogImpl;
-
-
-/**
- * This class is generated by jOOQ.
- */
-@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
-public class DefaultCatalog extends CatalogImpl {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * The reference instance of <code>DEFAULT_CATALOG</code>
-     */
-    public static final DefaultCatalog DEFAULT_CATALOG = new DefaultCatalog();
-
-    /**
-     * The schema <code>public</code>.
-     */
-    public final Public PUBLIC = Public.PUBLIC;
-
-    /**
-     * No further instances allowed
-     */
-    private DefaultCatalog() {
-        super("");
-    }
-
-    @Override
-    public final List<Schema> getSchemas() {
-        return Arrays.asList(
-            Public.PUBLIC
-        );
-    }
-
-    /**
-     * A reference to the 3.19 minor release of the code generator. If this
-     * doesn't compile, it's because the runtime library uses an older minor
-     * release, namely: 3.19. You can turn off the generation of this reference
-     * by specifying /configuration/generator/generate/jooqVersionReference
-     */
-    private static final String REQUIRE_RUNTIME_JOOQ_VERSION = Constants.VERSION_3_19;
-}
-
-====================
-FILE: Keys.java
-
-/*
- * This file is generated by jOOQ.
- */
-package jooq;
-
-
-import jooq.tables.Collisions;
-import jooq.tables.Planes;
-import jooq.tables.records.CollisionsRecord;
-import jooq.tables.records.PlanesRecord;
-
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
-import org.jooq.impl.DSL;
-import org.jooq.impl.Internal;
-
-
-/**
- * A class modelling foreign key relationships and constraints of tables in
- * public.
- */
-@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
-public class Keys {
-
-    // -------------------------------------------------------------------------
-    // UNIQUE and PRIMARY KEY definitions
-    // -------------------------------------------------------------------------
-
-    public static final UniqueKey<CollisionsRecord> PK_COLLISIONS = Internal.createUniqueKey(Collisions.COLLISIONS, DSL.name("PK_COLLISIONS"), new TableField[] { Collisions.COLLISIONS.ID }, true);
-    public static final UniqueKey<PlanesRecord> PK_PLANES = Internal.createUniqueKey(Planes.PLANES, DSL.name("PK_PLANES"), new TableField[] { Planes.PLANES.ID }, true);
-}
-
-====================
-FILE: Public.java
-
-/*
- * This file is generated by jOOQ.
- */
-package jooq;
-
-
-import java.util.Arrays;
-import java.util.List;
-
-import jooq.tables.Collisions;
-import jooq.tables.Planes;
-
-import org.jooq.Catalog;
-import org.jooq.Table;
-import org.jooq.impl.SchemaImpl;
-
-
-/**
- * This class is generated by jOOQ.
- */
-@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
-public class Public extends SchemaImpl {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * The reference instance of <code>public</code>
-     */
-    public static final Public PUBLIC = new Public();
-
-    /**
-     * The table <code>public.collisions</code>.
-     */
-    public final Collisions COLLISIONS = Collisions.COLLISIONS;
-
-    /**
-     * The table <code>public.planes</code>.
-     */
-    public final Planes PLANES = Planes.PLANES;
-
-    /**
-     * No further instances allowed
-     */
-    private Public() {
-        super("public", null);
-    }
-
-
-    @Override
-    public Catalog getCatalog() {
-        return DefaultCatalog.DEFAULT_CATALOG;
-    }
-
-    @Override
-    public final List<Table<?>> getTables() {
-        return Arrays.asList(
-            Collisions.COLLISIONS,
-            Planes.PLANES
-        );
-    }
-}
-
-====================
-FILE: Collisions.java
-
-/*
- * This file is generated by jOOQ.
- */
-package jooq.tables;
-
-
-import java.time.LocalDateTime;
-import java.util.Collection;
-
-import jooq.Keys;
-import jooq.Public;
-import jooq.tables.records.CollisionsRecord;
-
-import org.jooq.Condition;
-import org.jooq.Field;
-import org.jooq.Identity;
-import org.jooq.Name;
-import org.jooq.PlainSQL;
-import org.jooq.QueryPart;
-import org.jooq.SQL;
-import org.jooq.Schema;
-import org.jooq.Select;
-import org.jooq.Stringly;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.TableOptions;
-import org.jooq.UniqueKey;
-import org.jooq.impl.DSL;
-import org.jooq.impl.SQLDataType;
-import org.jooq.impl.TableImpl;
-
-
-/**
- * This class is generated by jOOQ.
- */
-@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
-public class Collisions extends TableImpl<CollisionsRecord> {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * The reference instance of <code>public.collisions</code>
-     */
-    public static final Collisions COLLISIONS = new Collisions();
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<CollisionsRecord> getRecordType() {
-        return CollisionsRecord.class;
-    }
-
-    /**
-     * The column <code>public.collisions.id</code>.
-     */
-    public final TableField<CollisionsRecord, Integer> ID = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "");
-
-    /**
-     * The column <code>public.collisions.involved_planes</code>.
-     */
-    public final TableField<CollisionsRecord, String[]> INVOLVED_PLANES = createField(DSL.name("involved_planes"), SQLDataType.VARCHAR.array(), this, "");
-
-    /**
-     * The column <code>public.collisions.time</code>.
-     */
-    public final TableField<CollisionsRecord, LocalDateTime> TIME = createField(DSL.name("time"), SQLDataType.LOCALDATETIME(1), this, "");
-
-    private Collisions(Name alias, Table<CollisionsRecord> aliased) {
-        this(alias, aliased, (Field<?>[]) null, null);
-    }
-
-    private Collisions(Name alias, Table<CollisionsRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
-    }
-
-    /**
-     * Create an aliased <code>public.collisions</code> table reference
-     */
-    public Collisions(String alias) {
-        this(DSL.name(alias), COLLISIONS);
-    }
-
-    /**
-     * Create an aliased <code>public.collisions</code> table reference
-     */
-    public Collisions(Name alias) {
-        this(alias, COLLISIONS);
-    }
-
-    /**
-     * Create a <code>public.collisions</code> table reference
-     */
-    public Collisions() {
-        this(DSL.name("collisions"), null);
-    }
-
-    @Override
-    public Schema getSchema() {
-        return aliased() ? null : Public.PUBLIC;
-    }
-
-    @Override
-    public Identity<CollisionsRecord, Integer> getIdentity() {
-        return (Identity<CollisionsRecord, Integer>) super.getIdentity();
-    }
-
-    @Override
-    public UniqueKey<CollisionsRecord> getPrimaryKey() {
-        return Keys.PK_COLLISIONS;
-    }
-
-    @Override
-    public Collisions as(String alias) {
-        return new Collisions(DSL.name(alias), this);
-    }
-
-    @Override
-    public Collisions as(Name alias) {
-        return new Collisions(alias, this);
-    }
-
-    @Override
-    public Collisions as(Table<?> alias) {
-        return new Collisions(alias.getQualifiedName(), this);
-    }
-
-    /**
-     * Rename this table
-     */
-    @Override
-    public Collisions rename(String name) {
-        return new Collisions(DSL.name(name), null);
-    }
-
-    /**
-     * Rename this table
-     */
-    @Override
-    public Collisions rename(Name name) {
-        return new Collisions(name, null);
-    }
-
-    /**
-     * Rename this table
-     */
-    @Override
-    public Collisions rename(Table<?> name) {
-        return new Collisions(name.getQualifiedName(), null);
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    public Collisions where(Condition condition) {
-        return new Collisions(getQualifiedName(), aliased() ? this : null, null, condition);
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    public Collisions where(Collection<? extends Condition> conditions) {
-        return where(DSL.and(conditions));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    public Collisions where(Condition... conditions) {
-        return where(DSL.and(conditions));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    public Collisions where(Field<Boolean> condition) {
-        return where(DSL.condition(condition));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    @PlainSQL
-    public Collisions where(SQL condition) {
-        return where(DSL.condition(condition));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    @PlainSQL
-    public Collisions where(@Stringly.SQL String condition) {
-        return where(DSL.condition(condition));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    @PlainSQL
-    public Collisions where(@Stringly.SQL String condition, Object... binds) {
-        return where(DSL.condition(condition, binds));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    @PlainSQL
-    public Collisions where(@Stringly.SQL String condition, QueryPart... parts) {
-        return where(DSL.condition(condition, parts));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    public Collisions whereExists(Select<?> select) {
-        return where(DSL.exists(select));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    public Collisions whereNotExists(Select<?> select) {
-        return where(DSL.notExists(select));
-    }
-}
-
-====================
-FILE: Planes.java
-
-/*
- * This file is generated by jOOQ.
- */
-package jooq.tables;
-
-
-import java.time.LocalDateTime;
-import java.util.Collection;
-
-import jooq.Keys;
-import jooq.Public;
-import jooq.tables.records.PlanesRecord;
-
-import org.jooq.Condition;
-import org.jooq.Field;
-import org.jooq.Identity;
-import org.jooq.Name;
-import org.jooq.PlainSQL;
-import org.jooq.QueryPart;
-import org.jooq.SQL;
-import org.jooq.Schema;
-import org.jooq.Select;
-import org.jooq.Stringly;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.TableOptions;
-import org.jooq.UniqueKey;
-import org.jooq.impl.DSL;
-import org.jooq.impl.SQLDataType;
-import org.jooq.impl.TableImpl;
-
-
-/**
- * This class is generated by jOOQ.
- */
-@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
-public class Planes extends TableImpl<PlanesRecord> {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * The reference instance of <code>public.planes</code>
-     */
-    public static final Planes PLANES = new Planes();
-
-    /**
-     * The class holding records for this type
-     */
-    @Override
-    public Class<PlanesRecord> getRecordType() {
-        return PlanesRecord.class;
-    }
-
-    /**
-     * The column <code>public.planes.id</code>.
-     */
-    public final TableField<PlanesRecord, Integer> ID = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "");
-
-    /**
-     * The column <code>public.planes.flight_number</code>.
-     */
-    public final TableField<PlanesRecord, String> FLIGHT_NUMBER = createField(DSL.name("flight_number"), SQLDataType.VARCHAR, this, "");
-
-    /**
-     * The column <code>public.planes.start_time</code>.
-     */
-    public final TableField<PlanesRecord, LocalDateTime> START_TIME = createField(DSL.name("start_time"), SQLDataType.LOCALDATETIME(1).nullable(false), this, "");
-
-    /**
-     * The column <code>public.planes.landing_time</code>.
-     */
-    public final TableField<PlanesRecord, LocalDateTime> LANDING_TIME = createField(DSL.name("landing_time"), SQLDataType.LOCALDATETIME(1), this, "");
-
-    private Planes(Name alias, Table<PlanesRecord> aliased) {
-        this(alias, aliased, (Field<?>[]) null, null);
-    }
-
-    private Planes(Name alias, Table<PlanesRecord> aliased, Field<?>[] parameters, Condition where) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
-    }
-
-    /**
-     * Create an aliased <code>public.planes</code> table reference
-     */
-    public Planes(String alias) {
-        this(DSL.name(alias), PLANES);
-    }
-
-    /**
-     * Create an aliased <code>public.planes</code> table reference
-     */
-    public Planes(Name alias) {
-        this(alias, PLANES);
-    }
-
-    /**
-     * Create a <code>public.planes</code> table reference
-     */
-    public Planes() {
-        this(DSL.name("planes"), null);
-    }
-
-    @Override
-    public Schema getSchema() {
-        return aliased() ? null : Public.PUBLIC;
-    }
-
-    @Override
-    public Identity<PlanesRecord, Integer> getIdentity() {
-        return (Identity<PlanesRecord, Integer>) super.getIdentity();
-    }
-
-    @Override
-    public UniqueKey<PlanesRecord> getPrimaryKey() {
-        return Keys.PK_PLANES;
-    }
-
-    @Override
-    public Planes as(String alias) {
-        return new Planes(DSL.name(alias), this);
-    }
-
-    @Override
-    public Planes as(Name alias) {
-        return new Planes(alias, this);
-    }
-
-    @Override
-    public Planes as(Table<?> alias) {
-        return new Planes(alias.getQualifiedName(), this);
-    }
-
-    /**
-     * Rename this table
-     */
-    @Override
-    public Planes rename(String name) {
-        return new Planes(DSL.name(name), null);
-    }
-
-    /**
-     * Rename this table
-     */
-    @Override
-    public Planes rename(Name name) {
-        return new Planes(name, null);
-    }
-
-    /**
-     * Rename this table
-     */
-    @Override
-    public Planes rename(Table<?> name) {
-        return new Planes(name.getQualifiedName(), null);
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    public Planes where(Condition condition) {
-        return new Planes(getQualifiedName(), aliased() ? this : null, null, condition);
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    public Planes where(Collection<? extends Condition> conditions) {
-        return where(DSL.and(conditions));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    public Planes where(Condition... conditions) {
-        return where(DSL.and(conditions));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    public Planes where(Field<Boolean> condition) {
-        return where(DSL.condition(condition));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    @PlainSQL
-    public Planes where(SQL condition) {
-        return where(DSL.condition(condition));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    @PlainSQL
-    public Planes where(@Stringly.SQL String condition) {
-        return where(DSL.condition(condition));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    @PlainSQL
-    public Planes where(@Stringly.SQL String condition, Object... binds) {
-        return where(DSL.condition(condition, binds));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    @PlainSQL
-    public Planes where(@Stringly.SQL String condition, QueryPart... parts) {
-        return where(DSL.condition(condition, parts));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    public Planes whereExists(Select<?> select) {
-        return where(DSL.exists(select));
-    }
-
-    /**
-     * Create an inline derived table from this table
-     */
-    @Override
-    public Planes whereNotExists(Select<?> select) {
-        return where(DSL.notExists(select));
-    }
-}
-
-====================
-FILE: CollisionsRecord.java
-
-/*
- * This file is generated by jOOQ.
- */
-package jooq.tables.records;
-
-
-import java.time.LocalDateTime;
-
-import jooq.tables.Collisions;
-
-import org.jooq.Record1;
-import org.jooq.impl.UpdatableRecordImpl;
-
-
-/**
- * This class is generated by jOOQ.
- */
-@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
-public class CollisionsRecord extends UpdatableRecordImpl<CollisionsRecord> {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Setter for <code>public.collisions.id</code>.
-     */
-    public void setId(Integer value) {
-        set(0, value);
-    }
-
-    /**
-     * Getter for <code>public.collisions.id</code>.
-     */
-    public Integer getId() {
-        return (Integer) get(0);
-    }
-
-    /**
-     * Setter for <code>public.collisions.involved_planes</code>.
-     */
-    public void setInvolvedPlanes(String[] value) {
-        set(1, value);
-    }
-
-    /**
-     * Getter for <code>public.collisions.involved_planes</code>.
-     */
-    public String[] getInvolvedPlanes() {
-        return (String[]) get(1);
-    }
-
-    /**
-     * Setter for <code>public.collisions.time</code>.
-     */
-    public void setTime(LocalDateTime value) {
-        set(2, value);
-    }
-
-    /**
-     * Getter for <code>public.collisions.time</code>.
-     */
-    public LocalDateTime getTime() {
-        return (LocalDateTime) get(2);
-    }
-
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Record1<Integer> key() {
-        return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached CollisionsRecord
-     */
-    public CollisionsRecord() {
-        super(Collisions.COLLISIONS);
-    }
-
-    /**
-     * Create a detached, initialised CollisionsRecord
-     */
-    public CollisionsRecord(Integer id, String[] involvedPlanes, LocalDateTime time) {
-        super(Collisions.COLLISIONS);
-
-        setId(id);
-        setInvolvedPlanes(involvedPlanes);
-        setTime(time);
-        resetChangedOnNotNull();
-    }
-}
-
-====================
-FILE: PlanesRecord.java
-
-/*
- * This file is generated by jOOQ.
- */
-package jooq.tables.records;
-
-
-import java.time.LocalDateTime;
-
-import jooq.tables.Planes;
-
-import org.jooq.Record1;
-import org.jooq.impl.UpdatableRecordImpl;
-
-
-/**
- * This class is generated by jOOQ.
- */
-@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
-public class PlanesRecord extends UpdatableRecordImpl<PlanesRecord> {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Setter for <code>public.planes.id</code>.
-     */
-    public void setId(Integer value) {
-        set(0, value);
-    }
-
-    /**
-     * Getter for <code>public.planes.id</code>.
-     */
-    public Integer getId() {
-        return (Integer) get(0);
-    }
-
-    /**
-     * Setter for <code>public.planes.flight_number</code>.
-     */
-    public void setFlightNumber(String value) {
-        set(1, value);
-    }
-
-    /**
-     * Getter for <code>public.planes.flight_number</code>.
-     */
-    public String getFlightNumber() {
-        return (String) get(1);
-    }
-
-    /**
-     * Setter for <code>public.planes.start_time</code>.
-     */
-    public void setStartTime(LocalDateTime value) {
-        set(2, value);
-    }
-
-    /**
-     * Getter for <code>public.planes.start_time</code>.
-     */
-    public LocalDateTime getStartTime() {
-        return (LocalDateTime) get(2);
-    }
-
-    /**
-     * Setter for <code>public.planes.landing_time</code>.
-     */
-    public void setLandingTime(LocalDateTime value) {
-        set(3, value);
-    }
-
-    /**
-     * Getter for <code>public.planes.landing_time</code>.
-     */
-    public LocalDateTime getLandingTime() {
-        return (LocalDateTime) get(3);
-    }
-
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Record1<Integer> key() {
-        return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create a detached PlanesRecord
-     */
-    public PlanesRecord() {
-        super(Planes.PLANES);
-    }
-
-    /**
-     * Create a detached, initialised PlanesRecord
-     */
-    public PlanesRecord(Integer id, String flightNumber, LocalDateTime startTime, LocalDateTime landingTime) {
-        super(Planes.PLANES);
-
-        setId(id);
-        setFlightNumber(flightNumber);
-        setStartTime(startTime);
-        setLandingTime(landingTime);
-        resetChangedOnNotNull();
-    }
-}
-
-====================
-FILE: Tables.java
-
-/*
- * This file is generated by jOOQ.
- */
-package jooq;
-
-
-import jooq.tables.Collisions;
-import jooq.tables.Planes;
-
-
-/**
- * Convenience access to all tables in public.
- */
-@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
-public class Tables {
-
-    /**
-     * The table <code>public.collisions</code>.
-     */
-    public static final Collisions COLLISIONS = Collisions.COLLISIONS;
-
-    /**
-     * The table <code>public.planes</code>.
-     */
-    public static final Planes PLANES = Planes.PLANES;
-}
-
-====================
 FILE: AirportServer.java
 
 package com.jakub.bone.server;
@@ -2222,6 +1395,7 @@ import com.jakub.bone.domain.airport.Airport;
 import com.jakub.bone.application.CollisionDetector;
 import com.jakub.bone.database.AirportDatabase;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.application.PlaneHandler;
 import org.apache.logging.log4j.ThreadContext;
@@ -2233,13 +1407,16 @@ import java.sql.SQLException;
 
 @Log4j2
 @Getter
+@Setter
 public class AirportServer  {
     private ServerSocket serverSocket;
+    private AirportDatabase database;
     private ControlTower controlTower;
     private Airport airport;
 
-    public AirportServer(ControlTower controller) throws SQLException {
-        this.controlTower = controller;
+    public AirportServer() throws SQLException {
+        this.database = new AirportDatabase();
+        this.controlTower = new ControlTower(database);
         this.airport = new Airport();
     }
 
@@ -2269,6 +1446,8 @@ public class AirportServer  {
             }
         } catch (IOException ex) {
             log.error("Failed to start AirportServer on port {}: {}", port, ex.getMessage(), ex);
+        } finally {
+            stopServer();
         }
     }
 
@@ -2278,17 +1457,20 @@ public class AirportServer  {
                 serverSocket.close();
                 log.info("Server closed successfully");
             }
+
+            if(database != null){
+                database.closeConnection();
+                log.info("Database closed successfully");
+            }
+
         } catch (IOException ex) {
-            log.error("Error occurred while closing server socket: {}", ex.getMessage());
+            log.error("Error occurred while closing server socket: {}", ex.getMessage(), ex);
         }
     }
 
     public static void main(String[] args) throws IOException, SQLException {
-        AirportDatabase database = new AirportDatabase();
-        ControlTower controlTower = new ControlTower(database);
-        AirportServer airportServer = new AirportServer(controlTower);
+        AirportServer airportServer = new AirportServer();
         airportServer.startServer(5000);
-        airportServer.stopServer();
     }
 }
 
@@ -2677,6 +1859,7 @@ package com.jakub.bone.ui.utills;
 
 import com.jakub.bone.ui.model.PlaneModel;
 import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.utills.Constant;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Group;
@@ -2685,11 +1868,13 @@ import javafx.util.Duration;
 
 import com.jakub.bone.domain.airport.Location;
 import com.jakub.bone.domain.plane.Plane;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.*;
 
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.LANDING;
 
+@Log4j2
 public class SceneUpdater {
     private final Group root;
     private ControlTower controller;
@@ -2715,9 +1900,10 @@ public class SceneUpdater {
         for (Plane plane : planes) {
             if(isFirstPlane){
                 try{
-                    Thread.sleep(500);
+                    Thread.sleep(Constant.SCENE_UPDATE_DELAY);
                 } catch (InterruptedException ex){
-                    ex.getMessage();
+                    log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
+                    Thread.currentThread().interrupt();
                 }
                 isFirstPlane = false;
             }
@@ -2768,6 +1954,43 @@ public class SmartGroup extends Group {
 }
 
 ====================
+FILE: ConfigLoader.java
+
+package com.jakub.bone.utills;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+public class ConfigLoader {
+    private static final Properties properties = new Properties();
+
+    static {
+        try (InputStream input = ConfigLoader.class.getClassLoader().getResourceAsStream("config.properties")) {
+            if (input == null) {
+                throw new RuntimeException("Configuration file 'config.properties' not found in classpath.");
+            }
+            properties.load(input);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load configuration file.", e);
+        }
+    }
+
+    public static String get(String key) {
+        return properties.getProperty(key);
+    }
+
+    public static int getInt(String key) {
+        return Integer.parseInt(properties.getProperty(key));
+    }
+
+    public static double getDouble(String key) {
+        return Double.parseDouble(properties.getProperty(key));
+    }
+}
+
+====================
 FILE: Constant.java
 
 package com.jakub.bone.utills;
@@ -2775,38 +1998,67 @@ package com.jakub.bone.utills;
 import com.jakub.bone.domain.airport.Location;
 
 public class Constant {
-    // Runway dimensions
-    public static final int RUNWAY_WIDTH = 5000; // in meters
-    public static final int RUNWAY_HEIGHT = 1000; // in meters
+    // Runway properties
+    public static final int RUNWAY_WIDTH = ConfigLoader.getInt("runway.width");
+    public static final int RUNWAY_HEIGHT = ConfigLoader.getInt("runway.height");
 
-    // Airplane limitations
-    public static final int MAX_CAPACITY = 100; // max number of airplanes in airspace
-    public static final int MAX_ALTITUDE = 5000; // in meters
-    public static final int MIN_ALTITUDE = 2000; // in meters
-    public static final double ALTITUDE_COLLISION_DISTANCE = 10.0; // in meters
-    public static final double HORIZONTAL_COLLISION_DISTANCE = 500.0; // in meters
+    // Plane properties
+    public static final int MAX_CAPACITY = ConfigLoader.getInt("airplane.max-capacity");
+    public static final int MAX_ALTITUDE = ConfigLoader.getInt("airplane.max-altitude");
+    public static final int MIN_ALTITUDE = ConfigLoader.getInt("airplane.min-altitude");
 
-    // Fuel-related values
-    public static final double CONSUMPTION_PER_HOUR = 2000; // in liters
-    public static final double INITIAL_FUEL_LEVEL = 6000; // for 3 hours in liters
-    public static final double CONSUMPTION_PER_SECOND = CONSUMPTION_PER_HOUR / 3600.0; // in liters
+    // Collision properties
+    public static final double ALTITUDE_COLLISION_DISTANCE = ConfigLoader.getDouble("collision.altitude-distance");
+    public static final double HORIZONTAL_COLLISION_DISTANCE = ConfigLoader.getDouble("collision.horizontal-distance");
 
-    // Time-related values
-    public static final long COLLISION_CHECK_INTERVAL = 1000; // in milliseconds
+    // Fuel properties
+    public static final double CONSUMPTION_PER_HOUR = ConfigLoader.getDouble("fuel.consumption-per-hour");
+    public static final double INITIAL_FUEL_LEVEL = ConfigLoader.getDouble("fuel.initial-fuel-level");
+    public static final double CONSUMPTION_PER_SECOND = CONSUMPTION_PER_HOUR / 3600.0;
 
-    // Landing-related values
-    public static int LANDING_ALTITUDE = 700; // in meters
-    public  static Location LANDING_POINT_RUNWAY_1 = new Location(3000, 1500, 0);
-    public static Location LANDING_POINT_RUNWAY_2 = new Location(3000, -1500, 0);
-    public static Location ENTRY_POINT_CORRIDOR_1 = new Location(-5000, 3500, 1000);
-    public static Location ENTRY_POINT_CORRIDOR_2 = new Location(-5000, 500, 1000);
-    public static Location FINAL_APPROACH_CORRIDOR_1 = new Location(-2000, 1500, 500);
-    public static Location FINAL_APPROACH_CORRIDOR_2 = new Location(-2000, -1500, 500);
+    // Delays
+    public static final int UPDATE_DELAY = ConfigLoader.getInt("delays.update");
+    public static final int SERVER_INIT_DELAY = ConfigLoader.getInt("delays.server-init");
+    public static final int COLLISION_CHECK_DELAY = ConfigLoader.getInt("delays.collision-check");
+    public static final int AFTER_COLLISION_DELAY = ConfigLoader.getInt("delays.after-collision");
+    public static final int LANDING_CHECK_DELAY = ConfigLoader.getInt("delays.landing-check");
+    public static final int SCENE_UPDATE_DELAY = ConfigLoader.getInt("delays.scene-update");
+    public static final int CLIENT_SPAWN_DELAY = ConfigLoader.getInt("delays.client-spawn");
 
+    // Landing properties
+    public static final int LANDING_ALTITUDE = ConfigLoader.getInt("landing.altitude");
+    public static final Location LANDING_POINT_RUNWAY_1 = new Location(
+            ConfigLoader.getInt("landing.point.runway-1.x"),
+            ConfigLoader.getInt("landing.point.runway-1.y"),
+            ConfigLoader.getInt("landing.point.runway-1.altitude")
+    );
+    public static final Location LANDING_POINT_RUNWAY_2 = new Location(
+            ConfigLoader.getInt("landing.point.runway-2.x"),
+            ConfigLoader.getInt("landing.point.runway-2.y"),
+            ConfigLoader.getInt("landing.point.runway-2.altitude")
+    );
 
-    // Holding-related
-    public static int HOLDING_ALTITUDE = 1000; // in meters
-    public static int HOLDING_ENTRY_ALTITUDE = 1013; // in meters
+    public static Location ENTRY_POINT_CORRIDOR_1 = new Location(
+            ConfigLoader.getInt("landing.entry.corridor-1.x"),
+            ConfigLoader.getInt("landing.entry.corridor-1.y"),
+            ConfigLoader.getInt("landing.entry.corridor-1.altitude"));
+    public static Location ENTRY_POINT_CORRIDOR_2 = new Location(
+            ConfigLoader.getInt("landing.entry.corridor-2.x"),
+            ConfigLoader.getInt("landing.entry.corridor-2.y"),
+            ConfigLoader.getInt("landing.entry.corridor-2.altitude"));
+    public static Location FINAL_APPROACH_CORRIDOR_1 = new Location(
+            ConfigLoader.getInt("landing.final.corridor-1.x"),
+            ConfigLoader.getInt("landing.final.corridor-1.y"),
+            ConfigLoader.getInt("landing.final.corridor-1.altitude"));
+    public static Location FINAL_APPROACH_CORRIDOR_2 = new Location(
+            ConfigLoader.getInt("landing.final.corridor-2.x"),
+            ConfigLoader.getInt("landing.final.corridor-2.y"),
+            ConfigLoader.getInt("landing.final.corridor-2.altitude"));
+
+    // Holding properties
+    public static int HOLDING_ALTITUDE = ConfigLoader.getInt("holding.altitude");
+    public static int HOLDING_ENTRY_ALTITUDE = ConfigLoader.getInt("holding.entry-altitude");
+
 }
 
 ====================
@@ -2991,6 +2243,7 @@ import com.jakub.bone.database.AirportDatabase;
 import com.jakub.bone.database.CollisionRepository;
 import com.jakub.bone.database.PlaneRepository;
 import org.junit.jupiter.api.*;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import com.jakub.bone.domain.plane.Plane;
@@ -3007,28 +2260,31 @@ class ClientServerConnectionTest {
     @Mock
     AirportDatabase mockDatabase;
     @Mock
-    PlaneRepository planeRepository;
+    PlaneRepository mockPlaneRepository;
     @Mock
-    CollisionRepository collisionRepository;
-    ControlTower controlTower;
+    CollisionRepository mockCollisionRepository;
+    @InjectMocks
+    ControlTower mockControlTower;
     AirportServer server;
 
     @BeforeEach
     void setUp() throws IOException, SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_DAO()).thenReturn(planeRepository);
-        when(mockDatabase.getCOLLISION_DAO()).thenReturn(collisionRepository);
+        when(mockDatabase.getPLANE_REPOSITORY()).thenReturn(mockPlaneRepository);
+        when(mockDatabase.getCOLLISION_REPOSITORY()).thenReturn(mockCollisionRepository);
 
-        this.controlTower = new ControlTower(mockDatabase);
             new Thread(() -> {
                 try {
-                    this.server = new AirportServer(controlTower);
+                    this.server = new AirportServer();
+                    this.server.setDatabase(mockDatabase);
+                    this.server.setControlTower(mockControlTower);
                     this.server.startServer(5000);
                 } catch (IOException | SQLException ex) {
                     throw new RuntimeException(ex);
                 }
             }).start();
     }
+
     @AfterEach
     void tearDown() throws IOException {
         if (server != null) {
@@ -3039,7 +2295,7 @@ class ClientServerConnectionTest {
     /**
      * Helper method to wait for the server to start without repeating try-catch blocks
      */
-    private void waitForStart() {
+    private void waitForUpdate() {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
@@ -3051,13 +2307,13 @@ class ClientServerConnectionTest {
     @DisplayName("Should test single client connection")
     void testSingleClientConnection() {
         // Wait for the server to start
-        waitForStart();
+        waitForUpdate();
 
         PlaneClient planeClient = new PlaneClient("localhost", 5000);
         new Thread(planeClient).start();
 
-        // Give some time for the client to connect
-        waitForStart();
+        // Wait for the client to connect
+        waitForUpdate();
 
         assertTrue(planeClient.isConnected(), "Client should successfully connect to the server");
     }
@@ -3065,19 +2321,19 @@ class ClientServerConnectionTest {
     @Test
     @DisplayName("Should test multiple clients connection")
     void testConnectionWithMultipleClients() {
-        waitForStart();
+        waitForUpdate();
 
         PlaneClient planeClient1 = new PlaneClient("localhost", 5000);
         new Thread(planeClient1).start();
 
         // Wait for the first client to connect
-        waitForStart();
+        waitForUpdate();
 
         PlaneClient planeClient2 = new PlaneClient("localhost", 5000);
         new Thread(planeClient2).start();
 
         // Wait for the second client to connect
-        waitForStart();
+        waitForUpdate();
 
         assertTrue(planeClient1.isConnected(), "Client1 should successfully connect to the server");
         assertTrue(planeClient2.isConnected(), "Client2 should successfully connect to the server");
@@ -3086,18 +2342,13 @@ class ClientServerConnectionTest {
     @Test
     @DisplayName("Should test client registration")
     void testClientRegistration() {
-        try{
-            Thread.sleep(2000);
-        } catch (InterruptedException ex){
-            ex.printStackTrace();
-        }
+        waitForUpdate();
+
         PlaneClient planeClient = new PlaneClient("localhost", 5000);
         new Thread(planeClient).start();
-            try{
-                Thread.sleep(2000);
-            } catch (InterruptedException ex){
-                ex.printStackTrace();
-            }
+
+        waitForUpdate();
+
         assertEquals(1, server.getControlTower().getPlanes().size(),
                 "Planes list should contain only one Plane object after registration");
     }
@@ -3105,7 +2356,7 @@ class ClientServerConnectionTest {
     @Test
     @DisplayName("Should test client registration with full capacity")
     void testClientRegistrationWithFullCapacity() {
-        waitForStart();
+        waitForUpdate();
 
         // Fill the list with 100 planes
         for(int i = 0; i < 100; i++){
@@ -3116,8 +2367,7 @@ class ClientServerConnectionTest {
         PlaneClient planeClient = new PlaneClient("localhost", 5000);
         new Thread(planeClient).start();
 
-        // Wait for the client to attempt registration
-        waitForStart();
+        waitForUpdate();
 
         assertEquals(100, server.getControlTower().getPlanes().size(),
                 "Plane list should contain only 100 planes; the new plane should not be added");
@@ -3130,6 +2380,8 @@ FILE: ClientTest.java
 package load_tests;
 
 import com.jakub.bone.client.PlaneClient;
+import com.jakub.bone.utills.Constant;
+
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
@@ -3163,7 +2415,7 @@ public class ClientTest {
                 executorService.execute(client);
 
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(Constant.CLIENT_SPAWN_DELAY);
                 } catch (InterruptedException ex) {
                     logger.log(Level.WARNING, "Client thread interrupted", ex);
                     Thread.currentThread().interrupt();
@@ -3181,8 +2433,6 @@ FILE: ServerTest.java
 
 package load_tests;
 
-import com.jakub.bone.application.ControlTower;
-import com.jakub.bone.database.AirportDatabase;
 import com.jakub.bone.server.AirportServer;
 
 import java.io.IOException;
@@ -3198,17 +2448,13 @@ import java.util.logging.Logger;
 public class ServerTest {
     static final Logger logger = Logger.getLogger(ClientTest.class.getName());
     public static void main(String[] args) throws IOException, SQLException {
-        AirportDatabase airportDatabase = new AirportDatabase();
-        ControlTower controller = new ControlTower(airportDatabase);
 
         AirportServer airportServer = null;
         try {
-            airportServer = new AirportServer(controller);
+            airportServer = new AirportServer();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-        airportServer = new AirportServer(controller);
 
         // Automatically stop after 70 minutes
         Timer timer = new Timer();
@@ -3243,6 +2489,7 @@ import com.jakub.bone.domain.airport.Location;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import com.jakub.bone.domain.plane.Plane;
@@ -3261,15 +2508,15 @@ class CollisionTest {
     PlaneRepository mockPlaneRepository;
     @Mock
     CollisionRepository mockCollisionRepository;
+    @InjectMocks
     ControlTower controlTower;
     CollisionDetector collisionDetector;
 
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneRepository);
-        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionRepository);
-        this.controlTower = new ControlTower(mockDatabase);
+        when(mockDatabase.getPLANE_REPOSITORY()).thenReturn(mockPlaneRepository);
+        when(mockDatabase.getCOLLISION_REPOSITORY()).thenReturn(mockCollisionRepository);
         this.collisionDetector = new CollisionDetector(controlTower);
     }
 
@@ -3336,6 +2583,7 @@ import com.jakub.bone.database.PlaneRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import com.jakub.bone.domain.plane.Plane;
@@ -3354,14 +2602,14 @@ class ControlTowerTest {
     PlaneRepository mockPlaneRepository;
     @Mock
     CollisionRepository mockCollisionRepository;
+    @InjectMocks
     ControlTower controlTower;
     List<Plane> incomingPlanes;
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneRepository);
-        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionRepository);
-        controlTower = new ControlTower(mockDatabase);
+        when(mockDatabase.getPLANE_REPOSITORY()).thenReturn(mockPlaneRepository);
+        when(mockDatabase.getCOLLISION_REPOSITORY()).thenReturn(mockCollisionRepository);
         incomingPlanes = new ArrayList<>();
     }
 
@@ -3449,6 +2697,7 @@ import com.jakub.bone.database.PlaneRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import com.jakub.bone.domain.plane.Plane;
@@ -3468,15 +2717,15 @@ class RunwayTest {
     PlaneRepository mockPlaneRepository;
     @Mock
     CollisionRepository mockCollisionRepository;
+    @InjectMocks
     ControlTower controlTower;
     Airport airport;
 
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneRepository);
-        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionRepository);
-        controlTower = new ControlTower(mockDatabase);
+        when(mockDatabase.getPLANE_REPOSITORY()).thenReturn(mockPlaneRepository);
+        when(mockDatabase.getCOLLISION_REPOSITORY()).thenReturn(mockCollisionRepository);
         airport = new Airport();
     }
 
@@ -3579,6 +2828,7 @@ import com.jakub.bone.database.PlaneRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import com.jakub.bone.domain.plane.Plane;
@@ -3596,15 +2846,15 @@ class DatabaseOperationTest {
     PlaneRepository mockPlaneRepository;
     @Mock
     CollisionRepository mockCollisionRepository;
+    @InjectMocks
     ControlTower controlTower;
     CollisionDetector collisionDetector;
 
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneRepository);
-        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionRepository);
-        controlTower = new ControlTower(mockDatabase);
+        when(mockDatabase.getPLANE_REPOSITORY()).thenReturn(mockPlaneRepository);
+        when(mockDatabase.getCOLLISION_REPOSITORY()).thenReturn(mockCollisionRepository);
         collisionDetector = new CollisionDetector(controlTower);
     }
 
@@ -3672,6 +2922,7 @@ import com.jakub.bone.utills.WaypointGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import com.jakub.bone.domain.plane.Plane;
@@ -3698,6 +2949,7 @@ class FlightPhaseTest {
     PlaneRepository mockPlaneRepository;
     @Mock
     CollisionRepository mockCollisionRepository;
+    @InjectMocks
     ControlTower controlTower;
     FlightPhaseCoordinator phaseCoordinator;
     Airport airport;
@@ -3706,9 +2958,8 @@ class FlightPhaseTest {
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_DAO()).thenReturn(mockPlaneRepository);
-        when(mockDatabase.getCOLLISION_DAO()).thenReturn(mockCollisionRepository);
-        this.controlTower = new ControlTower(mockDatabase);
+        when(mockDatabase.getPLANE_REPOSITORY()).thenReturn(mockPlaneRepository);
+        when(mockDatabase.getCOLLISION_REPOSITORY()).thenReturn(mockCollisionRepository);
         this.airport = new Airport();
         this.messenger = mock(Messenger.class);
         this.phaseCoordinator = new FlightPhaseCoordinator(controlTower, airport, messenger);
@@ -3842,7 +3093,7 @@ class LocationTest {
         plane.getNavigator().setLocation(initLocation);
 
         // Update location
-        plane.getNavigator().updateLocation(newLocation, plane.getFlightNumber());
+        plane.getNavigator().updateLocation(newLocation);
 
         assertNotEquals(plane.getNavigator().getLocation(), initLocation, "Plane should not remain at the initial location");
         assertEquals(plane.getNavigator().getLocation(), newLocation, "Plane should have the new location after update");
