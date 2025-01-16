@@ -41,6 +41,7 @@ public class ControlTower {
         return executeWithLock(() -> planes.size() >= MAX_CAPACITY);
     }
 
+
     public boolean isAtCollisionRiskZone(Plane plane) {
         return executeWithLock(() -> planes.stream()
                 .anyMatch(otherPlane -> plane.getNavigator().getRiskZoneWaypoints()

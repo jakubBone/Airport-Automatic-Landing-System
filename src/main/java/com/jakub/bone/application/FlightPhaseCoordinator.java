@@ -79,30 +79,22 @@ public class FlightPhaseCoordinator {
     }
     private void enterHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);
-        plane.setPhase(HOLDING);
-        if (!holdPatternLogged) {
-            log.info("Plane [{}] enter {}", plane.getFlightNumber(), HOLDING);
-            holdPatternLogged = true;
-        }
+        plane.changePhase(HOLDING);
     }
 
     private void applyDescending(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);
-        plane.setPhase(DESCENDING);
-        if (!descentLogged) {
-            log.info("Plane [{}]: instructed to {}", plane.getFlightNumber(), DESCENT);
-            descentLogged = true;
-        }
+        plane.changePhase(DESCENDING);
     }
 
     private void applyHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(HOLD_PATTERN, out);
-        plane.setPhase(HOLDING);
+        plane.changePhase(HOLDING);
     }
 
     private void applyLanding(Plane plane, Runway runway, ObjectOutputStream out) throws IOException {
         controlTower.assignRunway(runway);
-        plane.setPhase(LANDING);
+        plane.changePhase(LANDING);
         messenger.send(LAND, out);
         messenger.send(runway, out);
         log.info("Plane [{}]: instructed to {} on runway [{}]", plane.getFlightNumber(), LAND, runway.getId());
@@ -118,6 +110,7 @@ public class FlightPhaseCoordinator {
         }
         return null;
     }
+
 
     private void waitForUpdate(int interval) {
         try {

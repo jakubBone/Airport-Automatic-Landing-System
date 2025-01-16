@@ -42,7 +42,7 @@ public class SimulationLauncher extends Application {
             }
         }
 
-        int clientsNumber = 10000;
+        int clientsNumber = 1000;
 
         new Thread(() -> {
             for (int i = 0; i < clientsNumber; i++) {

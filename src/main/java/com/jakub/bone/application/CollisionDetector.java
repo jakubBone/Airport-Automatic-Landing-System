@@ -25,8 +25,7 @@ public class CollisionDetector extends Thread {
                 }
             } catch (InterruptedException ex) {
                 log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
-                Thread.currentThread().interrupt();
-                log.info("Restarting collision detection process...");
+                break;
             }
         }
     }
