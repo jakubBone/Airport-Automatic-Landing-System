@@ -1,7 +1,6 @@
 package com.jakub.bone.client;
 
 import com.jakub.bone.application.PlaneHandler;
-import com.jakub.bone.utills.Constant;
 import lombok.Getter;
 import com.jakub.bone.utills.Messenger;
 import lombok.extern.log4j.Log4j2;
@@ -34,7 +33,7 @@ public class PlaneClient extends Client implements Runnable {
         connectAndHandle();
     }
 
-    private void connectAndHandle(){
+    private void connectAndHandle() {
         ThreadContext.put("type", "Client");
         try {
             establishConnection();
@@ -56,14 +55,14 @@ public class PlaneClient extends Client implements Runnable {
         log.info("PlaneClient [{}]: connected to server", plane.getFlightNumber());
     }
 
-    private void initializeServices(){
+    private void initializeServices() {
         this.communicationService = new PlaneCommunicationService(plane, messenger, out);
         this.instructionHandler = new PlaneInstructionHandler(plane, messenger, in, out);
     }
 
     private void processInstructions() throws IOException, ClassNotFoundException {
         while (!instructionHandler.isProcessCompleted()) {
-            if(!communicationService.sendFuelLevel() || !communicationService.sendLocation()){
+            if (!communicationService.sendFuelLevel() || !communicationService.sendLocation()) {
                 log.error("Plane [{}]: lost communication due to fuel or location issues", plane.getFlightNumber());
                 return;
             }
@@ -71,7 +70,7 @@ public class PlaneClient extends Client implements Runnable {
             PlaneHandler.AirportInstruction instruction = messenger.receiveAndParse(in, PlaneHandler.AirportInstruction.class);
             instructionHandler.processInstruction(instruction);
 
-            if(plane.isDestroyed()){
+            if (plane.isDestroyed()) {
                 log.info("Plane [{}]: has destroyed", plane.getFlightNumber());
                 return;
             }
@@ -85,7 +84,6 @@ public class PlaneClient extends Client implements Runnable {
         return code + number;
     }
 
-
     private void closeConnection() {
         stopConnection();
         log.debug("Plane [{}]: connection stopped", plane.getFlightNumber());
@@ -98,14 +96,27 @@ public class PlaneClient extends Client implements Runnable {
 
         for (int i = 0; i < numberOfClients; i++) {
             PlaneClient client = new PlaneClient("localhost", 5000);
-            try{
-                Thread.sleep(Constant.CLIENT_SPAWN_DELAY);
-            } catch (InterruptedException ex){
-                log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
-                Thread.currentThread().interrupt();
-            }
+
             executorService.execute(client);
         }
         executorService.shutdown();
     }
+}
+
+
+
+
+
+
+
+
+
+
+
+    /* try{
+                Thread.sleep(Constant.CLIENT_SPAWN_DELAY);
+            } catch (InterruptedException ex){
+                log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
+                Thread.currentThread().interrupt();
+            }*/
 }
