@@ -1,6 +1,7 @@
 package com.jakub.bone.client;
 
 import com.jakub.bone.application.PlaneHandler;
+import com.jakub.bone.utills.Constant;
 import lombok.Getter;
 import com.jakub.bone.utills.Messenger;
 import lombok.extern.log4j.Log4j2;
@@ -96,27 +97,14 @@ public class PlaneClient extends Client implements Runnable {
 
         for (int i = 0; i < numberOfClients; i++) {
             PlaneClient client = new PlaneClient("localhost", 5000);
-
-            executorService.execute(client);
-        }
-        executorService.shutdown();
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-    /* try{
+            try{
                 Thread.sleep(Constant.CLIENT_SPAWN_DELAY);
             } catch (InterruptedException ex){
                 log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
-            }*/
+            }
+            executorService.execute(client);
+        }
+        executorService.shutdown();
+    }
 }
