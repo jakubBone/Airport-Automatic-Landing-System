@@ -24,7 +24,7 @@ prevent collisions, and ensure efficient usage of runways.
 
 ## 🚀 Technologies Used
 
-- **Java 17**: Core programming language for client-server logic
+- **Java 21**: Core programming language for client-server logic
 
 - **PostgreSQL**: Backend database for logging data
 
