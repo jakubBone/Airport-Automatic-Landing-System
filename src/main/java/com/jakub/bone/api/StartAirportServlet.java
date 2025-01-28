@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -54,11 +53,9 @@ public class StartAirportServlet extends HttpServlet {
         if(airportServer == null) {
             Thread serverThread = new Thread(() -> {
                 try {
-                    this.airportServer = new AirportServer();
+                    this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
                     this.airportServer.startServer(5000);
-                } catch (SQLException ex) {
-                    throw new RuntimeException("Failed to initialize AirportServer due to database issues", ex);
-                } catch (IOException ex) {
+                }  catch (IOException ex) {
                     throw new RuntimeException("Failed to initialize AirportServer due to I/O issues", ex);
                 }
             });

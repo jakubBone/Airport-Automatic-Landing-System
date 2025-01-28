@@ -23,13 +23,15 @@ public class AirportServer  {
     private AirportDatabase database;
     private ControlTower controlTower;
     private Airport airport;
-    private boolean isRunning;
+    private boolean running;
+    private boolean paused;
 
     public AirportServer() throws SQLException {
         this.database = new AirportDatabase();
         this.controlTower = new ControlTower(database);
         this.airport = new Airport();
-        this.isRunning = false;
+        this.running = false;
+        this.paused = false;
     }
 
     public void startServer(int port) throws IOException {
@@ -43,11 +45,18 @@ public class AirportServer  {
             log.info("Collision detector started");
 
             while (true) {
+                synchronized (this) {
+                    while (paused) {
+                        log.info("Airport paused. Waiting...");
+                        wait();
+                    }
+                }
+
                 try {
                     Socket clientSocket = serverSocket.accept();
                     if (clientSocket != null) {
                         log.debug("Server connected with client at port: {}", port);
-                        isRunning = true;
+                        running = true;
                         new PlaneHandler(clientSocket, controlTower, airport).start();
                     }
                 } catch (Exception ex) {
@@ -59,9 +68,11 @@ public class AirportServer  {
             }
         } catch (IOException ex) {
             log.error("Failed to start AirportServer on port {}: {}", port, ex.getMessage(), ex);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
             stopServer();
-            isRunning = false;
+            running = false;
         }
     }
 
@@ -78,6 +89,13 @@ public class AirportServer  {
             }
         } catch (IOException ex) {
             log.error("Error occurred while closing server socket: {}", ex.getMessage(), ex);
+        }
+    }
+
+    public synchronized void setPaused(boolean paused) {
+        this.paused = paused;
+        if (!paused) {
+            notifyAll();
         }
     }
 
