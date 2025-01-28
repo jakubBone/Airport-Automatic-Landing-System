@@ -78,14 +78,14 @@ public class AirportServer  {
 
     public void stopServer() {
         try {
-            if (serverSocket != null && !serverSocket.isClosed()) {
-                serverSocket.close();
-                log.info("Server closed successfully");
-            }
-
             if(database != null){
                 database.closeConnection();
                 log.info("Database closed successfully");
+            }
+
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+                log.info("Server closed successfully");
             }
         } catch (IOException ex) {
             log.error("Error occurred while closing server socket: {}", ex.getMessage(), ex);

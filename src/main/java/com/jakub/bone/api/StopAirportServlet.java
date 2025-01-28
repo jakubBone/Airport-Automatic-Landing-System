@@ -12,23 +12,24 @@ import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-@WebServlet(urlPatterns = "/airport/resume")
-public class ResumeAirportServlet extends HttpServlet {
+@WebServlet(urlPatterns = "/airport/stop")
+public class StopAirportServlet extends HttpServlet {
     private static AirportServer airportServer;
     private static Lock lock = new ReentrantLock();
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
         lock.lock();
         try {
-            if (airportServer != null && airportServer.isPaused()) {
-                airportServer.setPaused(false);
+            if (airportServer != null && airportServer.isRunning()) {
+                airportServer.stopServer();
             }
         } finally {
             lock.unlock();
         }
 
-        String json = new Gson().toJson("{\"message\": \"Airport resumed successfully\"}");
+        String json = new Gson().toJson("{\"message\": \"Airport stopped successfully\"}");
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
