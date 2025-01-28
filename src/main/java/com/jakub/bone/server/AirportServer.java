@@ -23,11 +23,13 @@ public class AirportServer  {
     private AirportDatabase database;
     private ControlTower controlTower;
     private Airport airport;
+    private boolean isRunning;
 
     public AirportServer() throws SQLException {
         this.database = new AirportDatabase();
         this.controlTower = new ControlTower(database);
         this.airport = new Airport();
+        this.isRunning = false;
     }
 
     public void startServer(int port) throws IOException {
@@ -45,6 +47,7 @@ public class AirportServer  {
                     Socket clientSocket = serverSocket.accept();
                     if (clientSocket != null) {
                         log.debug("Server connected with client at port: {}", port);
+                        isRunning = true;
                         new PlaneHandler(clientSocket, controlTower, airport).start();
                     }
                 } catch (Exception ex) {
@@ -58,6 +61,7 @@ public class AirportServer  {
             log.error("Failed to start AirportServer on port {}: {}", port, ex.getMessage(), ex);
         } finally {
             stopServer();
+            isRunning = false;
         }
     }
 
@@ -72,7 +76,6 @@ public class AirportServer  {
                 database.closeConnection();
                 log.info("Database closed successfully");
             }
-
         } catch (IOException ex) {
             log.error("Error occurred while closing server socket: {}", ex.getMessage(), ex);
         }
