@@ -88,7 +88,6 @@ public class PlaneClient extends Client implements Runnable {
     private void closeConnection() {
         stopConnection();
         log.debug("Plane [{}]: connection stopped", plane.getFlightNumber());
-
     }
 
     public static void main(String[] args) throws IOException {
