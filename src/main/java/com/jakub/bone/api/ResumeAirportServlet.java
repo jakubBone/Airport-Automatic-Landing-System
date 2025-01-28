@@ -12,35 +12,25 @@ import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-@WebServlet(urlPatterns = "/airport/pause")
-public class PauseAirportServlet extends HttpServlet {
+@WebServlet(urlPatterns = "/airport/resume")
+public class ResumeAirportServlet extends HttpServlet {
     private static AirportServer airportServer;
     private static Lock lock = new ReentrantLock();
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        boolean paused = false;
+        boolean resumed = false;
         this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
         lock.lock();
         try {
             if (airportServer != null && airportServer.isPaused()) {
-                paused = false;
-            } else {
-                airportServer.setPaused(true);
-                paused = true;
+                airportServer.setPaused(false);
             }
         } finally {
             lock.unlock();
         }
 
-        String json;
-        if (paused) {
-            json = new Gson().toJson("{\"message\": \"Airport paused successfully\"}");
-            response.setStatus(HttpServletResponse.SC_OK);
-        } else {
-            json = new Gson().toJson("{\"message\": \"Airport is already paused\"}");
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
-        }
-
+        String json = new Gson().toJson("{\"message\": \"Airport resumed successfully\"}");
+        response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(json);

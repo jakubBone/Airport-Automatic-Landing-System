@@ -23,8 +23,8 @@ public class StartAirportServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         boolean started = false;
+        lock.lock();
         try {
-            lock.lock();
             if (airportServer != null && airportServer.isRunning()) {
                 started = false;
             } else {

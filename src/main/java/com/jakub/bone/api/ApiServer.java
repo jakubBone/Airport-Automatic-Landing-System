@@ -21,6 +21,7 @@ public class ApiServer {
         // Servlets registration
         context.addServlet(new ServletHolder(new StartAirportServlet()), "/airport/start");
         context.addServlet(new ServletHolder(new PauseAirportServlet()), "/airport/pause");
+        context.addServlet(new ServletHolder(new ResumeAirportServlet()), "/airport/resume");
 
         try {
             server.start();
