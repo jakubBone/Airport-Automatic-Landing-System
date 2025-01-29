@@ -18,9 +18,9 @@ import static com.jakub.bone.utills.Constant.SERVER_INIT_DELAY;
 
 @WebServlet(urlPatterns = "/airport/start")
 public class StartAirportServlet extends HttpServlet {
-    private static AirportServer airportServer;
-    private static Messenger messenger = new Messenger();
-    private static Lock lock = new ReentrantLock();
+    private AirportServer airportServer;
+    private Messenger messenger = new Messenger();
+    private Lock lock = new ReentrantLock();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

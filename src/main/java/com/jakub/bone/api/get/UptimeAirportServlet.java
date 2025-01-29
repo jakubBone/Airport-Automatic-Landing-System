@@ -17,7 +17,7 @@ import java.time.Instant;
 @WebServlet(urlPatterns = "/airport/uptime")
 public class UptimeAirportServlet extends HttpServlet {
     private AirportServer airportServer;
-    private static Messenger messenger = new Messenger();
+    private Messenger messenger = new Messenger();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

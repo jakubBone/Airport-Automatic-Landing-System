@@ -15,9 +15,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @WebServlet(urlPatterns = "/airport/pause")
 public class PauseAirportServlet extends HttpServlet {
-    private static AirportServer airportServer;
-    private static Messenger messenger = new Messenger();
-    private static Lock lock = new ReentrantLock();
+    private AirportServer airportServer;
+    private Messenger messenger = new Messenger();
+    private Lock lock = new ReentrantLock();
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         boolean paused = false;

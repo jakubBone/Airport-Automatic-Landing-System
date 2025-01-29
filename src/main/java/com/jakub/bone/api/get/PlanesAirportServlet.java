@@ -8,19 +8,25 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jooq.DSLContext;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jooq.Tables.PLANES;
+
 @WebServlet(urlPatterns = "/airport/planes/*")
 public class PlanesAirportServlet extends HttpServlet {
     private AirportServer airportServer;
-    private static Messenger messenger = new Messenger();
+    private Messenger messenger = new Messenger();
+    private DSLContext context;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
+        this.context = airportServer.getDatabase().getCONTEXT();
+
         List<Plane> planes = airportServer.getControlTower().getPlanes();
         List<String> flightNumbers = new ArrayList<>();
 
@@ -36,13 +42,11 @@ public class PlanesAirportServlet extends HttpServlet {
             case "/flightNumbers":
                 messenger.send(response, flightNumbers);
                 break;
+            case "/landed":
+                messenger.send(response, getLandedPlanes());
+                break;
             default:
-                String flightNumber = path.substring(1);
-                Plane plane = planes.stream()
-                        .filter(p -> p.getFlightNumber().equals(flightNumber))
-                        .findFirst()
-                        .orElse(null);
-
+                Plane plane = findPlaneByNumber(planes, path)
                 if (plane == null) {
                     messenger.send(response, "Plane not found");
                 } else {
@@ -53,5 +57,20 @@ public class PlanesAirportServlet extends HttpServlet {
                                     " fuel: " + plane.getFuelManager().getFuelLevel());
                 }
         }
+    }
+
+    public List<String> getLandedPlanes(){
+        return context.select(PLANES.FLIGHT_NUMBER)
+                .from(PLANES)
+                .where(PLANES.LANDING_TIME.isNotNull())
+                .fetchInto(String.class);
+    }
+
+    public Plane findPlaneByNumber(List<Plane> planes, String path){
+        String flightNumber = path.substring(1);
+        return planes.stream()
+                .filter(p -> p.getFlightNumber().equals(flightNumber))
+                .findFirst()
+                .orElse(null);
     }
 }
