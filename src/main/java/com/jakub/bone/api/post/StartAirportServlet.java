@@ -1,4 +1,4 @@
-package com.jakub.bone.api;
+package com.jakub.bone.api.get;
 
 import com.google.gson.Gson;
 import com.jakub.bone.client.PlaneClient;
