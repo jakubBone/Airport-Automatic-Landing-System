@@ -1,5 +1,6 @@
 package com.jakub.bone.api;
 
+import com.jakub.bone.api.get.PlanesAirportServlet;
 import com.jakub.bone.api.get.UptimeAirportServlet;
 import com.jakub.bone.api.post.PauseAirportServlet;
 import com.jakub.bone.api.post.StartAirportServlet;
@@ -22,12 +23,13 @@ public class ApiServer {
         AirportServer airportServer = new AirportServer();
         context.setAttribute("airportServer", airportServer);
 
-        // Servlets registration
+        // Init Servlets
         context.addServlet(new ServletHolder(new StartAirportServlet()), "/airport/start");
         context.addServlet(new ServletHolder(new PauseAirportServlet()), "/airport/pause");
         context.addServlet(new ServletHolder(new ResumeAirportServlet()), "/airport/resume");
         context.addServlet(new ServletHolder(new StopAirportServlet()), "/airport/stop");
         context.addServlet(new ServletHolder(new UptimeAirportServlet()), "/airport/uptime");
+        context.addServlet(new ServletHolder(new PlanesAirportServlet()), "/airport/planes");
 
         try {
             server.start();
