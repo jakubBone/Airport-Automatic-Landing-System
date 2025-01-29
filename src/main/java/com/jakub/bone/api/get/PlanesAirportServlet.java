@@ -46,7 +46,7 @@ public class PlanesAirportServlet extends HttpServlet {
                 messenger.send(response, getLandedPlanes());
                 break;
             default:
-                Plane plane = findPlaneByNumber(planes, path)
+                Plane plane = findPlaneByNumber(planes, path);
                 if (plane == null) {
                     messenger.send(response, "Plane not found");
                 } else {
