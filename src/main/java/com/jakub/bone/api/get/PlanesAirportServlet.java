@@ -28,14 +28,30 @@ public class PlanesAirportServlet extends HttpServlet {
             flightNumbers.add(plane.getFlightNumber());
         }
 
-        String json = request.getPathInfo();
-        switch(json) {
+        String path = request.getPathInfo();
+        switch(path) {
             case "/count":
                 messenger.send(response, planes.size());
                 break;
             case "/flightNumbers":
                 messenger.send(response, flightNumbers);
                 break;
+            default:
+                String flightNumber = path.substring(1);
+                Plane plane = planes.stream()
+                        .filter(p -> p.getFlightNumber().equals(flightNumber))
+                        .findFirst()
+                        .orElse(null);
+
+                if (plane == null) {
+                    messenger.send(response, "Plane not found");
+                } else {
+                    messenger.send(response,
+                            "flightNumber: " + plane.getFlightNumber() +
+                                    " status: " + plane.getPhase().toString() +
+                                    " altitude: " + plane.getNavigator().getLocation().getAltitude() +
+                                    " fuel: " + plane.getFuelManager().getFuelLevel());
+                }
         }
     }
 }
