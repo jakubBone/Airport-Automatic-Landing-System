@@ -29,7 +29,7 @@ public class ApiServer {
         context.addServlet(new ServletHolder(new ResumeAirportServlet()), "/airport/resume");
         context.addServlet(new ServletHolder(new StopAirportServlet()), "/airport/stop");
         context.addServlet(new ServletHolder(new UptimeAirportServlet()), "/airport/uptime");
-        context.addServlet(new ServletHolder(new PlanesAirportServlet()), "/airport/planes");
+        context.addServlet(new ServletHolder(new PlanesAirportServlet()), "/airport/planes/*");
 
         try {
             server.start();

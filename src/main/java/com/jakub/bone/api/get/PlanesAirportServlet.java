@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(urlPatterns = "/airport/planes")
+@WebServlet(urlPatterns = "/airport/planes/*")
 public class PlanesAirportServlet extends HttpServlet {
     private AirportServer airportServer;
     private static Messenger messenger = new Messenger();
@@ -21,13 +21,21 @@ public class PlanesAirportServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
-
         List<Plane> planes = airportServer.getControlTower().getPlanes();
         List<String> flightNumbers = new ArrayList<>();
 
         for(Plane plane: planes){
             flightNumbers.add(plane.getFlightNumber());
         }
-        messenger.send(response, flightNumbers);
+
+        String json = request.getPathInfo();
+        switch(json) {
+            case "/count":
+                messenger.send(response, planes.size());
+                break;
+            case "/flightNumbers":
+                messenger.send(response, flightNumbers);
+                break;
+        }
     }
 }
