@@ -1,7 +1,8 @@
-package com.jakub.bone.api.get;
+package com.jakub.bone.api.post;
 
 import com.google.gson.Gson;
 import com.jakub.bone.server.AirportServer;
+import com.jakub.bone.utills.Messenger;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,6 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @WebServlet(urlPatterns = "/airport/stop")
 public class StopAirportServlet extends HttpServlet {
     private static AirportServer airportServer;
+    private static Messenger messenger = new Messenger();
     private static Lock lock = new ReentrantLock();
 
     @Override
@@ -22,17 +24,14 @@ public class StopAirportServlet extends HttpServlet {
         this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
         lock.lock();
         try {
-            if (airportServer != null && airportServer.isRunning()) {
-                airportServer.stopServer();
+            if (airportServer == null && !airportServer.isRunning()) {
+                messenger.send(response, "Airport is not running");
+                return;
             }
+            airportServer.stopServer();
         } finally {
             lock.unlock();
         }
-
-        String json = new Gson().toJson("{\"message\": \"Airport stopped successfully\"}");
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(json);
+        messenger.send(response, "Airport stopped successfully");
     }
 }

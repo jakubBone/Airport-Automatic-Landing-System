@@ -13,7 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
-
 @Log4j2
 @Getter
 public class PlaneClient extends Client implements Runnable {

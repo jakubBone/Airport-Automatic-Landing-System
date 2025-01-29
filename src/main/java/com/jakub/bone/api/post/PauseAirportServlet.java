@@ -1,7 +1,8 @@
-package com.jakub.bone.api.get;
+package com.jakub.bone.api.post;
 
 import com.google.gson.Gson;
 import com.jakub.bone.server.AirportServer;
+import com.jakub.bone.utills.Messenger;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,6 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @WebServlet(urlPatterns = "/airport/pause")
 public class PauseAirportServlet extends HttpServlet {
     private static AirportServer airportServer;
+    private static Messenger messenger = new Messenger();
     private static Lock lock = new ReentrantLock();
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -25,24 +27,17 @@ public class PauseAirportServlet extends HttpServlet {
             if (airportServer != null && airportServer.isPaused()) {
                 paused = false;
             } else {
-                airportServer.setPaused(true);
+                airportServer.pauseServer();
                 paused = true;
             }
         } finally {
             lock.unlock();
         }
 
-        String json;
         if (paused) {
-            json = new Gson().toJson("{\"message\": \"Airport paused successfully\"}");
-            response.setStatus(HttpServletResponse.SC_OK);
+            messenger.send(response, "Airport paused successfully");
         } else {
-            json = new Gson().toJson("{\"message\": \"Airport is already paused\"}");
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            messenger.send(response, "Airport is already paused");
         }
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(json);
     }
 }

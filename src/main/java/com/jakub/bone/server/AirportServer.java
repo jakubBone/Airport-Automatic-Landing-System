@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
 
 @Log4j2
 @Getter
@@ -26,6 +28,8 @@ public class AirportServer  {
     private boolean running;
     private boolean paused;
 
+    private Instant startTime;
+
     public AirportServer() throws SQLException {
         this.database = new AirportDatabase();
         this.controlTower = new ControlTower(database);
@@ -36,8 +40,10 @@ public class AirportServer  {
 
     public void startServer(int port) throws IOException {
         ThreadContext.put("type", "Server");
+        running = true;
         try {
             this.serverSocket = new ServerSocket(port);
+            this.startTime = Instant.now();
             log.info("Server started");
 
             new CollisionDetector(controlTower).start();
@@ -45,11 +51,10 @@ public class AirportServer  {
             log.info("Collision detector started");
 
             while (true) {
-                synchronized (this) {
-                    while (paused) {
-                        log.info("Airport paused. Waiting...");
-                        wait();
-                    }
+                if(paused) {
+                    Thread.sleep(2000);
+                    log.info("Airport paused. Waiting...");
+                    continue;
                 }
 
                 try {
@@ -72,11 +77,11 @@ public class AirportServer  {
             throw new RuntimeException(e);
         } finally {
             stopServer();
-            running = false;
         }
     }
 
     public void stopServer() {
+        running = false;
         try {
             if(database != null){
                 database.closeConnection();
@@ -92,11 +97,12 @@ public class AirportServer  {
         }
     }
 
-    public synchronized void setPaused(boolean paused) {
-        this.paused = paused;
-        if (!paused) {
-            notifyAll();
-        }
+    public void pauseServer() {
+        this.paused = true;
+    }
+
+    public void resumeServer() {
+        this.paused = false;
     }
 
     public static void main(String[] args) throws IOException, SQLException {

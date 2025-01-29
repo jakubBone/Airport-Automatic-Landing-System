@@ -1,8 +1,8 @@
-package com.jakub.bone.api.get;
+package com.jakub.bone.api.post;
 
-import com.google.gson.Gson;
 import com.jakub.bone.client.PlaneClient;
 import com.jakub.bone.server.AirportServer;
+import com.jakub.bone.utills.Messenger;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -19,34 +19,23 @@ import static com.jakub.bone.utills.Constant.SERVER_INIT_DELAY;
 @WebServlet(urlPatterns = "/airport/start")
 public class StartAirportServlet extends HttpServlet {
     private static AirportServer airportServer;
+    private static Messenger messenger = new Messenger();
     private static Lock lock = new ReentrantLock();
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         boolean started = false;
         lock.lock();
         try {
             if (airportServer != null && airportServer.isRunning()) {
-                started = false;
+                messenger.send(response, "Airport is already running");
             } else {
                 startAirport();
-                started = true;
+                messenger.send(response, "Airport started successfully");
             }
         } finally {
             lock.unlock();
         }
-
-        String json;
-        if (started) {
-            json = new Gson().toJson("{\"message\": \"Airport started successfully\"}");
-            response.setStatus(HttpServletResponse.SC_OK);
-        } else {
-            json = new Gson().toJson("{\"message\": \"Airport is already running\"}");
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
-        }
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(json);
     }
 
     public void startAirport() {
@@ -66,7 +55,6 @@ public class StartAirportServlet extends HttpServlet {
                 try {
                     Thread.sleep(SERVER_INIT_DELAY);
                 } catch (InterruptedException ex) {
-                    //log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
                     Thread.currentThread().interrupt();
                 }
             }
@@ -79,7 +67,6 @@ public class StartAirportServlet extends HttpServlet {
                     try {
                         Thread.sleep(CLIENT_SPAWN_DELAY);
                     } catch (InterruptedException ex) {
-                        //log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
                         Thread.currentThread().interrupt();
                     }
                 }

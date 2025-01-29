@@ -1,5 +1,10 @@
 package com.jakub.bone.api;
 
+import com.jakub.bone.api.get.UptimeAirportServlet;
+import com.jakub.bone.api.post.PauseAirportServlet;
+import com.jakub.bone.api.post.StartAirportServlet;
+import com.jakub.bone.api.post.StopAirportServlet;
+import com.jakub.bone.api.post.ResumeAirportServlet;
 import com.jakub.bone.server.AirportServer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -9,7 +14,6 @@ import java.sql.SQLException;
 
 public class ApiServer {
     public static void main(String[] args) throws SQLException {
-
         Server server = new Server(8080);
 
         ServletContextHandler context = new ServletContextHandler();
@@ -23,6 +27,7 @@ public class ApiServer {
         context.addServlet(new ServletHolder(new PauseAirportServlet()), "/airport/pause");
         context.addServlet(new ServletHolder(new ResumeAirportServlet()), "/airport/resume");
         context.addServlet(new ServletHolder(new StopAirportServlet()), "/airport/stop");
+        context.addServlet(new ServletHolder(new UptimeAirportServlet()), "/airport/uptime");
 
         try {
             server.start();
