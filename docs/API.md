@@ -20,7 +20,7 @@ This document describes the REST API endpoints available in the Airport Automati
 - `GET /airport/planes/count` – Get the number of planes in the air
 - `GET /airport/planes/flightNumbers` – Get the flight numbers list of planes in the air
 - `GET /airport/planes/landed` – Get a list of landed planes
-- `GET /airport/collisions` – Get information about past collisions\
+- `GET /airport/collisions` – Get information about past collisions
 
 
 ## 1️⃣  Control Endpoints 
@@ -28,35 +28,30 @@ This document describes the REST API endpoints available in the Airport Automati
 These endpoints allow you to control the airport system.  
 
 ### `POST /airport/start`  
-📌 **Description:** Starts the airport system. Creates the control tower and allows planes to land.  
+📌 **Description:** Starts the airport system.
 
 🔹 **Request Example:**  
 ```sh
 curl -X POST http://localhost:8080/airport/start
-```
+
 🔹 **Response Example:** 
 ```json
 {
   "message": "airport started successfully"
 }
-```
-<br>
 
 ### `POST /airport/pause`
-📌 **Description:** Pauses the airport system, preventing new planes from landing. 
+📌 **Description:** Pauses the airport system, preventing new planes from register in the airspace 
 
 🔹 **Request Example:**  
 ```sh
 curl -X POST http://localhost:8080/airport/pause
-```
 
 🔹 **Response Example:** 
 ```json
 {
   "message": "airport paused successfully"
 }
-```
-<br>
 
 ### `POST /airport/resume`
 📌 **Description:** Resumes the airport system after being paused.
@@ -64,15 +59,12 @@ curl -X POST http://localhost:8080/airport/pause
 🔹 **Request Example:**  
 ```sh
 curl -X POST http://localhost:8080/airport/resume
-```
 
 🔹 **Response Example:** 
 ```json
 {
   "message": "airport resumed successfully"
 }
-```
-<br>
 
 ### `POST /airport/stop`
 📌 **Description:** Stops the airport system, preventing all further activity.
@@ -80,16 +72,13 @@ curl -X POST http://localhost:8080/airport/resume
 🔹 **Request Example:**  
 ```sh
 curl -X POST http://localhost:8080/airport/stop
-```
 
 🔹 **Response Example:** 
 ```json
 {
   "message": "airport stopped successfully"
 }
-```
 
-<br>
 
 ## 1️⃣  Monitoring Endpoints
 
@@ -101,61 +90,51 @@ These endpoints provide real-time information about the airport system.
 🔹 **Request Example:**  
 ```sh
 curl -X GET http://localhost:8080/airport/uptime
-```
 
 🔹 **Response Example:** 
 ```json
 {
   "message": "00:10:23"
 }
-```
-<br>
 
 ### `GET /airport/planes/count`
-📌 **Description:** Returns the number of planes in the air.
+📌 **Description:** Returns the number of planes in the airspace.
 
 🔹 **Request Example:**  
 ```sh
 curl -X GET http://localhost:8080/airport/planes/count
-```
 
 🔹 **Response Example:** 
 ```json
 {
   "count": 45
 }
-```
-<br>
 
 ### `GET /airport/planes/flightNumbers`
-📌 **Description:** Returns the flight numbers list of planes in the air.
+📌 **Description:** Returns the flight numbers list of planes in the airspace.
 
 🔹 **Request Example:**  
 ```sh
 curl -X GET http://localhost:8080/airport/planes/flightNumbers
-```
 
 🔹 **Response Example:** 
 ```json
 {
   "flight numbers": ["MH101", "LH202", "BA303"]
 }
-```
-<br>
 
 ### `GET /airport/planes/landed`
-📌 **Description:** Returns a list of landed planes.
+📌 **Description:** Returns a list of planes landed in the past.
 
 🔹 **Request Example:**  
 ```sh
 curl -X GET http://localhost:8080/airport/planes/landed
-```
 
 🔹 **Response Example:** 
+```json
 {
   "landed planes": ["AA001", "DL305", "UA786"]
 }
-<br>
 
 ### `GET /airport/collisions`
 📌 **Description:** Returns the flight numbers list of planes collided in the past.
@@ -163,14 +142,12 @@ curl -X GET http://localhost:8080/airport/planes/landed
 🔹 **Request Example:**  
 ```sh
 curl -X GET http://localhost:8080/airport/collisions
-```
 
 🔹 **Response Example:** 
-```json
 {
   "collided planes": ["MH101, LH202"]
 }
-```
+
 
 ## 📌 Notes
 - API responses are in JSON format.
