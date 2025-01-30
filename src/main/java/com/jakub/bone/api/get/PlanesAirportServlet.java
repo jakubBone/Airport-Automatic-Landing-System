@@ -11,8 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jooq.DSLContext;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static jooq.Tables.PLANES;
 
@@ -37,24 +36,20 @@ public class PlanesAirportServlet extends HttpServlet {
         String path = request.getPathInfo();
         switch(path) {
             case "/count":
-                messenger.send(response, planes.size());
+                messenger.send(response, Map.of("count", planes.size()));
                 break;
             case "/flightNumbers":
-                messenger.send(response, flightNumbers);
+                messenger.send(response, Map.of("flight numbers", flightNumbers));
                 break;
             case "/landed":
-                messenger.send(response, getLandedPlanes());
+                messenger.send(response, Map.of("landed planes", getLandedPlanes()));
                 break;
             default:
                 Plane plane = findPlaneByNumber(planes, path);
                 if (plane == null) {
-                    messenger.send(response, "Plane not found");
+                    messenger.send(response, Map.of("message" ,"plane not found"));
                 } else {
-                    messenger.send(response,
-                            "flightNumber: " + plane.getFlightNumber() +
-                                    " status: " + plane.getPhase().toString() +
-                                    " altitude: " + plane.getNavigator().getLocation().getAltitude() +
-                                    " fuel: " + plane.getFuelManager().getFuelLevel());
+                    messenger.send(response, mapPlane(plane));
                 }
         }
     }
@@ -72,5 +67,21 @@ public class PlanesAirportServlet extends HttpServlet {
                 .filter(p -> p.getFlightNumber().equals(flightNumber))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private Map<String, Object> mapPlane(Plane plane){
+        Map<String, Object> planeMap = new LinkedHashMap<>();
+        planeMap.put("flightNumber", plane.getFlightNumber());
+        planeMap.put("phase", plane.getPhase());
+
+        Map<String, Object> locationMap = new LinkedHashMap<>();
+        locationMap.put("x", plane.getNavigator().getLocation().getX());
+        locationMap.put("y", plane.getNavigator().getLocation().getY());
+        locationMap.put("altitude", plane.getNavigator().getLocation().getAltitude());
+
+        planeMap.put("location", locationMap);
+        planeMap.put("fuel level", plane.getFuelManager().getFuelLevel());
+
+        return planeMap;
     }
 }

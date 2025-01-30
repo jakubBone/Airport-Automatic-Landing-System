@@ -1,7 +1,5 @@
 package com.jakub.bone.api.get;
 
-import com.jakub.bone.api.ApiServer;
-import com.jakub.bone.api.post.StartAirportServlet;
 import com.jakub.bone.server.AirportServer;
 import com.jakub.bone.utills.Messenger;
 import jakarta.servlet.ServletException;
@@ -13,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 
 @WebServlet(urlPatterns = "/airport/uptime")
 public class UptimeAirportServlet extends HttpServlet {
@@ -23,7 +22,7 @@ public class UptimeAirportServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
         if (airportServer != null || airportServer.getStartTime() == null) {
-            messenger.send(response, "Airport is not running");
+            messenger.send(response, Map.of("message", "airport is not running"));
             return;
         }
 
@@ -32,6 +31,6 @@ public class UptimeAirportServlet extends HttpServlet {
         long minutes = uptime.toMinutesPart();
         long seconds = uptime.toSecondsPart();
 
-        messenger.send(response, String.format("%02d:%02d:%02d", hours, minutes, seconds));
+        messenger.send(response, Map.of("message", String.format("%02d:%02d:%02d", hours, minutes, seconds)));
     }
 }

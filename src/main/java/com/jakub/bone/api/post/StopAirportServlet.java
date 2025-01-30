@@ -1,6 +1,5 @@
 package com.jakub.bone.api.post;
 
-import com.google.gson.Gson;
 import com.jakub.bone.server.AirportServer;
 import com.jakub.bone.utills.Messenger;
 import jakarta.servlet.ServletException;
@@ -10,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -25,13 +25,13 @@ public class StopAirportServlet extends HttpServlet {
         lock.lock();
         try {
             if (airportServer == null && !airportServer.isRunning()) {
-                messenger.send(response, "Airport is not running");
+                messenger.send(response, Map.of("message", "airport is not running"));
                 return;
             }
             airportServer.stopServer();
         } finally {
             lock.unlock();
         }
-        messenger.send(response, "Airport stopped successfully");
+        messenger.send(response, Map.of("message", "airport stopped successfully"));
     }
 }

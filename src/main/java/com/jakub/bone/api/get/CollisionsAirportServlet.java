@@ -11,6 +11,7 @@ import org.jooq.DSLContext;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import static jooq.Tables.COLLISIONS;
 @WebServlet(urlPatterns = "/airport/collisions")
@@ -24,7 +25,7 @@ public class CollisionsAirportServlet extends HttpServlet {
         this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
         this.context = airportServer.getDatabase().getCONTEXT();
 
-        messenger.send(response, getCollidedPlanes());
+        messenger.send(response, Map.of("collided planes" ,getCollidedPlanes()));
     }
 
     public List<String> getCollidedPlanes(){

@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -24,14 +25,13 @@ public class StartAirportServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        boolean started = false;
         lock.lock();
         try {
             if (airportServer != null && airportServer.isRunning()) {
-                messenger.send(response, "Airport is already running");
+                messenger.send(response, Map.of("message", "airport is already running"));
             } else {
                 startAirport();
-                messenger.send(response, "Airport started successfully");
+                messenger.send(response, Map.of("message", "airport started successfully"));
             }
         } finally {
             lock.unlock();

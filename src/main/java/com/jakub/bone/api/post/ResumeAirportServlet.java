@@ -1,6 +1,5 @@
 package com.jakub.bone.api.post;
 
-import com.google.gson.Gson;
 import com.jakub.bone.server.AirportServer;
 import com.jakub.bone.utills.Messenger;
 import jakarta.servlet.ServletException;
@@ -10,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -29,7 +29,6 @@ public class ResumeAirportServlet extends HttpServlet {
         } finally {
             lock.unlock();
         }
-
-        messenger.send(response, "Airport resumed successfully");
+        messenger.send(response, Map.of("message", "airport resumed successfully"));
     }
 }
