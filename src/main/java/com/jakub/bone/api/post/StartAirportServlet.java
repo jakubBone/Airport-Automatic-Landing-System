@@ -11,8 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+
 
 import static com.jakub.bone.utills.Constant.CLIENT_SPAWN_DELAY;
 import static com.jakub.bone.utills.Constant.SERVER_INIT_DELAY;
@@ -21,11 +20,9 @@ import static com.jakub.bone.utills.Constant.SERVER_INIT_DELAY;
 public class StartAirportServlet extends HttpServlet {
     private AirportServer airportServer;
     private Messenger messenger = new Messenger();
-    private Lock lock = new ReentrantLock();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        lock.lock();
         try {
             if (airportServer != null && airportServer.isRunning()) {
                 messenger.send(response, Map.of("message", "airport is already running"));
@@ -36,12 +33,10 @@ public class StartAirportServlet extends HttpServlet {
         } catch (Exception ex){
             messenger.send(response, Map.of("error", "Failed to start airport"));
             System.err.println("Error starting airport: " + ex.getMessage());
-        } finally {
-            lock.unlock();
         }
     }
 
-    public void startAirport() {
+    private void startAirport() {
         if(airportServer == null) {
             Thread serverThread = new Thread(() -> {
                 try {

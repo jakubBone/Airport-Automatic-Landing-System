@@ -28,7 +28,7 @@ public class CollisionsAirportServlet extends HttpServlet {
         messenger.send(response, Map.of("collided planes" ,getCollidedPlanes()));
     }
 
-    public List<String> getCollidedPlanes(){
+    private List<String> getCollidedPlanes(){
         try{
             return context.select(COLLISIONS.INVOLVED_PLANES)
                     .from(COLLISIONS)

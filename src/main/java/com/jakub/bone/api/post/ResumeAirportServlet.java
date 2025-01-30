@@ -10,27 +10,21 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 @WebServlet(urlPatterns = "/airport/resume")
 public class ResumeAirportServlet extends HttpServlet {
     private AirportServer airportServer;
     private Messenger messenger = new Messenger();
-    private Lock lock = new ReentrantLock();
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
-        lock.lock();
         try {
             if (airportServer != null && airportServer.isPaused()) {
                 airportServer.resumeServer();
             }
-        } catch (Exception ex){
+        } catch (Exception ex) {
             messenger.send(response, Map.of("error", "Failed to resume airport"));
             System.err.println("Error resuming airport: " + ex.getMessage());
-        }finally {
-            lock.unlock();
         }
         messenger.send(response, Map.of("message", "airport resumed successfully"));
     }

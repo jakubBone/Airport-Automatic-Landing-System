@@ -10,18 +10,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 @WebServlet(urlPatterns = "/airport/pause")
 public class PauseAirportServlet extends HttpServlet {
     private AirportServer airportServer;
     private Messenger messenger = new Messenger();
-    private Lock lock = new ReentrantLock();
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
-        lock.lock();
         try {
             if (airportServer != null && airportServer.isPaused()) {
                 messenger.send(response, Map.of("message", "airport is already paused"));
@@ -32,9 +28,6 @@ public class PauseAirportServlet extends HttpServlet {
         } catch (Exception ex){
             messenger.send(response, Map.of("error", "Failed to pause airport"));
             System.err.println("Error pausing airport: " + ex.getMessage());
-        }
-        finally {
-            lock.unlock();
         }
     }
 }

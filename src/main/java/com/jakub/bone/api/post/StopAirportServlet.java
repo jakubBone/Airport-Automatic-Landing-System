@@ -22,18 +22,15 @@ public class StopAirportServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
-        lock.lock();
         try {
             if (airportServer == null && !airportServer.isRunning()) {
                 messenger.send(response, Map.of("message", "airport is not running"));
                 return;
             }
             airportServer.stopServer();
-        } catch (Exception ex){
+        } catch (Exception ex) {
             messenger.send(response, Map.of("error", "Failed to stop airport"));
             System.err.println("Error stopping airport: " + ex.getMessage());
-        }finally {
-            lock.unlock();
         }
         messenger.send(response, Map.of("message", "airport stopped successfully"));
     }

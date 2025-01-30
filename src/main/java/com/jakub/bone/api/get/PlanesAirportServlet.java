@@ -59,14 +59,14 @@ public class PlanesAirportServlet extends HttpServlet {
         }
     }
 
-    public List<String> getLandedPlanes(){
+    private List<String> getLandedPlanes(){
         return context.select(PLANES.FLIGHT_NUMBER)
                 .from(PLANES)
                 .where(PLANES.LANDING_TIME.isNotNull())
                 .fetchInto(String.class);
     }
 
-    public Plane findPlaneByNumber(List<Plane> planes, String path){
+    private Plane findPlaneByNumber(List<Plane> planes, String path){
         String flightNumber = path.substring(1);
         return planes.stream()
                 .filter(p -> p.getFlightNumber().equals(flightNumber))

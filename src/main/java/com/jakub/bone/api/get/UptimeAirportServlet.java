@@ -33,7 +33,7 @@ public class UptimeAirportServlet extends HttpServlet {
             long minutes = uptime.toMinutesPart();
             long seconds = uptime.toSecondsPart();
 
-            messenger.send(response, Map.of("message", String.format("%02d:%02d:%02d", hours, minutes, seconds)))
+            messenger.send(response, Map.of("message", String.format("%02d:%02d:%02d", hours, minutes, seconds)));
         } catch (Exception ex){
             messenger.send(response, Map.of("error", "Failed to retrieve uptime"));
             System.err.println("Error retrieving update data: " + ex.getMessage());
