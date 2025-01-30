@@ -29,7 +29,10 @@ public class StopAirportServlet extends HttpServlet {
                 return;
             }
             airportServer.stopServer();
-        } finally {
+        } catch (Exception ex){
+            messenger.send(response, Map.of("error", "Failed to stop airport"));
+            System.err.println("Error stopping airport: " + ex.getMessage());
+        }finally {
             lock.unlock();
         }
         messenger.send(response, Map.of("message", "airport stopped successfully"));

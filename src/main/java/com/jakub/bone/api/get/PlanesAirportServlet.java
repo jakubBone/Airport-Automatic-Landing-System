@@ -23,34 +23,39 @@ public class PlanesAirportServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
-        this.context = airportServer.getDatabase().getCONTEXT();
+        try{
+            this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
+            this.context = airportServer.getDatabase().getCONTEXT();
 
-        List<Plane> planes = airportServer.getControlTower().getPlanes();
-        List<String> flightNumbers = new ArrayList<>();
+            List<Plane> planes = airportServer.getControlTower().getPlanes();
+            List<String> flightNumbers = new ArrayList<>();
 
-        for(Plane plane: planes){
-            flightNumbers.add(plane.getFlightNumber());
-        }
+            for(Plane plane: planes){
+                flightNumbers.add(plane.getFlightNumber());
+            }
 
-        String path = request.getPathInfo();
-        switch(path) {
-            case "/count":
-                messenger.send(response, Map.of("count", planes.size()));
-                break;
-            case "/flightNumbers":
-                messenger.send(response, Map.of("flight numbers", flightNumbers));
-                break;
-            case "/landed":
-                messenger.send(response, Map.of("landed planes", getLandedPlanes()));
-                break;
-            default:
-                Plane plane = findPlaneByNumber(planes, path);
-                if (plane == null) {
-                    messenger.send(response, Map.of("message" ,"plane not found"));
-                } else {
-                    messenger.send(response, mapPlane(plane));
-                }
+            String path = request.getPathInfo();
+            switch(path) {
+                case "/count":
+                    messenger.send(response, Map.of("count", planes.size()));
+                    break;
+                case "/flightNumbers":
+                    messenger.send(response, Map.of("flight numbers", flightNumbers));
+                    break;
+                case "/landed":
+                    messenger.send(response, Map.of("landed planes", getLandedPlanes()));
+                    break;
+                default:
+                    Plane plane = findPlaneByNumber(planes, path);
+                    if (plane == null) {
+                        messenger.send(response, Map.of("message" ,"plane not found"));
+                    } else {
+                        messenger.send(response, mapPlane(plane));
+                    }
+            }
+        } catch (Exception ex){
+            messenger.send(response, Map.of("error", "Internal server error"));
+            System.err.println("Error handling request: " + ex.getMessage());
         }
     }
 

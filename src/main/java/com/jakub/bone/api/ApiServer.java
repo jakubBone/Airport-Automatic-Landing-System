@@ -12,6 +12,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class ApiServer {
@@ -39,15 +40,16 @@ public class ApiServer {
             try {
                 server.join();
             } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
+                Thread.currentThread().interrupt();
+                System.err.println("API Server interrupted: " + ex.getMessage());
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            System.err.println("Unexpected error: " + ex.getMessage());
         } finally {
             try {
                 server.stop();
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("Failed to stop server: " + e.getMessage());
             }
         }
     }

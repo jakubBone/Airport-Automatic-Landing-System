@@ -29,9 +29,15 @@ public class CollisionsAirportServlet extends HttpServlet {
     }
 
     public List<String> getCollidedPlanes(){
-        return context.select(COLLISIONS.INVOLVED_PLANES)
-                .from(COLLISIONS)
-                .where(COLLISIONS.TIME.isNotNull())
-                .fetchInto(String.class);
+        try{
+            return context.select(COLLISIONS.INVOLVED_PLANES)
+                    .from(COLLISIONS)
+                    .where(COLLISIONS.TIME.isNotNull())
+                    .fetchInto(String.class);
+        } catch (Exception ex){
+            System.err.println("Error retrieving collision data: " + ex.getMessage());
+            return List.of();
+        }
+
     }
 }

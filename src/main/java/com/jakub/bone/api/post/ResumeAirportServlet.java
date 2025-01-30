@@ -26,7 +26,10 @@ public class ResumeAirportServlet extends HttpServlet {
             if (airportServer != null && airportServer.isPaused()) {
                 airportServer.resumeServer();
             }
-        } finally {
+        } catch (Exception ex){
+            messenger.send(response, Map.of("error", "Failed to resume airport"));
+            System.err.println("Error resuming airport: " + ex.getMessage());
+        }finally {
             lock.unlock();
         }
         messenger.send(response, Map.of("message", "airport resumed successfully"));

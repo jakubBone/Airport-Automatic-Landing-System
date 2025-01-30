@@ -29,7 +29,11 @@ public class PauseAirportServlet extends HttpServlet {
                 airportServer.pauseServer();
                 messenger.send(response, Map.of("message", "airport paused successfully"));
             }
-        } finally {
+        } catch (Exception ex){
+            messenger.send(response, Map.of("error", "Failed to pause airport"));
+            System.err.println("Error pausing airport: " + ex.getMessage());
+        }
+        finally {
             lock.unlock();
         }
     }

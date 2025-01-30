@@ -33,6 +33,9 @@ public class StartAirportServlet extends HttpServlet {
                 startAirport();
                 messenger.send(response, Map.of("message", "airport started successfully"));
             }
+        } catch (Exception ex){
+            messenger.send(response, Map.of("error", "Failed to start airport"));
+            System.err.println("Error starting airport: " + ex.getMessage());
         } finally {
             lock.unlock();
         }
