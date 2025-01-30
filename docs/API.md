@@ -33,11 +33,13 @@ These endpoints allow you to control the airport system.
 🔹 **Request Example:**  
 ```sh
 curl -X POST http://localhost:8080/airport/start
+```
 🔹 **Response Example:** 
 ```json
 {
   "message": "airport started successfully"
 }
+```
 
 ### `POST /airport/pause`
 📌 **Description:** Pauses the airport system, preventing new planes from landing. 
@@ -45,11 +47,14 @@ curl -X POST http://localhost:8080/airport/start
 🔹 **Request Example:**  
 ```sh
 curl -X POST http://localhost:8080/airport/pause
+```
+
 🔹 **Response Example:** 
 ```json
 {
   "message": "airport paused successfully"
 }
+```
 
 ### `POST /airport/resume`
 📌 **Description:** Resumes the airport system after being paused.
@@ -57,11 +62,14 @@ curl -X POST http://localhost:8080/airport/pause
 🔹 **Request Example:**  
 ```sh
 curl -X POST http://localhost:8080/airport/resume
+```
+
 🔹 **Response Example:** 
 ```json
 {
   "message": "airport resumed successfully"
 }
+```
 
 ### `POST /airport/stop`
 📌 **Description:** Stops the airport system, preventing all further activity.
@@ -69,11 +77,14 @@ curl -X POST http://localhost:8080/airport/resume
 🔹 **Request Example:**  
 ```sh
 curl -X POST http://localhost:8080/airport/stop
+```
+
 🔹 **Response Example:** 
 ```json
 {
   "message": "airport stopped successfully"
 }
+```
 
 
 ## 1️⃣  Monitoring Endpoints
@@ -86,11 +97,14 @@ These endpoints provide real-time information about the airport system.
 🔹 **Request Example:**  
 ```sh
 curl -X GET http://localhost:8080/airport/uptime
+```
+
 🔹 **Response Example:** 
 ```json
 {
   "message": "00:10:23"
 }
+```
 
 ### `GET /airport/planes/count`
 📌 **Description:** Returns the number of planes in the air.
@@ -98,11 +112,14 @@ curl -X GET http://localhost:8080/airport/uptime
 🔹 **Request Example:**  
 ```sh
 curl -X GET http://localhost:8080/airport/planes/count
+```
+
 🔹 **Response Example:** 
 ```json
 {
   "count": 45
 }
+```
 
 ### `GET /airport/planes/flightNumbers`
 📌 **Description:** Returns the flight numbers list of planes in the air.
@@ -110,11 +127,14 @@ curl -X GET http://localhost:8080/airport/planes/count
 🔹 **Request Example:**  
 ```sh
 curl -X GET http://localhost:8080/airport/planes/flightNumbers
+```
+
 🔹 **Response Example:** 
 ```json
 {
   "flight numbers": ["MH101", "LH202", "BA303"]
 }
+```
 
 ### `GET /airport/planes/landed`
 📌 **Description:** Returns a list of landed planes.
@@ -122,6 +142,8 @@ curl -X GET http://localhost:8080/airport/planes/flightNumbers
 🔹 **Request Example:**  
 ```sh
 curl -X GET http://localhost:8080/airport/planes/landed
+```
+
 🔹 **Response Example:** 
 {
   "landed planes": ["AA001", "DL305", "UA786"]
@@ -133,11 +155,14 @@ curl -X GET http://localhost:8080/airport/planes/landed
 🔹 **Request Example:**  
 ```sh
 curl -X GET http://localhost:8080/airport/collisions
+```
+
 🔹 **Response Example:** 
+```json
 {
   "collided planes": ["MH101, LH202"]
 }
-
+```
 
 ## 📌 Notes
 - API responses are in JSON format.
