@@ -41,6 +41,9 @@ curl -X POST http://localhost:8080/airport/start
 }
 ```
 
+
+
+
 ### `POST /airport/pause`
 📌 **Description:** Pauses the airport system, preventing new planes from landing. 
 
