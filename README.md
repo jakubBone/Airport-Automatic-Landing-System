@@ -122,18 +122,19 @@ The system provides a REST API for monitoring and controlling the airport. The a
 
 ### Control Endpoints
 
-`POST /airport/start` – Start the airport system
-`POST /airport/pause` – Pause the system
-`POST /airport/resume` – Resume the system
-`POST /airport/stop` – Stop the system
+
+- `POST /airport/start` – Start the airport system
+- `POST /airport/pause` – Pause the system
+- `POST /airport/resume` – Resume the system
+- `POST /airport/stop` – Stop the system
 
 ### Monitoring Endpoints
 
-`GET /airport/uptime` – Get the current uptime of the airport system
-`GET /airport/planes/count` – Get the number of planes in the air
-`GET /airport/planes/flightNumbers` – Get the flight numbers list of planes in the air
-`GET /airport/planes/landed` – Get a list of landed planes
-`GET /airport/collisions` – Get information about past collisions
+- `GET /airport/uptime` – Get the current uptime of the airport system
+- `GET /airport/planes/count` – Get the number of planes in the air
+- `GET /airport/planes/flightNumbers` – Get the flight numbers list of planes in the air
+- `GET /airport/planes/landed` – Get a list of landed planes
+- `GET /airport/collisions` – Get information about past collisions
 
 For a detailed API specification, see API Documentation.
 
