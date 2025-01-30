@@ -40,9 +40,7 @@ curl -X POST http://localhost:8080/airport/start
   "message": "airport started successfully"
 }
 ```
-
-
-
+<br>
 
 ### `POST /airport/pause`
 📌 **Description:** Pauses the airport system, preventing new planes from landing. 
@@ -58,6 +56,7 @@ curl -X POST http://localhost:8080/airport/pause
   "message": "airport paused successfully"
 }
 ```
+<br>
 
 ### `POST /airport/resume`
 📌 **Description:** Resumes the airport system after being paused.
@@ -73,6 +72,7 @@ curl -X POST http://localhost:8080/airport/resume
   "message": "airport resumed successfully"
 }
 ```
+<br>
 
 ### `POST /airport/stop`
 📌 **Description:** Stops the airport system, preventing all further activity.
@@ -89,6 +89,7 @@ curl -X POST http://localhost:8080/airport/stop
 }
 ```
 
+<br>
 
 ## 1️⃣  Monitoring Endpoints
 
@@ -108,6 +109,7 @@ curl -X GET http://localhost:8080/airport/uptime
   "message": "00:10:23"
 }
 ```
+<br>
 
 ### `GET /airport/planes/count`
 📌 **Description:** Returns the number of planes in the air.
@@ -123,6 +125,7 @@ curl -X GET http://localhost:8080/airport/planes/count
   "count": 45
 }
 ```
+<br>
 
 ### `GET /airport/planes/flightNumbers`
 📌 **Description:** Returns the flight numbers list of planes in the air.
@@ -138,6 +141,7 @@ curl -X GET http://localhost:8080/airport/planes/flightNumbers
   "flight numbers": ["MH101", "LH202", "BA303"]
 }
 ```
+<br>
 
 ### `GET /airport/planes/landed`
 📌 **Description:** Returns a list of landed planes.
@@ -151,6 +155,7 @@ curl -X GET http://localhost:8080/airport/planes/landed
 {
   "landed planes": ["AA001", "DL305", "UA786"]
 }
+<br>
 
 ### `GET /airport/collisions`
 📌 **Description:** Returns the flight numbers list of planes collided in the past.
