@@ -21,6 +21,8 @@ prevent collisions, and ensure efficient usage of runways.
 
 - **Visualization**: A 3D interface using JavaFX for visualizing airplane movements
 
+- **REST API **: Exposes endpoints for controlling the airport and retrieving real-time data
+
 
 ## 🚀 Technologies Used
 
@@ -38,11 +40,14 @@ prevent collisions, and ensure efficient usage of runways.
 
 - **Gradle**: Build automation and dependency management
 
+- **Jetty**: Embedded HTTP server for API
+
 
 ## 📂 Project Structure
 
 ```
 src
+├── com.jakub.bone.api            # REST API endpoints
 ├── com.jakub.bone.application    # Core application logic
 ├── com.jakub.bone.client         # Client-side logic 
 ├── com.jakub.bone.core           # Simulation entry point
@@ -93,6 +98,12 @@ Before you begin, ensure you have the following tools installed:
    Start the server to manage plane communications:
    ```bash
    java -cp build/classes/java/main com.jakub.bone.core.AirportServer
+   
+   5. **Run the API Server**   
+   The API will be available at: http://localhost:8080
+   Start the REST API for managing and monitoring the system:
+   ```bash
+   java -cp build/classes/java/main com.jakub.bone.api.ApiServer
 
 6. **Run the Clients**  
    Simulate planes connecting to the server:
@@ -103,6 +114,28 @@ Before you begin, ensure you have the following tools installed:
    Start the 3D visualization tool for real-time airplane monitoring:
    ```bash
    java -cp build/classes/java/main com.jakub.bone.core.SimulationLauncher
+   
+   
+## 🌐 API Overview
+
+The system provides a REST API for monitoring and controlling the airport. The available endpoints include:
+
+### Control Endpoints
+
+`POST /airport/start` – Start the airport system
+`POST /airport/pause` – Pause the system
+`POST /airport/resume` – Resume the system
+`POST /airport/stop` – Stop the system
+
+### Monitoring Endpoints
+
+`GET /airport/uptime` – Get the current uptime of the airport system
+`GET /airport/planes/count` – Get the number of planes in the air
+`GET /airport/planes/flightNumbers` – Get the flight numbers list of planes in the air
+`GET /airport/planes/landed` – Get a list of landed planes
+`GET /airport/collisions` – Get information about past collisions
+
+For a detailed API specification, see API Documentation.
 
 
 ## 🎨 Interactive Visualization
