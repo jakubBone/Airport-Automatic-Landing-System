@@ -1,4 +1,443 @@
 ====================
+FILE: ApiServer.java
+
+package com.jakub.bone.api;
+
+import com.jakub.bone.api.get.CollisionsAirportServlet;
+import com.jakub.bone.api.get.PlanesAirportServlet;
+import com.jakub.bone.api.get.UptimeAirportServlet;
+import com.jakub.bone.api.post.PauseAirportServlet;
+import com.jakub.bone.api.post.StartAirportServlet;
+import com.jakub.bone.api.post.StopAirportServlet;
+import com.jakub.bone.api.post.ResumeAirportServlet;
+import com.jakub.bone.server.AirportServer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+
+import java.sql.SQLException;
+
+public class ApiServer {
+    public static void main(String[] args) throws SQLException {
+        Server server = new Server(8080);
+
+        ServletContextHandler context = new ServletContextHandler();
+        server.setHandler(context);
+
+        AirportServer airportServer = new AirportServer();
+        context.setAttribute("airportServer", airportServer);
+
+        // Init Servlets
+        context.addServlet(new ServletHolder(new StartAirportServlet()), "/airport/start");
+        context.addServlet(new ServletHolder(new PauseAirportServlet()), "/airport/pause");
+        context.addServlet(new ServletHolder(new ResumeAirportServlet()), "/airport/resume");
+        context.addServlet(new ServletHolder(new StopAirportServlet()), "/airport/stop");
+        context.addServlet(new ServletHolder(new UptimeAirportServlet()), "/airport/uptime");
+        context.addServlet(new ServletHolder(new PlanesAirportServlet()), "/airport/planes/*");
+        context.addServlet(new ServletHolder(new CollisionsAirportServlet()), "/airport/collisions");
+
+        try {
+            server.start();
+            System.out.println("Server is running on http://localhost:8080");
+            try {
+                server.join();
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                System.err.println("API Server interrupted: " + ex.getMessage());
+            }
+        } catch (Exception ex) {
+            System.err.println("Failed to start API Server: " + ex.getMessage());
+        } finally {
+            try {
+                server.stop();
+            } catch (Exception e) {
+                System.err.println("Failed to stop API Server: " + e.getMessage());
+            }
+        }
+    }
+}
+
+====================
+FILE: CollisionsAirportServlet.java
+
+package com.jakub.bone.api.get;
+
+import com.jakub.bone.server.AirportServer;
+import com.jakub.bone.utills.Messenger;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.jooq.DSLContext;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import static jooq.Tables.COLLISIONS;
+@WebServlet(urlPatterns = "/airport/collisions")
+public class CollisionsAirportServlet extends HttpServlet {
+    private AirportServer airportServer;
+    private Messenger messenger = new Messenger();
+    private DSLContext context;
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
+        this.context = airportServer.getDatabase().getCONTEXT();
+
+        messenger.send(response, Map.of("collided planes" ,getCollidedPlanes()));
+    }
+
+    private List<String> getCollidedPlanes(){
+        try{
+            return context.select(COLLISIONS.INVOLVED_PLANES)
+                    .from(COLLISIONS)
+                    .where(COLLISIONS.TIME.isNotNull())
+                    .fetchInto(String.class);
+        } catch (Exception ex){
+            System.err.println("Error retrieving collision data: " + ex.getMessage());
+            return List.of();
+        }
+
+    }
+}
+
+====================
+FILE: PlanesAirportServlet.java
+
+package com.jakub.bone.api.get;
+
+import com.jakub.bone.domain.plane.Plane;
+import com.jakub.bone.server.AirportServer;
+import com.jakub.bone.utills.Messenger;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.jooq.DSLContext;
+
+import java.io.IOException;
+import java.util.*;
+
+import static jooq.Tables.PLANES;
+
+@WebServlet(urlPatterns = "/airport/planes/*")
+public class PlanesAirportServlet extends HttpServlet {
+    private AirportServer airportServer;
+    private Messenger messenger = new Messenger();
+    private DSLContext context;
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try{
+            this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
+            this.context = airportServer.getDatabase().getCONTEXT();
+
+            List<Plane> planes = airportServer.getControlTower().getPlanes();
+            List<String> flightNumbers = new ArrayList<>();
+
+            for(Plane plane: planes){
+                flightNumbers.add(plane.getFlightNumber());
+            }
+
+            String path = request.getPathInfo();
+            switch(path) {
+                case "/count":
+                    messenger.send(response, Map.of("count", planes.size()));
+                    break;
+                case "/flightNumbers":
+                    messenger.send(response, Map.of("flight numbers", flightNumbers));
+                    break;
+                case "/landed":
+                    messenger.send(response, Map.of("landed planes", getLandedPlanes()));
+                    break;
+                default:
+                    Plane plane = findPlaneByNumber(planes, path);
+                    if (plane == null) {
+                        messenger.send(response, Map.of("message" ,"plane not found"));
+                    } else {
+                        messenger.send(response, mapPlane(plane));
+                    }
+            }
+        } catch (Exception ex){
+            messenger.send(response, Map.of("error", "Internal server error"));
+            System.err.println("Error handling request: " + ex.getMessage());
+        }
+    }
+
+    private List<String> getLandedPlanes(){
+        return context.select(PLANES.FLIGHT_NUMBER)
+                .from(PLANES)
+                .where(PLANES.LANDING_TIME.isNotNull())
+                .fetchInto(String.class);
+    }
+
+    private Plane findPlaneByNumber(List<Plane> planes, String path){
+        String flightNumber = path.substring(1);
+        return planes.stream()
+                .filter(p -> p.getFlightNumber().equals(flightNumber))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Map<String, Object> mapPlane(Plane plane){
+        Map<String, Object> planeMap = new LinkedHashMap<>();
+        planeMap.put("flightNumber", plane.getFlightNumber());
+        planeMap.put("phase", plane.getPhase());
+
+        Map<String, Object> locationMap = new LinkedHashMap<>();
+        locationMap.put("x", plane.getNavigator().getLocation().getX());
+        locationMap.put("y", plane.getNavigator().getLocation().getY());
+        locationMap.put("altitude", plane.getNavigator().getLocation().getAltitude());
+
+        planeMap.put("location", locationMap);
+        planeMap.put("fuel level", plane.getFuelManager().getFuelLevel());
+
+        return planeMap;
+    }
+}
+
+====================
+FILE: UptimeAirportServlet.java
+
+package com.jakub.bone.api.get;
+
+import com.jakub.bone.server.AirportServer;
+import com.jakub.bone.utills.Messenger;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+
+@WebServlet(urlPatterns = "/airport/uptime")
+public class UptimeAirportServlet extends HttpServlet {
+    private AirportServer airportServer;
+    private Messenger messenger = new Messenger();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try{
+            this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
+            if (airportServer != null || airportServer.getStartTime() == null) {
+                messenger.send(response, Map.of("message", "airport is not running"));
+                return;
+            }
+
+            Duration uptime = Duration.between(airportServer.getStartTime(),Instant.now());
+            long hours = uptime.toHours();
+            long minutes = uptime.toMinutesPart();
+            long seconds = uptime.toSecondsPart();
+
+            messenger.send(response, Map.of("message", String.format("%02d:%02d:%02d", hours, minutes, seconds)));
+        } catch (Exception ex){
+            messenger.send(response, Map.of("error", "Failed to retrieve uptime"));
+            System.err.println("Error retrieving update data: " + ex.getMessage());
+        }
+    }
+}
+
+====================
+FILE: PauseAirportServlet.java
+
+package com.jakub.bone.api.post;
+
+import com.jakub.bone.server.AirportServer;
+import com.jakub.bone.utills.Messenger;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.util.Map;
+
+@WebServlet(urlPatterns = "/airport/pause")
+public class PauseAirportServlet extends HttpServlet {
+    private AirportServer airportServer;
+    private Messenger messenger = new Messenger();
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
+        try {
+            if (airportServer != null && airportServer.isPaused()) {
+                messenger.send(response, Map.of("message", "airport is already paused"));
+            } else {
+                airportServer.pauseServer();
+                messenger.send(response, Map.of("message", "airport paused successfully"));
+            }
+        } catch (Exception ex){
+            messenger.send(response, Map.of("error", "Failed to pause airport"));
+            System.err.println("Error pausing airport: " + ex.getMessage());
+        }
+    }
+}
+
+====================
+FILE: ResumeAirportServlet.java
+
+package com.jakub.bone.api.post;
+
+import com.jakub.bone.server.AirportServer;
+import com.jakub.bone.utills.Messenger;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.util.Map;
+
+@WebServlet(urlPatterns = "/airport/resume")
+public class ResumeAirportServlet extends HttpServlet {
+    private AirportServer airportServer;
+    private Messenger messenger = new Messenger();
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
+        try {
+            if (airportServer != null && airportServer.isPaused()) {
+                airportServer.resumeServer();
+            }
+        } catch (Exception ex) {
+            messenger.send(response, Map.of("error", "Failed to resume airport"));
+            System.err.println("Error resuming airport: " + ex.getMessage());
+        }
+        messenger.send(response, Map.of("message", "airport resumed successfully"));
+    }
+}
+
+====================
+FILE: StartAirportServlet.java
+
+package com.jakub.bone.api.post;
+
+import com.jakub.bone.client.PlaneClient;
+import com.jakub.bone.server.AirportServer;
+import com.jakub.bone.utills.Messenger;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.util.Map;
+
+
+import static com.jakub.bone.utills.Constant.CLIENT_SPAWN_DELAY;
+import static com.jakub.bone.utills.Constant.SERVER_INIT_DELAY;
+
+@WebServlet(urlPatterns = "/airport/start")
+public class StartAirportServlet extends HttpServlet {
+    private AirportServer airportServer;
+    private Messenger messenger = new Messenger();
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            if (airportServer != null && airportServer.isRunning()) {
+                messenger.send(response, Map.of("message", "airport is already running"));
+            } else {
+                startAirport();
+                messenger.send(response, Map.of("message", "airport started successfully"));
+            }
+        } catch (Exception ex){
+            messenger.send(response, Map.of("error", "Failed to start airport"));
+            System.err.println("Error starting airport: " + ex.getMessage());
+        }
+    }
+
+    private void startAirport() {
+        if(airportServer == null) {
+            Thread serverThread = new Thread(() -> {
+                try {
+                    this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
+                    this.airportServer.startServer(5000);
+                }  catch (IOException ex) {
+                    throw new RuntimeException("Failed to initialize AirportServer due to I/O issues", ex);
+                }
+            });
+            serverThread.start();
+
+            // Wait for the server to initialize before proceeding
+            while (airportServer == null || airportServer.getControlTower() == null) {
+                try {
+                    Thread.sleep(SERVER_INIT_DELAY);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+
+            new Thread(() -> {
+                for (int i = 0; i < 100; i++) {
+                    PlaneClient client = new PlaneClient("localhost", 5000);
+                    new Thread(client).start();
+
+                    try {
+                        Thread.sleep(CLIENT_SPAWN_DELAY);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }).start();
+        }
+    }
+}
+
+====================
+FILE: StopAirportServlet.java
+
+package com.jakub.bone.api.post;
+
+import com.jakub.bone.server.AirportServer;
+import com.jakub.bone.utills.Messenger;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+@WebServlet(urlPatterns = "/airport/stop")
+public class StopAirportServlet extends HttpServlet {
+    private AirportServer airportServer;
+    private Messenger messenger = new Messenger();
+    private Lock lock = new ReentrantLock();
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
+        try {
+            if (airportServer == null && !airportServer.isRunning()) {
+                messenger.send(response, Map.of("message", "airport is not running"));
+                return;
+            }
+            airportServer.stopServer();
+        } catch (Exception ex) {
+            messenger.send(response, Map.of("error", "Failed to stop airport"));
+            System.err.println("Error stopping airport: " + ex.getMessage());
+        }
+        messenger.send(response, Map.of("message", "airport stopped successfully"));
+    }
+}
+
+====================
 FILE: CollisionDetector.java
 
 package com.jakub.bone.application;
@@ -28,8 +467,7 @@ public class CollisionDetector extends Thread {
                 }
             } catch (InterruptedException ex) {
                 log.error("Collision detection interrupted: {}", ex.getMessage(), ex);
-                Thread.currentThread().interrupt();
-                log.info("Restarting collision detection process...");
+                break;
             }
         }
     }
@@ -118,6 +556,7 @@ public class ControlTower {
     public boolean isSpaceFull() {
         return executeWithLock(() -> planes.size() >= MAX_CAPACITY);
     }
+
 
     public boolean isAtCollisionRiskZone(Plane plane) {
         return executeWithLock(() -> planes.stream()
@@ -271,30 +710,22 @@ public class FlightPhaseCoordinator {
     }
     private void enterHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);
-        plane.setPhase(HOLDING);
-        if (!holdPatternLogged) {
-            log.info("Plane [{}] enter {}", plane.getFlightNumber(), HOLDING);
-            holdPatternLogged = true;
-        }
+        plane.changePhase(HOLDING);
     }
 
     private void applyDescending(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);
-        plane.setPhase(DESCENDING);
-        if (!descentLogged) {
-            log.info("Plane [{}]: instructed to {}", plane.getFlightNumber(), DESCENT);
-            descentLogged = true;
-        }
+        plane.changePhase(DESCENDING);
     }
 
     private void applyHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(HOLD_PATTERN, out);
-        plane.setPhase(HOLDING);
+        plane.changePhase(HOLDING);
     }
 
     private void applyLanding(Plane plane, Runway runway, ObjectOutputStream out) throws IOException {
         controlTower.assignRunway(runway);
-        plane.setPhase(LANDING);
+        plane.changePhase(LANDING);
         messenger.send(LAND, out);
         messenger.send(runway, out);
         log.info("Plane [{}]: instructed to {} on runway [{}]", plane.getFlightNumber(), LAND, runway.getId());
@@ -310,6 +741,7 @@ public class FlightPhaseCoordinator {
         }
         return null;
     }
+
 
     private void waitForUpdate(int interval) {
         try {
@@ -563,7 +995,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
-
 @Log4j2
 @Getter
 public class PlaneClient extends Client implements Runnable {
@@ -584,7 +1015,7 @@ public class PlaneClient extends Client implements Runnable {
         connectAndHandle();
     }
 
-    private void connectAndHandle(){
+    private void connectAndHandle() {
         ThreadContext.put("type", "Client");
         try {
             establishConnection();
@@ -606,14 +1037,14 @@ public class PlaneClient extends Client implements Runnable {
         log.info("PlaneClient [{}]: connected to server", plane.getFlightNumber());
     }
 
-    private void initializeServices(){
+    private void initializeServices() {
         this.communicationService = new PlaneCommunicationService(plane, messenger, out);
         this.instructionHandler = new PlaneInstructionHandler(plane, messenger, in, out);
     }
 
     private void processInstructions() throws IOException, ClassNotFoundException {
         while (!instructionHandler.isProcessCompleted()) {
-            if(!communicationService.sendFuelLevel() || !communicationService.sendLocation()){
+            if (!communicationService.sendFuelLevel() || !communicationService.sendLocation()) {
                 log.error("Plane [{}]: lost communication due to fuel or location issues", plane.getFlightNumber());
                 return;
             }
@@ -621,7 +1052,7 @@ public class PlaneClient extends Client implements Runnable {
             PlaneHandler.AirportInstruction instruction = messenger.receiveAndParse(in, PlaneHandler.AirportInstruction.class);
             instructionHandler.processInstruction(instruction);
 
-            if(plane.isDestroyed()){
+            if (plane.isDestroyed()) {
                 log.info("Plane [{}]: has destroyed", plane.getFlightNumber());
                 return;
             }
@@ -635,11 +1066,9 @@ public class PlaneClient extends Client implements Runnable {
         return code + number;
     }
 
-
     private void closeConnection() {
         stopConnection();
         log.debug("Plane [{}]: connection stopped", plane.getFlightNumber());
-
     }
 
     public static void main(String[] args) throws IOException {
@@ -872,7 +1301,7 @@ public class SimulationLauncher extends Application {
             }
         }
 
-        int clientsNumber = 10000;
+        int clientsNumber = 1000;
 
         new Thread(() -> {
             for (int i = 0; i < clientsNumber; i++) {
@@ -1322,6 +1751,10 @@ import lombok.extern.log4j.Log4j2;
 import java.io.Serializable;
 import java.util.List;
 
+import static com.jakub.bone.domain.plane.Plane.FlightPhase.DESCENDING;
+import static com.jakub.bone.domain.plane.Plane.FlightPhase.HOLDING;
+import static com.jakub.bone.domain.plane.Plane.FlightPhase.LANDING;
+
 @Log4j2
 @Getter
 @Setter
@@ -1340,7 +1773,7 @@ public class Plane implements Serializable {
 
     public Plane(String flightNumber) {
         this.flightNumber = flightNumber;
-        this.phase = FlightPhase.DESCENDING;
+        this.phase = DESCENDING;
         this.fuelManager = new FuelManager();
         this.navigator = new Navigator(fuelManager);
         this.isDestroyed = false;
@@ -1351,14 +1784,14 @@ public class Plane implements Serializable {
     public void descend(){
         navigator.move();
         if (navigator.isAtLastWaypoint()) {
-            setPhase(FlightPhase.HOLDING);
+            setPhase(HOLDING);
             navigator.setWaypoints(WaypointGenerator.getHoldingPatternWaypoints());
             navigator.setCurrentIndex(0);
         }
     }
 
     public void hold(){
-        setPhase(FlightPhase.HOLDING);
+        setPhase(HOLDING);
         navigator.move();
         if (navigator.isAtLastWaypoint()) {
             navigator.setCurrentIndex(0);
@@ -1375,14 +1808,1164 @@ public class Plane implements Serializable {
     }
 
     public void setLandingPhase(Runway runway) {
-        setPhase(FlightPhase.LANDING);
+        changePhase(LANDING);
+        //setPhase(FlightPhase.LANDING);
         navigator.setWaypoints(WaypointGenerator.getLandingWaypoints(runway));
         navigator.setCurrentIndex(0);
+    }
+
+    public void changePhase(FlightPhase newPhase) {
+        if (this.phase != newPhase) {
+            log.info("Plane [{}]: transitioned to phase: {}", flightNumber, newPhase);
+            this.phase = newPhase;
+        }
     }
 
     public void destroyPlane() {
         this.isDestroyed = true;
     }
+}
+
+====================
+FILE: DefaultCatalog.java
+
+/*
+ * This file is generated by jOOQ.
+ */
+package jooq;
+
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.jooq.Constants;
+import org.jooq.Schema;
+import org.jooq.impl.CatalogImpl;
+
+
+/**
+ * This class is generated by jOOQ.
+ */
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
+public class DefaultCatalog extends CatalogImpl {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * The reference instance of <code>DEFAULT_CATALOG</code>
+     */
+    public static final DefaultCatalog DEFAULT_CATALOG = new DefaultCatalog();
+
+    /**
+     * The schema <code>public</code>.
+     */
+    public final Public PUBLIC = Public.PUBLIC;
+
+    /**
+     * No further instances allowed
+     */
+    private DefaultCatalog() {
+        super("");
+    }
+
+    @Override
+    public final List<Schema> getSchemas() {
+        return Arrays.asList(
+            Public.PUBLIC
+        );
+    }
+
+    /**
+     * A reference to the 3.19 minor release of the code generator. If this
+     * doesn't compile, it's because the runtime library uses an older minor
+     * release, namely: 3.19. You can turn off the generation of this reference
+     * by specifying /configuration/generator/generate/jooqVersionReference
+     */
+    private static final String REQUIRE_RUNTIME_JOOQ_VERSION = Constants.VERSION_3_19;
+}
+
+====================
+FILE: Keys.java
+
+/*
+ * This file is generated by jOOQ.
+ */
+package jooq;
+
+
+import jooq.tables.Collisions;
+import jooq.tables.Planes;
+import jooq.tables.records.CollisionsRecord;
+import jooq.tables.records.PlanesRecord;
+
+import org.jooq.TableField;
+import org.jooq.UniqueKey;
+import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
+
+
+/**
+ * A class modelling foreign key relationships and constraints of tables in
+ * public.
+ */
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
+public class Keys {
+
+    // -------------------------------------------------------------------------
+    // UNIQUE and PRIMARY KEY definitions
+    // -------------------------------------------------------------------------
+
+    public static final UniqueKey<CollisionsRecord> PK_COLLISIONS = Internal.createUniqueKey(Collisions.COLLISIONS, DSL.name("PK_COLLISIONS"), new TableField[] { Collisions.COLLISIONS.ID }, true);
+    public static final UniqueKey<PlanesRecord> PK_PLANES = Internal.createUniqueKey(Planes.PLANES, DSL.name("PK_PLANES"), new TableField[] { Planes.PLANES.ID }, true);
+}
+
+====================
+FILE: Public.java
+
+/*
+ * This file is generated by jOOQ.
+ */
+package jooq;
+
+
+import java.util.Arrays;
+import java.util.List;
+
+import jooq.tables.Collisions;
+import jooq.tables.Planes;
+
+import org.jooq.Catalog;
+import org.jooq.Table;
+import org.jooq.impl.SchemaImpl;
+
+
+/**
+ * This class is generated by jOOQ.
+ */
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
+public class Public extends SchemaImpl {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * The reference instance of <code>public</code>
+     */
+    public static final Public PUBLIC = new Public();
+
+    /**
+     * The table <code>public.collisions</code>.
+     */
+    public final Collisions COLLISIONS = Collisions.COLLISIONS;
+
+    /**
+     * The table <code>public.planes</code>.
+     */
+    public final Planes PLANES = Planes.PLANES;
+
+    /**
+     * No further instances allowed
+     */
+    private Public() {
+        super("public", null);
+    }
+
+
+    @Override
+    public Catalog getCatalog() {
+        return DefaultCatalog.DEFAULT_CATALOG;
+    }
+
+    @Override
+    public final List<Table<?>> getTables() {
+        return Arrays.asList(
+            Collisions.COLLISIONS,
+            Planes.PLANES
+        );
+    }
+}
+
+====================
+FILE: Collisions.java
+
+/*
+ * This file is generated by jOOQ.
+ */
+package jooq.tables;
+
+
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.function.Function;
+
+import jooq.Keys;
+import jooq.Public;
+import jooq.tables.records.CollisionsRecord;
+
+import org.jooq.Condition;
+import org.jooq.Field;
+import org.jooq.Function3;
+import org.jooq.Identity;
+import org.jooq.Name;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
+import org.jooq.Records;
+import org.jooq.Row3;
+import org.jooq.SQL;
+import org.jooq.Schema;
+import org.jooq.Select;
+import org.jooq.SelectField;
+import org.jooq.Stringly;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
+import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
+import org.jooq.impl.TableImpl;
+
+
+/**
+ * This class is generated by jOOQ.
+ */
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
+public class Collisions extends TableImpl<CollisionsRecord> {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * The reference instance of <code>public.collisions</code>
+     */
+    public static final Collisions COLLISIONS = new Collisions();
+
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<CollisionsRecord> getRecordType() {
+        return CollisionsRecord.class;
+    }
+
+    /**
+     * The column <code>public.collisions.id</code>.
+     */
+    public final TableField<CollisionsRecord, Integer> ID = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "");
+
+    /**
+     * The column <code>public.collisions.involved_planes</code>.
+     */
+    public final TableField<CollisionsRecord, String[]> INVOLVED_PLANES = createField(DSL.name("involved_planes"), SQLDataType.VARCHAR.array(), this, "");
+
+    /**
+     * The column <code>public.collisions.time</code>.
+     */
+    public final TableField<CollisionsRecord, LocalDateTime> TIME = createField(DSL.name("time"), SQLDataType.LOCALDATETIME(1), this, "");
+
+    private Collisions(Name alias, Table<CollisionsRecord> aliased) {
+        this(alias, aliased, (Field<?>[]) null, null);
+    }
+
+    private Collisions(Name alias, Table<CollisionsRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
+    }
+
+    /**
+     * Create an aliased <code>public.collisions</code> table reference
+     */
+    public Collisions(String alias) {
+        this(DSL.name(alias), COLLISIONS);
+    }
+
+    /**
+     * Create an aliased <code>public.collisions</code> table reference
+     */
+    public Collisions(Name alias) {
+        this(alias, COLLISIONS);
+    }
+
+    /**
+     * Create a <code>public.collisions</code> table reference
+     */
+    public Collisions() {
+        this(DSL.name("collisions"), null);
+    }
+
+    @Override
+    public Schema getSchema() {
+        return aliased() ? null : Public.PUBLIC;
+    }
+
+    @Override
+    public Identity<CollisionsRecord, Integer> getIdentity() {
+        return (Identity<CollisionsRecord, Integer>) super.getIdentity();
+    }
+
+    @Override
+    public UniqueKey<CollisionsRecord> getPrimaryKey() {
+        return Keys.PK_COLLISIONS;
+    }
+
+    @Override
+    public Collisions as(String alias) {
+        return new Collisions(DSL.name(alias), this);
+    }
+
+    @Override
+    public Collisions as(Name alias) {
+        return new Collisions(alias, this);
+    }
+
+    @Override
+    public Collisions as(Table<?> alias) {
+        return new Collisions(alias.getQualifiedName(), this);
+    }
+
+    /**
+     * Rename this table
+     */
+    @Override
+    public Collisions rename(String name) {
+        return new Collisions(DSL.name(name), null);
+    }
+
+    /**
+     * Rename this table
+     */
+    @Override
+    public Collisions rename(Name name) {
+        return new Collisions(name, null);
+    }
+
+    /**
+     * Rename this table
+     */
+    @Override
+    public Collisions rename(Table<?> name) {
+        return new Collisions(name.getQualifiedName(), null);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Collisions where(Condition condition) {
+        return new Collisions(getQualifiedName(), aliased() ? this : null, null, condition);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Collisions where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Collisions where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Collisions where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Collisions where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Collisions where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Collisions where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Collisions where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Collisions whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Collisions whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
+    }
+
+    // -------------------------------------------------------------------------
+    // Row3 type methods
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Row3<Integer, String[], LocalDateTime> fieldsRow() {
+        return (Row3) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function3<? super Integer, ? super String[], ? super LocalDateTime, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function3<? super Integer, ? super String[], ? super LocalDateTime, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
+    }
+}
+
+====================
+FILE: Planes.java
+
+/*
+ * This file is generated by jOOQ.
+ */
+package jooq.tables;
+
+
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.function.Function;
+
+import jooq.Keys;
+import jooq.Public;
+import jooq.tables.records.PlanesRecord;
+
+import org.jooq.Condition;
+import org.jooq.Field;
+import org.jooq.Function4;
+import org.jooq.Identity;
+import org.jooq.Name;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
+import org.jooq.Records;
+import org.jooq.Row4;
+import org.jooq.SQL;
+import org.jooq.Schema;
+import org.jooq.Select;
+import org.jooq.SelectField;
+import org.jooq.Stringly;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.TableOptions;
+import org.jooq.UniqueKey;
+import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
+import org.jooq.impl.TableImpl;
+
+
+/**
+ * This class is generated by jOOQ.
+ */
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
+public class Planes extends TableImpl<PlanesRecord> {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * The reference instance of <code>public.planes</code>
+     */
+    public static final Planes PLANES = new Planes();
+
+    /**
+     * The class holding records for this type
+     */
+    @Override
+    public Class<PlanesRecord> getRecordType() {
+        return PlanesRecord.class;
+    }
+
+    /**
+     * The column <code>public.planes.id</code>.
+     */
+    public final TableField<PlanesRecord, Integer> ID = createField(DSL.name("id"), SQLDataType.INTEGER.nullable(false).identity(true), this, "");
+
+    /**
+     * The column <code>public.planes.flight_number</code>.
+     */
+    public final TableField<PlanesRecord, String> FLIGHT_NUMBER = createField(DSL.name("flight_number"), SQLDataType.VARCHAR, this, "");
+
+    /**
+     * The column <code>public.planes.start_time</code>.
+     */
+    public final TableField<PlanesRecord, LocalDateTime> START_TIME = createField(DSL.name("start_time"), SQLDataType.LOCALDATETIME(1).nullable(false), this, "");
+
+    /**
+     * The column <code>public.planes.landing_time</code>.
+     */
+    public final TableField<PlanesRecord, LocalDateTime> LANDING_TIME = createField(DSL.name("landing_time"), SQLDataType.LOCALDATETIME(1), this, "");
+
+    private Planes(Name alias, Table<PlanesRecord> aliased) {
+        this(alias, aliased, (Field<?>[]) null, null);
+    }
+
+    private Planes(Name alias, Table<PlanesRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
+    }
+
+    /**
+     * Create an aliased <code>public.planes</code> table reference
+     */
+    public Planes(String alias) {
+        this(DSL.name(alias), PLANES);
+    }
+
+    /**
+     * Create an aliased <code>public.planes</code> table reference
+     */
+    public Planes(Name alias) {
+        this(alias, PLANES);
+    }
+
+    /**
+     * Create a <code>public.planes</code> table reference
+     */
+    public Planes() {
+        this(DSL.name("planes"), null);
+    }
+
+    @Override
+    public Schema getSchema() {
+        return aliased() ? null : Public.PUBLIC;
+    }
+
+    @Override
+    public Identity<PlanesRecord, Integer> getIdentity() {
+        return (Identity<PlanesRecord, Integer>) super.getIdentity();
+    }
+
+    @Override
+    public UniqueKey<PlanesRecord> getPrimaryKey() {
+        return Keys.PK_PLANES;
+    }
+
+    @Override
+    public Planes as(String alias) {
+        return new Planes(DSL.name(alias), this);
+    }
+
+    @Override
+    public Planes as(Name alias) {
+        return new Planes(alias, this);
+    }
+
+    @Override
+    public Planes as(Table<?> alias) {
+        return new Planes(alias.getQualifiedName(), this);
+    }
+
+    /**
+     * Rename this table
+     */
+    @Override
+    public Planes rename(String name) {
+        return new Planes(DSL.name(name), null);
+    }
+
+    /**
+     * Rename this table
+     */
+    @Override
+    public Planes rename(Name name) {
+        return new Planes(name, null);
+    }
+
+    /**
+     * Rename this table
+     */
+    @Override
+    public Planes rename(Table<?> name) {
+        return new Planes(name.getQualifiedName(), null);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Planes where(Condition condition) {
+        return new Planes(getQualifiedName(), aliased() ? this : null, null, condition);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Planes where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Planes where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Planes where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Planes where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Planes where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Planes where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Planes where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Planes whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Planes whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
+    }
+
+    // -------------------------------------------------------------------------
+    // Row4 type methods
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Row4<Integer, String, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row4) super.fieldsRow();
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
+     */
+    public <U> SelectField<U> mapping(Function4<? super Integer, ? super String, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+        return convertFrom(Records.mapping(from));
+    }
+
+    /**
+     * Convenience mapping calling {@link SelectField#convertFrom(Class,
+     * Function)}.
+     */
+    public <U> SelectField<U> mapping(Class<U> toType, Function4<? super Integer, ? super String, ? super LocalDateTime, ? super LocalDateTime, ? extends U> from) {
+        return convertFrom(toType, Records.mapping(from));
+    }
+}
+
+====================
+FILE: CollisionsRecord.java
+
+/*
+ * This file is generated by jOOQ.
+ */
+package jooq.tables.records;
+
+
+import java.time.LocalDateTime;
+
+import jooq.tables.Collisions;
+
+import org.jooq.Field;
+import org.jooq.Record1;
+import org.jooq.Record3;
+import org.jooq.Row3;
+import org.jooq.impl.UpdatableRecordImpl;
+
+
+/**
+ * This class is generated by jOOQ.
+ */
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
+public class CollisionsRecord extends UpdatableRecordImpl<CollisionsRecord> implements Record3<Integer, String[], LocalDateTime> {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Setter for <code>public.collisions.id</code>.
+     */
+    public void setId(Integer value) {
+        set(0, value);
+    }
+
+    /**
+     * Getter for <code>public.collisions.id</code>.
+     */
+    public Integer getId() {
+        return (Integer) get(0);
+    }
+
+    /**
+     * Setter for <code>public.collisions.involved_planes</code>.
+     */
+    public void setInvolvedPlanes(String[] value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>public.collisions.involved_planes</code>.
+     */
+    public String[] getInvolvedPlanes() {
+        return (String[]) get(1);
+    }
+
+    /**
+     * Setter for <code>public.collisions.time</code>.
+     */
+    public void setTime(LocalDateTime value) {
+        set(2, value);
+    }
+
+    /**
+     * Getter for <code>public.collisions.time</code>.
+     */
+    public LocalDateTime getTime() {
+        return (LocalDateTime) get(2);
+    }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Record1<Integer> key() {
+        return (Record1) super.key();
+    }
+
+    // -------------------------------------------------------------------------
+    // Record3 type implementation
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Row3<Integer, String[], LocalDateTime> fieldsRow() {
+        return (Row3) super.fieldsRow();
+    }
+
+    @Override
+    public Row3<Integer, String[], LocalDateTime> valuesRow() {
+        return (Row3) super.valuesRow();
+    }
+
+    @Override
+    public Field<Integer> field1() {
+        return Collisions.COLLISIONS.ID;
+    }
+
+    @Override
+    public Field<String[]> field2() {
+        return Collisions.COLLISIONS.INVOLVED_PLANES;
+    }
+
+    @Override
+    public Field<LocalDateTime> field3() {
+        return Collisions.COLLISIONS.TIME;
+    }
+
+    @Override
+    public Integer component1() {
+        return getId();
+    }
+
+    @Override
+    public String[] component2() {
+        return getInvolvedPlanes();
+    }
+
+    @Override
+    public LocalDateTime component3() {
+        return getTime();
+    }
+
+    @Override
+    public Integer value1() {
+        return getId();
+    }
+
+    @Override
+    public String[] value2() {
+        return getInvolvedPlanes();
+    }
+
+    @Override
+    public LocalDateTime value3() {
+        return getTime();
+    }
+
+    @Override
+    public CollisionsRecord value1(Integer value) {
+        setId(value);
+        return this;
+    }
+
+    @Override
+    public CollisionsRecord value2(String[] value) {
+        setInvolvedPlanes(value);
+        return this;
+    }
+
+    @Override
+    public CollisionsRecord value3(LocalDateTime value) {
+        setTime(value);
+        return this;
+    }
+
+    @Override
+    public CollisionsRecord values(Integer value1, String[] value2, LocalDateTime value3) {
+        value1(value1);
+        value2(value2);
+        value3(value3);
+        return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a detached CollisionsRecord
+     */
+    public CollisionsRecord() {
+        super(Collisions.COLLISIONS);
+    }
+
+    /**
+     * Create a detached, initialised CollisionsRecord
+     */
+    public CollisionsRecord(Integer id, String[] involvedPlanes, LocalDateTime time) {
+        super(Collisions.COLLISIONS);
+
+        setId(id);
+        setInvolvedPlanes(involvedPlanes);
+        setTime(time);
+        resetChangedOnNotNull();
+    }
+}
+
+====================
+FILE: PlanesRecord.java
+
+/*
+ * This file is generated by jOOQ.
+ */
+package jooq.tables.records;
+
+
+import java.time.LocalDateTime;
+
+import jooq.tables.Planes;
+
+import org.jooq.Field;
+import org.jooq.Record1;
+import org.jooq.Record4;
+import org.jooq.Row4;
+import org.jooq.impl.UpdatableRecordImpl;
+
+
+/**
+ * This class is generated by jOOQ.
+ */
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
+public class PlanesRecord extends UpdatableRecordImpl<PlanesRecord> implements Record4<Integer, String, LocalDateTime, LocalDateTime> {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Setter for <code>public.planes.id</code>.
+     */
+    public void setId(Integer value) {
+        set(0, value);
+    }
+
+    /**
+     * Getter for <code>public.planes.id</code>.
+     */
+    public Integer getId() {
+        return (Integer) get(0);
+    }
+
+    /**
+     * Setter for <code>public.planes.flight_number</code>.
+     */
+    public void setFlightNumber(String value) {
+        set(1, value);
+    }
+
+    /**
+     * Getter for <code>public.planes.flight_number</code>.
+     */
+    public String getFlightNumber() {
+        return (String) get(1);
+    }
+
+    /**
+     * Setter for <code>public.planes.start_time</code>.
+     */
+    public void setStartTime(LocalDateTime value) {
+        set(2, value);
+    }
+
+    /**
+     * Getter for <code>public.planes.start_time</code>.
+     */
+    public LocalDateTime getStartTime() {
+        return (LocalDateTime) get(2);
+    }
+
+    /**
+     * Setter for <code>public.planes.landing_time</code>.
+     */
+    public void setLandingTime(LocalDateTime value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>public.planes.landing_time</code>.
+     */
+    public LocalDateTime getLandingTime() {
+        return (LocalDateTime) get(3);
+    }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Record1<Integer> key() {
+        return (Record1) super.key();
+    }
+
+    // -------------------------------------------------------------------------
+    // Record4 type implementation
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Row4<Integer, String, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row4) super.fieldsRow();
+    }
+
+    @Override
+    public Row4<Integer, String, LocalDateTime, LocalDateTime> valuesRow() {
+        return (Row4) super.valuesRow();
+    }
+
+    @Override
+    public Field<Integer> field1() {
+        return Planes.PLANES.ID;
+    }
+
+    @Override
+    public Field<String> field2() {
+        return Planes.PLANES.FLIGHT_NUMBER;
+    }
+
+    @Override
+    public Field<LocalDateTime> field3() {
+        return Planes.PLANES.START_TIME;
+    }
+
+    @Override
+    public Field<LocalDateTime> field4() {
+        return Planes.PLANES.LANDING_TIME;
+    }
+
+    @Override
+    public Integer component1() {
+        return getId();
+    }
+
+    @Override
+    public String component2() {
+        return getFlightNumber();
+    }
+
+    @Override
+    public LocalDateTime component3() {
+        return getStartTime();
+    }
+
+    @Override
+    public LocalDateTime component4() {
+        return getLandingTime();
+    }
+
+    @Override
+    public Integer value1() {
+        return getId();
+    }
+
+    @Override
+    public String value2() {
+        return getFlightNumber();
+    }
+
+    @Override
+    public LocalDateTime value3() {
+        return getStartTime();
+    }
+
+    @Override
+    public LocalDateTime value4() {
+        return getLandingTime();
+    }
+
+    @Override
+    public PlanesRecord value1(Integer value) {
+        setId(value);
+        return this;
+    }
+
+    @Override
+    public PlanesRecord value2(String value) {
+        setFlightNumber(value);
+        return this;
+    }
+
+    @Override
+    public PlanesRecord value3(LocalDateTime value) {
+        setStartTime(value);
+        return this;
+    }
+
+    @Override
+    public PlanesRecord value4(LocalDateTime value) {
+        setLandingTime(value);
+        return this;
+    }
+
+    @Override
+    public PlanesRecord values(Integer value1, String value2, LocalDateTime value3, LocalDateTime value4) {
+        value1(value1);
+        value2(value2);
+        value3(value3);
+        value4(value4);
+        return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Create a detached PlanesRecord
+     */
+    public PlanesRecord() {
+        super(Planes.PLANES);
+    }
+
+    /**
+     * Create a detached, initialised PlanesRecord
+     */
+    public PlanesRecord(Integer id, String flightNumber, LocalDateTime startTime, LocalDateTime landingTime) {
+        super(Planes.PLANES);
+
+        setId(id);
+        setFlightNumber(flightNumber);
+        setStartTime(startTime);
+        setLandingTime(landingTime);
+        resetChangedOnNotNull();
+    }
+}
+
+====================
+FILE: Tables.java
+
+/*
+ * This file is generated by jOOQ.
+ */
+package jooq;
+
+
+import jooq.tables.Collisions;
+import jooq.tables.Planes;
+
+
+/**
+ * Convenience access to all tables in public.
+ */
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
+public class Tables {
+
+    /**
+     * The table <code>public.collisions</code>.
+     */
+    public static final Collisions COLLISIONS = Collisions.COLLISIONS;
+
+    /**
+     * The table <code>public.planes</code>.
+     */
+    public static final Planes PLANES = Planes.PLANES;
 }
 
 ====================
@@ -1404,6 +2987,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
 
 @Log4j2
 @Getter
@@ -1413,17 +2998,25 @@ public class AirportServer  {
     private AirportDatabase database;
     private ControlTower controlTower;
     private Airport airport;
+    private boolean running;
+    private boolean paused;
+
+    private Instant startTime;
 
     public AirportServer() throws SQLException {
         this.database = new AirportDatabase();
         this.controlTower = new ControlTower(database);
         this.airport = new Airport();
+        this.running = false;
+        this.paused = false;
     }
 
     public void startServer(int port) throws IOException {
         ThreadContext.put("type", "Server");
+        running = true;
         try {
             this.serverSocket = new ServerSocket(port);
+            this.startTime = Instant.now();
             log.info("Server started");
 
             new CollisionDetector(controlTower).start();
@@ -1431,10 +3024,17 @@ public class AirportServer  {
             log.info("Collision detector started");
 
             while (true) {
+                if(paused) {
+                    Thread.sleep(2000);
+                    log.info("Airport paused. Waiting...");
+                    continue;
+                }
+
                 try {
                     Socket clientSocket = serverSocket.accept();
                     if (clientSocket != null) {
                         log.debug("Server connected with client at port: {}", port);
+                        running = true;
                         new PlaneHandler(clientSocket, controlTower, airport).start();
                     }
                 } catch (Exception ex) {
@@ -1446,26 +3046,36 @@ public class AirportServer  {
             }
         } catch (IOException ex) {
             log.error("Failed to start AirportServer on port {}: {}", port, ex.getMessage(), ex);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
             stopServer();
         }
     }
 
     public void stopServer() {
+        running = false;
         try {
-            if (serverSocket != null && !serverSocket.isClosed()) {
-                serverSocket.close();
-                log.info("Server closed successfully");
-            }
-
             if(database != null){
                 database.closeConnection();
                 log.info("Database closed successfully");
             }
 
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+                log.info("Server closed successfully");
+            }
         } catch (IOException ex) {
             log.error("Error occurred while closing server socket: {}", ex.getMessage(), ex);
         }
+    }
+
+    public void pauseServer() {
+        this.paused = true;
+    }
+
+    public void resumeServer() {
+        this.paused = false;
     }
 
     public static void main(String[] args) throws IOException, SQLException {
@@ -2067,10 +3677,12 @@ FILE: Messenger.java
 package com.jakub.bone.utills;
 
 import com.google.gson.Gson;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 
 public class Messenger {
     private Gson gson;
@@ -2078,6 +3690,7 @@ public class Messenger {
         this.gson = new Gson();
     }
 
+    // Sending with ObjectOutputStream
     public void send(Object message, ObjectOutputStream out) throws IOException {
         if (message instanceof Integer) {
             // Send the enum as a plain string
@@ -2089,6 +3702,14 @@ public class Messenger {
         }
         out.flush();
 
+    }
+
+    // Sending with HttpServletResponse (REST API)
+    public void send(HttpServletResponse response, Object message) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        String jsonMessage = gson.toJson(message);
+        response.getWriter().write(jsonMessage);
     }
 
     public <T> T receiveAndParse(ObjectInputStream in, Class<T> type) throws IOException, ClassNotFoundException {
