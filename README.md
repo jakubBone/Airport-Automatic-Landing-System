@@ -136,7 +136,7 @@ The system provides a REST API for monitoring and controlling the airport. The a
 - `GET /airport/planes/landed` – Get a list of landed planes
 - `GET /airport/collisions` – Get information about past collisions
 
-For a detailed API specification, see API Documentation.
+For a detailed API specification, see [API Documentation](https://www.linkedin.com/in/jakub-bone)   .
 
 
 ## 🎨 Interactive Visualization
