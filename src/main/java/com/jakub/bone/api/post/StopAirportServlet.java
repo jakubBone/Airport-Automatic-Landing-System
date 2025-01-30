@@ -10,14 +10,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 @WebServlet(urlPatterns = "/airport/stop")
 public class StopAirportServlet extends HttpServlet {
     private AirportServer airportServer;
     private Messenger messenger = new Messenger();
-    private Lock lock = new ReentrantLock();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
