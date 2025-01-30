@@ -173,12 +173,13 @@ curl -X GET http://localhost:8080/airport/collisions
   "collided planes": ["MH101, LH202"]
 }
 ```
+<br>
 
 ## 📌 Notes
 - API responses are in JSON format.
 - The system must be started (`/airport/start`) before using monitoring endpoints.
 - The `/airport/planes/*` endpoints provide dynamic information based on real-time simulation data.
-
+<br>
 
 ## 📧 Contact
 
