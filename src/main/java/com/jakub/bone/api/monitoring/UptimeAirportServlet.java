@@ -1,4 +1,4 @@
-package com.jakub.bone.api.get;
+package com.jakub.bone.api.monitoring;
 
 import com.jakub.bone.server.AirportServer;
 import com.jakub.bone.utills.Messenger;

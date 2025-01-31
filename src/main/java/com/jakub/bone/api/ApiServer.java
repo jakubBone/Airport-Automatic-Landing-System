@@ -1,12 +1,12 @@
 package com.jakub.bone.api;
 
-import com.jakub.bone.api.get.CollisionsAirportServlet;
-import com.jakub.bone.api.get.PlanesAirportServlet;
-import com.jakub.bone.api.get.UptimeAirportServlet;
-import com.jakub.bone.api.post.PauseAirportServlet;
-import com.jakub.bone.api.post.StartAirportServlet;
-import com.jakub.bone.api.post.StopAirportServlet;
-import com.jakub.bone.api.post.ResumeAirportServlet;
+import com.jakub.bone.api.monitoring.CollisionsAirportServlet;
+import com.jakub.bone.api.monitoring.PlanesAirportServlet;
+import com.jakub.bone.api.monitoring.UptimeAirportServlet;
+import com.jakub.bone.api.control.PauseAirportServlet;
+import com.jakub.bone.api.control.StartAirportServlet;
+import com.jakub.bone.api.control.StopAirportServlet;
+import com.jakub.bone.api.control.ResumeAirportServlet;
 import com.jakub.bone.server.AirportServer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;

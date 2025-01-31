@@ -48,12 +48,15 @@ prevent collisions, and ensure efficient usage of runways.
 ```
 src
 ├── com.jakub.bone.api            # REST API endpoints
-├── com.jakub.bone.application    # Core application logic
+├── com.jakub.bone.application    # Application processes management
 ├── com.jakub.bone.client         # Client-side logic 
+├── com.jakub.bone.config         # Configuration and constants 
 ├── com.jakub.bone.core           # Simulation entry point
-├── com.jakub.bone.database       # Database integration using JOOQ
+├── com.jakub.bone.database       # Database connection
 ├── com.jakub.bone.domain         # Domain models for airport and airplane
+├── com.jakub.bone.repository     # Data persistence layer
 ├── com.jakub.bone.server         # Server-side logic 
+├── com.jakub.bone.service        # Business logic and processes 
 ├── com.jakub.bone.ui             # Visualization components
 └── com.jakub.bone.utills         # Utilities and constants  
 ``` 
@@ -121,7 +124,6 @@ Before you begin, ensure you have the following tools installed:
 The system provides a REST API for monitoring and controlling the airport. The available endpoints include:
 
 ### Control Endpoints
-
 
 - `POST /airport/start` – Start the airport system
 - `POST /airport/pause` – Pause the system

@@ -1,4 +1,4 @@
-package com.jakub.bone.api.post;
+package com.jakub.bone.api.control;
 
 import com.jakub.bone.server.AirportServer;
 import com.jakub.bone.service.AirportStateService;

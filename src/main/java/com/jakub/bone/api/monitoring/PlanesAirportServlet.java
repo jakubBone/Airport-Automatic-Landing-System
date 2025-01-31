@@ -1,4 +1,4 @@
-package com.jakub.bone.api.get;
+package com.jakub.bone.api.monitoring;
 
 import com.jakub.bone.domain.plane.Plane;
 import com.jakub.bone.server.AirportServer;
