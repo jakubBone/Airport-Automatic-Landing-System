@@ -40,7 +40,7 @@ class ClientServerConnectionTest {
                 try {
                     this.server = new AirportServer();
                     this.server.setDatabase(mockDatabase);
-                    this.server.setControlTower(mockControlTower);
+                    this.server.setControlTowerService(mockControlTower);
                     this.server.startServer(5000);
                 } catch (IOException | SQLException ex) {
                     throw new RuntimeException(ex);
@@ -112,7 +112,7 @@ class ClientServerConnectionTest {
 
         waitForUpdate();
 
-        assertEquals(1, server.getControlTower().getPlanes().size(),
+        assertEquals(1, server.getControlTowerService().getPlanes().size(),
                 "Planes list should contain only one Plane object after registration");
     }
 
@@ -124,7 +124,7 @@ class ClientServerConnectionTest {
         // Fill the list with 100 planes
         for(int i = 0; i < 100; i++){
             Plane plane = new Plane("TEST_PLANE");
-            server.getControlTower().getPlanes().add(plane);
+            server.getControlTowerService().getPlanes().add(plane);
         }
 
         PlaneClient planeClient = new PlaneClient("localhost", 5000);
@@ -132,7 +132,7 @@ class ClientServerConnectionTest {
 
         waitForUpdate();
 
-        assertEquals(100, server.getControlTower().getPlanes().size(),
+        assertEquals(100, server.getControlTowerService().getPlanes().size(),
                 "Plane list should contain only 100 planes; the new plane should not be added");
     }
 }

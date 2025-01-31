@@ -23,17 +23,17 @@ public class PlaneHandler extends Thread {
         DESCENT, HOLD_PATTERN, LAND, FULL, COLLISION, RISK_ZONE
     }
     private final Socket clientSocket;
-    private final ControlTowerService controlTower;
+    private final ControlTowerService controlTowerService;
     private final Airport airport;
     private Messenger messenger;
     private FlightPhaseService phaseCoordinator;
 
-    public PlaneHandler(Socket clientSocket, ControlTowerService controlTower, Airport airport) {
+    public PlaneHandler(Socket clientSocket, ControlTowerService controlTowerService, Airport airport) {
         this.clientSocket = clientSocket;
-        this.controlTower = controlTower;
+        this.controlTowerService = controlTowerService;
         this.airport = airport;
         this.messenger = new Messenger();
-        this.phaseCoordinator = new FlightPhaseService(controlTower, airport, messenger);
+        this.phaseCoordinator = new FlightPhaseService(controlTowerService, airport, messenger);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class PlaneHandler extends Thread {
     }
 
     private boolean isPlaneRegistered(Plane plane, ObjectOutputStream out) throws IOException {
-        if (controlTower.isSpaceFull()) {
+        if (controlTowerService.isSpaceFull()) {
             messenger.send(FULL, out);
             log.info("Plane [{}]: no capacity in airspace", plane.getFlightNumber());
             return false;
@@ -79,12 +79,12 @@ public class PlaneHandler extends Thread {
 
         waitForUpdate(UPDATE_DELAY);
 
-        if (controlTower.isAtCollisionRiskZone(plane)) {
+        if (controlTowerService.isAtCollisionRiskZone(plane)) {
             messenger.send(RISK_ZONE, out);
             log.info("Plane [{}]: initial location occupied. Redirecting", plane.getFlightNumber());
             return false;
         }
-        controlTower.registerPlane(plane);
+        controlTowerService.registerPlane(plane);
 
         log.info("Plane [{}]: registered at ({}, {}, {}) ", plane.getFlightNumber(), plane.getNavigator().getLocation().getX(), plane.getNavigator().getLocation().getY(), plane.getNavigator().getLocation().getAltitude());
         return true;
@@ -119,9 +119,9 @@ public class PlaneHandler extends Thread {
 
     private void handleCollision(Plane plane, ObjectOutputStream out) throws IOException {
         if (plane.getAssignedRunway() != null) {
-            controlTower.releaseRunway(plane.getAssignedRunway());
+            controlTowerService.releaseRunway(plane.getAssignedRunway());
         }
-        controlTower.getPlanes().remove(plane);
+        controlTowerService.getPlanes().remove(plane);
         messenger.send(COLLISION, out);
 
         waitForUpdate(AFTER_COLLISION_DELAY);
@@ -129,7 +129,7 @@ public class PlaneHandler extends Thread {
 
     private void handleOutOfFuel(Plane plane) throws IOException {
         plane.destroyPlane();
-        controlTower.removePlaneFromSpace(plane);
+        controlTowerService.removePlaneFromSpace(plane);
         log.info("Plane [{}]: out of fuel. Disappeared from the radar", plane.getFlightNumber());
     }
 

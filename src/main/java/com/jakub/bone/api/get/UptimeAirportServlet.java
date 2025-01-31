@@ -14,18 +14,18 @@ import java.util.Map;
 @WebServlet(urlPatterns = "/airport/uptime")
 public class UptimeAirportServlet extends HttpServlet {
     private AirportServer airportServer;
-    private Messenger messenger = new Messenger();
+    private Messenger messenger;
 
     @Override
     public void init() throws ServletException {
         this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
-        messenger = new Messenger();
+        this.messenger = new Messenger();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try{
-            if (airportServer != null || airportServer.getStartTime() == null) {
+            if (airportServer.getStartTime() == null) {
                 messenger.send(response, Map.of("message", "airport is not running"));
                 return;
             }

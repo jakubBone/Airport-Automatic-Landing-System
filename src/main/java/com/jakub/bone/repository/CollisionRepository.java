@@ -3,7 +3,9 @@ package com.jakub.bone.repository;
 import org.jooq.DSLContext;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import static jooq.Tables.COLLISIONS;
 import static org.jooq.impl.DSL.*;
 
 public class CollisionRepository {
@@ -19,5 +21,12 @@ public class CollisionRepository {
                 .values(planesIds,
                         LocalDateTime.now())
                 .execute();
+    }
+
+    public List<String> getCollidedPlanes(){
+        return CONTEXT.select(COLLISIONS.INVOLVED_PLANES)
+                .from(COLLISIONS)
+                .where(COLLISIONS.TIME.isNotNull())
+                .fetchInto(String.class);
     }
 }

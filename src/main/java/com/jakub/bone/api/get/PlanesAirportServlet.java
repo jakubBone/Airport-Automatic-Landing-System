@@ -27,9 +27,9 @@ public class PlanesAirportServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try{
-            int planesCount= airportServer.getControlTower().getPlanes().size();
+            int planesCount= airportServer.getControlTowerService().getPlanes().size();
             List<String> landedPlanes = airportServer.getDatabase().getPLANE_REPOSITORY().getLandedPlanes();
-            List<String> flightNumbers = airportServer.getControlTower().getAllFlightNumbers();
+            List<String> flightNumbers = airportServer.getControlTowerService().getAllFlightNumbers();
 
             String path = request.getPathInfo();
             switch(path) {
@@ -44,7 +44,7 @@ public class PlanesAirportServlet extends HttpServlet {
                     break;
                 default:
                     String flightNumber = path.substring(1);
-                    Plane plane = airportServer.getControlTower().getPlaneByFlightNumber(flightNumber);
+                    Plane plane = airportServer.getControlTowerService().getPlaneByFlightNumber(flightNumber);
                     if (plane == null) {
                         messenger.send(response, Map.of("message" ,"plane not found"));
                     } else {

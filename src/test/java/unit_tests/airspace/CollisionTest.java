@@ -55,7 +55,7 @@ class CollisionTest {
         Plane plane1 = createAndRegisterPlane("TEST_PLANE_1", 5000, 5000, 4010);
         Plane plane2 = createAndRegisterPlane("TEST_PLANE_2", 5000, 5000, 4000);
 
-        collisionDetector.checkCollision();
+        collisionDetector.detectCollision();
 
         // Both planes should be destroyed
         assertTrue(plane1.isDestroyed(), "TEST_PLANE_1 should be destroyed after collision");
@@ -69,7 +69,7 @@ class CollisionTest {
         Plane plane1 = createAndRegisterPlane("TEST_PLANE_1", 5000, 5000, 4010);
         Plane plane2 = createAndRegisterPlane("TEST_PLANE_2", 5000, 5000, 4000);
 
-        collisionDetector.checkCollision();
+        collisionDetector.detectCollision();
 
         // Both planes should be destroyed
         assertTrue(plane1.isDestroyed(), "TEST_PLANE_1 should be destroyed after collision");
@@ -83,7 +83,7 @@ class CollisionTest {
         Plane plane1 = createAndRegisterPlane("TEST_PLANE_1", 5000, 5000, 4020);
         Plane plane2 = createAndRegisterPlane("TEST_PLANE_2", 5000, 5000, 4000);
 
-        collisionDetector.checkCollision();
+        collisionDetector.detectCollision();
 
         // Both planes should remain intact
         assertFalse(plane1.isDestroyed(), "TEST_PLANE_1 should not be destroyed after collision");

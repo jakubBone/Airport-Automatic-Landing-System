@@ -29,7 +29,7 @@ public class AirportStateService {
             serverThread.start();
 
         // Wait for the server to initialize before proceeding
-        while (airportServer == null || airportServer.getControlTower() == null) {
+        while (airportServer == null || airportServer.getControlTowerService() == null) {
             try {
                 Thread.sleep(SERVER_INIT_DELAY);
             } catch (InterruptedException ex) {

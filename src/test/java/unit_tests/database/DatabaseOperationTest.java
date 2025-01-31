@@ -77,7 +77,7 @@ class DatabaseOperationTest {
         controlTower.getPlanes().add(plane1);
         controlTower.getPlanes().add(plane2);
 
-        collisionDetector.checkCollision();
+        collisionDetector.detectCollision();
 
         // Build the IDs array that the control tower will pass to the DAO
         String[] collidedIDs = {plane1.getFlightNumber(), plane2.getFlightNumber()};

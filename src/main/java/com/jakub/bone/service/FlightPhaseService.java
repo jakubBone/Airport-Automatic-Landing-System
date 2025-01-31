@@ -16,19 +16,15 @@ import static com.jakub.bone.config.Constant.*;
 
 @Log4j2
 public class FlightPhaseService {
-    private ControlTowerService controlTower;
+    private ControlTowerService controlTowerService;
     private Airport airport;
     private Messenger messenger;
     private Runway availableRunway;
-    private boolean descentLogged;
-    private boolean holdPatternLogged;
 
     public FlightPhaseService(ControlTowerService controlTower, Airport airport, Messenger messenger) {
-        this.controlTower = controlTower;
+        this.controlTowerService = controlTower;
         this.airport = airport;
         this.messenger = messenger;
-        this.descentLogged = false;
-        this.holdPatternLogged = false;
     }
 
     public void processFlightPhase(Plane plane, Location location, ObjectOutputStream out) throws IOException, ClassNotFoundException {
@@ -42,7 +38,7 @@ public class FlightPhaseService {
     }
 
     private void handleDescent(Plane plane, ObjectOutputStream out) throws IOException {
-        if (controlTower.isPlaneApproachingHoldingAltitude(plane)) {
+        if (controlTowerService.isPlaneApproachingHoldingAltitude(plane)) {
             enterHolding(plane, out);
         } else {
             applyDescending(plane, out);
@@ -53,7 +49,7 @@ public class FlightPhaseService {
         Runway runway = getRunwayIfPlaneAtCorridor(plane);
         availableRunway = runway;
 
-        if(runway != null && controlTower.isRunwayAvailable(runway)){
+        if(runway != null && controlTowerService.isRunwayAvailable(runway)){
             applyLanding(plane, runway, out);
         } else {
             applyHolding(plane, out);
@@ -66,16 +62,16 @@ public class FlightPhaseService {
             return;
         }
 
-        if (controlTower.hasLandedOnRunway(plane, availableRunway)) {
+        if (controlTowerService.hasLandedOnRunway(plane, availableRunway)) {
             plane.setLanded(true);
 
             waitForUpdate(LANDING_CHECK_DELAY);
 
-            controlTower.removePlaneFromSpace(plane);
+            controlTowerService.removePlaneFromSpace(plane);
             log.info("Plane [{}]: successfully landed on runway [{}]", plane.getFlightNumber(), availableRunway.getId());
             return;
         }
-        controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, availableRunway);
+        controlTowerService.releaseRunwayIfPlaneAtFinalApproach(plane, availableRunway);
     }
     private void enterHolding(Plane plane, ObjectOutputStream out) throws IOException {
         messenger.send(DESCENT, out);
@@ -93,7 +89,7 @@ public class FlightPhaseService {
     }
 
     private void applyLanding(Plane plane, Runway runway, ObjectOutputStream out) throws IOException {
-        controlTower.assignRunway(runway);
+        controlTowerService.assignRunway(runway);
         plane.changePhase(LANDING);
         messenger.send(LAND, out);
         messenger.send(runway, out);
@@ -110,7 +106,6 @@ public class FlightPhaseService {
         }
         return null;
     }
-
 
     private void waitForUpdate(int interval) {
         try {

@@ -4,17 +4,12 @@ import com.jakub.bone.domain.airport.Location;
 import com.jakub.bone.domain.plane.Plane;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.ThreadContext;
-import org.jooq.DSLContext;
-
-import java.util.List;
 
 import static com.jakub.bone.config.Constant.*;
-import static jooq.Tables.COLLISIONS;
 
 @Log4j2
 public class CollisionService extends Thread {
     private ControlTowerService controlTowerService;
-    private DSLContext context;
 
     public CollisionService(ControlTowerService controlTowerService){
         this.controlTowerService = controlTowerService;
@@ -26,7 +21,7 @@ public class CollisionService extends Thread {
         while(true) {
             try {
                 while (!Thread.currentThread().isInterrupted()) {
-                    checkCollision();
+                    detectCollision();
                     Thread.sleep(COLLISION_CHECK_DELAY);
                 }
             } catch (InterruptedException ex) {
@@ -36,7 +31,7 @@ public class CollisionService extends Thread {
         }
     }
 
-    public void checkCollision() {
+    public void detectCollision() {
             for (int i = 0; i < controlTowerService.getPlanes().size(); i++) {
                 Plane plane1 = controlTowerService.getPlanes().get(i);
                 for (int j = i + 1; j < controlTowerService.getPlanes().size(); j++) {
@@ -72,13 +67,5 @@ public class CollisionService extends Thread {
         );
         double altDiff = Math.abs(loc1.getAltitude() - loc2.getAltitude());
         return horizontalDistance <= HORIZONTAL_COLLISION_DISTANCE && altDiff <= ALTITUDE_COLLISION_DISTANCE;
-    }
-
-    // API function
-    public List<String> getCollidedPlanes() {
-        return context.select(COLLISIONS.INVOLVED_PLANES)
-                .from(COLLISIONS)
-                .where(COLLISIONS.TIME.isNotNull())
-                .fetchInto(String.class);
     }
 }

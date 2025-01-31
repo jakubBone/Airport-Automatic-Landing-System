@@ -6,7 +6,6 @@ import com.jakub.bone.domain.plane.Plane;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static jooq.Tables.COLLISIONS;
 import static jooq.Tables.PLANES;
 import static org.jooq.impl.DSL.*;
 
@@ -37,11 +36,5 @@ public class PlaneRepository {
                 .from(PLANES)
                 .where(PLANES.LANDING_TIME.isNotNull())
                 .fetchInto(String.class);
-    }
-    public List<String> getCollidedPlanes(){
-        return CONTEXT.select(COLLISIONS.INVOLVED_PLANES)
-                    .from(COLLISIONS)
-                    .where(COLLISIONS.TIME.isNotNull())
-                    .fetchInto(String.class);
     }
 }

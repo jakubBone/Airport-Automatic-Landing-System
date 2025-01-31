@@ -23,7 +23,7 @@ import java.time.Instant;
 public class AirportServer  {
     private ServerSocket serverSocket;
     private AirportDatabase database;
-    private ControlTowerService controlTower;
+    private ControlTowerService controlTowerService;
     private Airport airport;
     private boolean running;
     private boolean paused;
@@ -31,7 +31,7 @@ public class AirportServer  {
 
     public AirportServer() throws SQLException {
         this.database = new AirportDatabase();
-        this.controlTower = new ControlTowerService(database);
+        this.controlTowerService = new ControlTowerService(database);
         this.airport = new Airport();
         this.running = false;
         this.paused = false;
@@ -45,7 +45,7 @@ public class AirportServer  {
             this.startTime = Instant.now();
             log.info("Server started");
 
-            new CollisionService(controlTower).start();
+            new CollisionService(controlTowerService).start();
 
             log.info("Collision detector started");
 
@@ -61,7 +61,7 @@ public class AirportServer  {
                     if (clientSocket != null) {
                         log.debug("Server connected with client at port: {}", port);
                         running = true;
-                        new PlaneHandler(clientSocket, controlTower, airport).start();
+                        new PlaneHandler(clientSocket, controlTowerService, airport).start();
                     }
                 } catch (Exception ex) {
                     if(serverSocket.isClosed()){
