@@ -21,7 +21,7 @@ public class CollisionsAirportServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
-        messenger = new Messenger();
+        this.messenger = new Messenger();
     }
 
     @Override

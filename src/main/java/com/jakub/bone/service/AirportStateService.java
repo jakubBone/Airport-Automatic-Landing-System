@@ -1,0 +1,57 @@
+package com.jakub.bone.service;
+
+import com.jakub.bone.client.PlaneClient;
+import com.jakub.bone.server.AirportServer;
+
+import java.io.IOException;
+
+import static com.jakub.bone.config.Constant.CLIENT_SPAWN_DELAY;
+import static com.jakub.bone.config.Constant.SERVER_INIT_DELAY;
+
+public class AirportStateService {
+    private AirportServer airportServer;
+    public AirportStateService(AirportServer airportServer) {
+        this.airportServer = airportServer;
+    }
+
+    public void startAirport() {
+        if(airportServer.isRunning()){
+            return;
+        }
+
+        Thread serverThread = new Thread(() -> {
+            try {
+                this.airportServer.startServer(5000);
+            }  catch (IOException ex) {
+                throw new RuntimeException("Failed to initialize AirportServer due to I/O issues", ex);
+            }
+        });
+            serverThread.start();
+
+        // Wait for the server to initialize before proceeding
+        while (airportServer == null || airportServer.getControlTower() == null) {
+            try {
+                Thread.sleep(SERVER_INIT_DELAY);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        new Thread(() -> {
+            for (int i = 0; i < 100; i++) {
+                PlaneClient client = new PlaneClient("localhost", 5000);
+                new Thread(client).start();
+
+                try {
+                    Thread.sleep(CLIENT_SPAWN_DELAY);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }).start();
+    }
+
+    public AirportServer getAirportServer() {
+        return airportServer;
+    }
+}

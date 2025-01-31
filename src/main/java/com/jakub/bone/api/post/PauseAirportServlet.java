@@ -14,12 +14,17 @@ import java.util.Map;
 @WebServlet(urlPatterns = "/airport/pause")
 public class PauseAirportServlet extends HttpServlet {
     private AirportServer airportServer;
-    private Messenger messenger = new Messenger();
+    private Messenger messenger;
+
+    @Override
+    public void init() throws ServletException {
+        this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
+        this.messenger = new Messenger();
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
         try {
-            if (airportServer != null && airportServer.isPaused()) {
+            if (airportServer.isPaused()) {
                 messenger.send(response, Map.of("message", "airport is already paused"));
             } else {
                 airportServer.pauseServer();

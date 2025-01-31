@@ -14,12 +14,16 @@ import java.util.Map;
 @WebServlet(urlPatterns = "/airport/resume")
 public class ResumeAirportServlet extends HttpServlet {
     private AirportServer airportServer;
-    private Messenger messenger = new Messenger();
+    private Messenger messenger;
+    @Override
+    public void init() throws ServletException {
+        this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
+        this.messenger = new Messenger();
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");
         try {
-            if (airportServer != null && airportServer.isPaused()) {
+            if (airportServer.isPaused()) {
                 airportServer.resumeServer();
             }
         } catch (Exception ex) {
