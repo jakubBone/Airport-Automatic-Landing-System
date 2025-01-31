@@ -33,23 +33,18 @@ public class PlanesAirportServlet extends HttpServlet {
 
             String path = request.getPathInfo();
             switch(path) {
-                case "/count":
-                    messenger.send(response, Map.of("count", planesCount));
-                    break;
-                case "/flightNumbers":
-                    messenger.send(response, Map.of("flight numbers", flightNumbers));
-                    break;
-                case "/landed":
-                    messenger.send(response, Map.of("landed planes", landedPlanes));
-                    break;
-                default:
+                case "/count" -> messenger.send(response, Map.of("count", planesCount));
+                case "/flightNumbers" -> messenger.send(response, Map.of("flight numbers", flightNumbers));
+                case "/landed" -> messenger.send(response, Map.of("landed planes", landedPlanes));
+                default -> {
                     String flightNumber = path.substring(1);
                     Plane plane = airportServer.getControlTowerService().getPlaneByFlightNumber(flightNumber);
                     if (plane == null) {
-                        messenger.send(response, Map.of("message" ,"plane not found"));
+                        messenger.send(response, Map.of("message", "plane not found"));
                     } else {
                         messenger.send(response, PlaneMapper.mapPlane(plane));
                     }
+                }
             }
         } catch (Exception ex){
             messenger.send(response, Map.of("error", "Internal server error"));
