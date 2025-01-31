@@ -1,8 +1,8 @@
 package com.jakub.bone.server;
 
-import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.domain.airport.Airport;
-import com.jakub.bone.application.CollisionDetector;
+import com.jakub.bone.service.CollisionService;
 import com.jakub.bone.database.AirportDatabase;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,16 +23,15 @@ import java.time.Instant;
 public class AirportServer  {
     private ServerSocket serverSocket;
     private AirportDatabase database;
-    private ControlTower controlTower;
+    private ControlTowerService controlTower;
     private Airport airport;
     private boolean running;
     private boolean paused;
-
     private Instant startTime;
 
     public AirportServer() throws SQLException {
         this.database = new AirportDatabase();
-        this.controlTower = new ControlTower(database);
+        this.controlTower = new ControlTowerService(database);
         this.airport = new Airport();
         this.running = false;
         this.paused = false;
@@ -46,7 +45,7 @@ public class AirportServer  {
             this.startTime = Instant.now();
             log.info("Server started");
 
-            new CollisionDetector(controlTower).start();
+            new CollisionService(controlTower).start();
 
             log.info("Collision detector started");
 
@@ -103,6 +102,10 @@ public class AirportServer  {
 
     public void resumeServer() {
         this.paused = false;
+    }
+
+    public Duration getUptime(){
+        return Duration.between(getStartTime(),Instant.now());
     }
 
     public static void main(String[] args) throws IOException, SQLException {

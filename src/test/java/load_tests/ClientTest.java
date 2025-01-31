@@ -1,7 +1,7 @@
 package load_tests;
 
 import com.jakub.bone.client.PlaneClient;
-import com.jakub.bone.utills.Constant;
+import com.jakub.bone.config.Constant;
 
 import java.util.Timer;
 import java.util.TimerTask;

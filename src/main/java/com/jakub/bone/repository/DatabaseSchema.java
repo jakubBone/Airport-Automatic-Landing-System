@@ -1,4 +1,4 @@
-package com.jakub.bone.database;
+package com.jakub.bone.repository;
 
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;

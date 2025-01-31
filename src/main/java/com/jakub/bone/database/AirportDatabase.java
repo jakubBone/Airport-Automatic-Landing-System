@@ -1,9 +1,12 @@
 package com.jakub.bone.database;
 
+import com.jakub.bone.repository.DatabaseSchema;
+import com.jakub.bone.repository.PlaneRepository;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
+import com.jakub.bone.repository.CollisionRepository;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

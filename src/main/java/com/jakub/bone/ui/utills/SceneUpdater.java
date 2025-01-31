@@ -1,8 +1,8 @@
 package com.jakub.bone.ui.utills;
 
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.ui.model.PlaneModel;
-import com.jakub.bone.application.ControlTower;
-import com.jakub.bone.utills.Constant;
+import com.jakub.bone.config.Constant;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Group;
@@ -20,11 +20,11 @@ import static com.jakub.bone.domain.plane.Plane.FlightPhase.LANDING;
 @Log4j2
 public class SceneUpdater {
     private final Group root;
-    private ControlTower controller;
+    private ControlTowerService controller;
     private Map<String, PlaneModel> planesMap;
     private boolean isFirstPlane;
 
-    public SceneUpdater(Group root, ControlTower controller) {
+    public SceneUpdater(Group root, ControlTowerService controller) {
         this.root = root;
         this.controller = controller;
         this.planesMap = new HashMap<>();

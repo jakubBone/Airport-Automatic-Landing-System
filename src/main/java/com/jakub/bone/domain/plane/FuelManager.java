@@ -3,8 +3,8 @@ package com.jakub.bone.domain.plane;
 import lombok.Getter;
 import lombok.Setter;
 
-import static com.jakub.bone.utills.Constant.CONSUMPTION_PER_SECOND;
-import static com.jakub.bone.utills.Constant.INITIAL_FUEL_LEVEL;
+import static com.jakub.bone.config.Constant.CONSUMPTION_PER_SECOND;
+import static com.jakub.bone.config.Constant.INITIAL_FUEL_LEVEL;
 
 @Getter
 @Setter

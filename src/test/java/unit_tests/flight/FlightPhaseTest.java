@@ -2,11 +2,11 @@ package unit_tests.flight;
 
 import com.jakub.bone.domain.airport.Airport;
 
-import com.jakub.bone.application.ControlTower;
-import com.jakub.bone.application.FlightPhaseCoordinator;
+import com.jakub.bone.service.ControlTowerService;
+import com.jakub.bone.service.FlightPhaseService;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionRepository;
-import com.jakub.bone.database.PlaneRepository;
+import com.jakub.bone.repository.CollisionRepository;
+import com.jakub.bone.repository.PlaneRepository;
 import com.jakub.bone.domain.airport.Location;
 import com.jakub.bone.utills.WaypointGenerator;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.*;
-import static com.jakub.bone.utills.Constant.FINAL_APPROACH_CORRIDOR_1;
+import static com.jakub.bone.config.Constant.FINAL_APPROACH_CORRIDOR_1;
 
 /*
  * This class tests how a plane's flight phase changes
@@ -40,8 +40,8 @@ class FlightPhaseTest {
     @Mock
     CollisionRepository mockCollisionRepository;
     @InjectMocks
-    ControlTower controlTower;
-    FlightPhaseCoordinator phaseCoordinator;
+    ControlTowerService controlTower;
+    FlightPhaseService phaseCoordinator;
     Airport airport;
     Messenger messenger;
 
@@ -52,7 +52,7 @@ class FlightPhaseTest {
         when(mockDatabase.getCOLLISION_REPOSITORY()).thenReturn(mockCollisionRepository);
         this.airport = new Airport();
         this.messenger = mock(Messenger.class);
-        this.phaseCoordinator = new FlightPhaseCoordinator(controlTower, airport, messenger);
+        this.phaseCoordinator = new FlightPhaseService(controlTower, airport, messenger);
 
     }
 

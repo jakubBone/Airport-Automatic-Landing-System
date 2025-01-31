@@ -336,8 +336,8 @@ import java.io.IOException;
 import java.util.Map;
 
 
-import static com.jakub.bone.utills.Constant.CLIENT_SPAWN_DELAY;
-import static com.jakub.bone.utills.Constant.SERVER_INIT_DELAY;
+import static config.Constant.CLIENT_SPAWN_DELAY;
+import static config.Constant.SERVER_INIT_DELAY;
 
 @WebServlet(urlPatterns = "/airport/start")
 public class StartAirportServlet extends HttpServlet {
@@ -447,7 +447,7 @@ import com.jakub.bone.domain.plane.Plane;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.ThreadContext;
 
-import static com.jakub.bone.utills.Constant.*;
+import static config.Constant.*;
 
 @Log4j2
 public class CollisionDetector extends Thread {
@@ -531,7 +531,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import static com.jakub.bone.utills.Constant.*;
+import static config.Constant.*;
 
 @Log4j2
 @Getter
@@ -643,7 +643,7 @@ import java.io.ObjectOutputStream;
 
 import static com.jakub.bone.application.PlaneHandler.AirportInstruction.*;
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.*;
-import static com.jakub.bone.utills.Constant.*;
+import static config.Constant.*;
 
 @Log4j2
 public class FlightPhaseCoordinator {
@@ -771,7 +771,7 @@ import java.net.SocketException;
 
 import static com.jakub.bone.application.PlaneHandler.AirportInstruction.*;
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.DESCENDING;
-import static com.jakub.bone.utills.Constant.*;
+import static config.Constant.*;
 
 @Log4j2
 public class PlaneHandler extends Thread {
@@ -983,7 +983,7 @@ FILE: PlaneClient.java
 package com.jakub.bone.client;
 
 import com.jakub.bone.application.PlaneHandler;
-import com.jakub.bone.utills.Constant;
+import config.Constant;
 import lombok.Getter;
 import com.jakub.bone.utills.Messenger;
 import lombok.extern.log4j.Log4j2;
@@ -1269,8 +1269,8 @@ import lombok.extern.log4j.Log4j2;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static com.jakub.bone.utills.Constant.CLIENT_SPAWN_DELAY;
-import static com.jakub.bone.utills.Constant.SERVER_INIT_DELAY;
+import static config.Constant.CLIENT_SPAWN_DELAY;
+import static config.Constant.SERVER_INIT_DELAY;
 
 @Log4j2
 public class SimulationLauncher extends Application {
@@ -1508,7 +1508,7 @@ FILE: Airport.java
 package com.jakub.bone.domain.airport;
 
 import lombok.Getter;
-import com.jakub.bone.utills.Constant;
+import config.Constant;
 
 @Getter
 public class Airport {
@@ -1631,8 +1631,8 @@ package com.jakub.bone.domain.plane;
 import lombok.Getter;
 import lombok.Setter;
 
-import static com.jakub.bone.utills.Constant.CONSUMPTION_PER_SECOND;
-import static com.jakub.bone.utills.Constant.INITIAL_FUEL_LEVEL;
+import static config.Constant.CONSUMPTION_PER_SECOND;
+import static config.Constant.INITIAL_FUEL_LEVEL;
 
 @Getter
 @Setter
@@ -1668,7 +1668,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
-import static com.jakub.bone.utills.Constant.*;
+import static config.Constant.*;
 
 @Getter
 @Setter
@@ -2973,9 +2973,9 @@ FILE: AirportServer.java
 
 package com.jakub.bone.server;
 
-import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.domain.airport.Airport;
-import com.jakub.bone.application.CollisionDetector;
+import com.jakub.bone.service.CollisionService;
 import com.jakub.bone.database.AirportDatabase;
 import lombok.Getter;
 import lombok.Setter;
@@ -3267,8 +3267,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import lombok.Getter;
 
-import static com.jakub.bone.utills.Constant.RUNWAY_HEIGHT;
-import static com.jakub.bone.utills.Constant.RUNWAY_WIDTH;
+import static config.Constant.RUNWAY_HEIGHT;
+import static config.Constant.RUNWAY_WIDTH;
 
 @Getter
 public class RunwayModel {
@@ -3400,7 +3400,7 @@ FILE: SceneRenderer.java
 package com.jakub.bone.ui.utills;
 
 import com.jakub.bone.ui.model.TerminalModel;
-import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.domain.airport.Airport;
 
 import javafx.application.Application;
@@ -3468,8 +3468,8 @@ FILE: SceneUpdater.java
 package com.jakub.bone.ui.utills;
 
 import com.jakub.bone.ui.model.PlaneModel;
-import com.jakub.bone.application.ControlTower;
-import com.jakub.bone.utills.Constant;
+import com.jakub.bone.service.ControlTowerService;
+import config.Constant;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Group;
@@ -3730,7 +3730,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jakub.bone.utills.Constant.*;
+import static config.Constant.*;
 
 public class WaypointGenerator implements Serializable {
     public static List<Location> getDescentWaypoints() {
@@ -3859,10 +3859,10 @@ FILE: ClientServerConnectionTest.java
 package integration_tests;
 
 import com.jakub.bone.client.PlaneClient;
-import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionRepository;
-import com.jakub.bone.database.PlaneRepository;
+import repository.CollisionRepository;
+import com.jakub.bone.repository.PlaneRepository;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -4001,7 +4001,7 @@ FILE: ClientTest.java
 package load_tests;
 
 import com.jakub.bone.client.PlaneClient;
-import com.jakub.bone.utills.Constant;
+import config.Constant;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -4101,11 +4101,11 @@ FILE: CollisionTest.java
 
 package unit_tests.airspace;
 
-import com.jakub.bone.application.CollisionDetector;
-import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.service.CollisionService;
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionRepository;
-import com.jakub.bone.database.PlaneRepository;
+import repository.CollisionRepository;
+import com.jakub.bone.repository.PlaneRepository;
 import com.jakub.bone.domain.airport.Location;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -4197,10 +4197,10 @@ FILE: ControlTowerTest.java
 
 package unit_tests.airspace;
 
-import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionRepository;
-import com.jakub.bone.database.PlaneRepository;
+import repository.CollisionRepository;
+import com.jakub.bone.repository.PlaneRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -4310,10 +4310,10 @@ package unit_tests.airspace;
 
 import com.jakub.bone.domain.airport.Airport;
 
-import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionRepository;
-import com.jakub.bone.database.PlaneRepository;
+import repository.CollisionRepository;
+import com.jakub.bone.repository.PlaneRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -4329,7 +4329,7 @@ import static com.jakub.bone.domain.airport.Airport.runway1;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
-import static com.jakub.bone.utills.Constant.FINAL_APPROACH_CORRIDOR_1;
+import static config.Constant.FINAL_APPROACH_CORRIDOR_1;
 
 class RunwayTest {
     @Mock
@@ -4440,12 +4440,12 @@ FILE: DatabaseOperationTest.java
 
 package unit_tests.database;
 
-import com.jakub.bone.application.CollisionDetector;
+import com.jakub.bone.service.CollisionService;
 import com.jakub.bone.domain.airport.Airport;
-import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionRepository;
-import com.jakub.bone.database.PlaneRepository;
+import repository.CollisionRepository;
+import com.jakub.bone.repository.PlaneRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -4458,7 +4458,7 @@ import java.sql.SQLException;
 
 import static com.jakub.bone.domain.airport.Airport.runway1;
 import static org.mockito.Mockito.*;
-import static com.jakub.bone.utills.Constant.ENTRY_POINT_CORRIDOR_1;
+import static config.Constant.ENTRY_POINT_CORRIDOR_1;
 
 class DatabaseOperationTest {
     @Mock
@@ -4533,11 +4533,11 @@ package unit_tests.flight;
 
 import com.jakub.bone.domain.airport.Airport;
 
-import com.jakub.bone.application.ControlTower;
-import com.jakub.bone.application.FlightPhaseCoordinator;
+import com.jakub.bone.service.ControlTowerService;
+import com.jakub.bone.service.FlightPhaseService;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionRepository;
-import com.jakub.bone.database.PlaneRepository;
+import repository.CollisionRepository;
+import com.jakub.bone.repository.PlaneRepository;
 import com.jakub.bone.domain.airport.Location;
 import com.jakub.bone.utills.WaypointGenerator;
 import org.junit.jupiter.api.BeforeEach;
@@ -4557,7 +4557,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.*;
-import static com.jakub.bone.utills.Constant.FINAL_APPROACH_CORRIDOR_1;
+import static config.Constant.FINAL_APPROACH_CORRIDOR_1;
 
 /*
  * This class tests how a plane's flight phase changes
@@ -4661,7 +4661,7 @@ FILE: FuelManagerTest.java
 
 package unit_tests.flight;
 
-import com.jakub.bone.utills.Constant;
+import config.Constant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.jakub.bone.domain.plane.Plane;

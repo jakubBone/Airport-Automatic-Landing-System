@@ -1,6 +1,5 @@
-package com.jakub.bone.utills;
+package com.jakub.bone.config;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;

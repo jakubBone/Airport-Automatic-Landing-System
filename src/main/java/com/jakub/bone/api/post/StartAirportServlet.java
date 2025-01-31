@@ -13,13 +13,19 @@ import java.io.IOException;
 import java.util.Map;
 
 
-import static com.jakub.bone.utills.Constant.CLIENT_SPAWN_DELAY;
-import static com.jakub.bone.utills.Constant.SERVER_INIT_DELAY;
+import static com.jakub.bone.config.Constant.CLIENT_SPAWN_DELAY;
+import static com.jakub.bone.config.Constant.SERVER_INIT_DELAY;
 
 @WebServlet(urlPatterns = "/airport/start")
 public class StartAirportServlet extends HttpServlet {
     private AirportServer airportServer;
     private Messenger messenger = new Messenger();
+
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

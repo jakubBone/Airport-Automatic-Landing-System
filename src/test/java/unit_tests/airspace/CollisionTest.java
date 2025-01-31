@@ -1,10 +1,10 @@
 package unit_tests.airspace;
 
-import com.jakub.bone.application.CollisionDetector;
-import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.service.CollisionService;
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionRepository;
-import com.jakub.bone.database.PlaneRepository;
+import com.jakub.bone.repository.CollisionRepository;
+import com.jakub.bone.repository.PlaneRepository;
 import com.jakub.bone.domain.airport.Location;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,15 +29,15 @@ class CollisionTest {
     @Mock
     CollisionRepository mockCollisionRepository;
     @InjectMocks
-    ControlTower controlTower;
-    CollisionDetector collisionDetector;
+    ControlTowerService controlTower;
+    CollisionService collisionDetector;
 
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
         when(mockDatabase.getPLANE_REPOSITORY()).thenReturn(mockPlaneRepository);
         when(mockDatabase.getCOLLISION_REPOSITORY()).thenReturn(mockCollisionRepository);
-        this.collisionDetector = new CollisionDetector(controlTower);
+        this.collisionDetector = new CollisionService(controlTower);
     }
 
     //Helper method to create a plane, set its location, and register

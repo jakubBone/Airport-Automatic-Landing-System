@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jakub.bone.utills.Constant.*;
+import static com.jakub.bone.config.Constant.*;
 
 public class WaypointGenerator implements Serializable {
     public static List<Location> getDescentWaypoints() {

@@ -1,6 +1,8 @@
 package com.jakub.bone.application;
 
 import com.jakub.bone.domain.airport.Airport;
+import com.jakub.bone.service.ControlTowerService;
+import com.jakub.bone.service.FlightPhaseService;
 import com.jakub.bone.utills.Messenger;
 import com.jakub.bone.domain.airport.Location;
 import lombok.extern.log4j.Log4j2;
@@ -13,7 +15,7 @@ import java.net.SocketException;
 
 import static com.jakub.bone.application.PlaneHandler.AirportInstruction.*;
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.DESCENDING;
-import static com.jakub.bone.utills.Constant.*;
+import static com.jakub.bone.config.Constant.*;
 
 @Log4j2
 public class PlaneHandler extends Thread {
@@ -21,17 +23,17 @@ public class PlaneHandler extends Thread {
         DESCENT, HOLD_PATTERN, LAND, FULL, COLLISION, RISK_ZONE
     }
     private final Socket clientSocket;
-    private final ControlTower controlTower;
+    private final ControlTowerService controlTower;
     private final Airport airport;
     private Messenger messenger;
-    private FlightPhaseCoordinator phaseCoordinator;
+    private FlightPhaseService phaseCoordinator;
 
-    public PlaneHandler(Socket clientSocket, ControlTower controlTower, Airport airport) {
+    public PlaneHandler(Socket clientSocket, ControlTowerService controlTower, Airport airport) {
         this.clientSocket = clientSocket;
         this.controlTower = controlTower;
         this.airport = airport;
         this.messenger = new Messenger();
-        this.phaseCoordinator = new FlightPhaseCoordinator(controlTower, airport, messenger);
+        this.phaseCoordinator = new FlightPhaseService(controlTower, airport, messenger);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.jakub.bone.application;
+package com.jakub.bone.service;
 
 import com.jakub.bone.domain.airport.Airport;
 import com.jakub.bone.domain.airport.Runway;
@@ -12,18 +12,18 @@ import java.io.ObjectOutputStream;
 
 import static com.jakub.bone.application.PlaneHandler.AirportInstruction.*;
 import static com.jakub.bone.domain.plane.Plane.FlightPhase.*;
-import static com.jakub.bone.utills.Constant.*;
+import static com.jakub.bone.config.Constant.*;
 
 @Log4j2
-public class FlightPhaseCoordinator {
-    private ControlTower controlTower;
+public class FlightPhaseService {
+    private ControlTowerService controlTower;
     private Airport airport;
     private Messenger messenger;
     private Runway availableRunway;
     private boolean descentLogged;
     private boolean holdPatternLogged;
 
-    public FlightPhaseCoordinator(ControlTower controlTower, Airport airport, Messenger messenger) {
+    public FlightPhaseService(ControlTowerService controlTower, Airport airport, Messenger messenger) {
         this.controlTower = controlTower;
         this.airport = airport;
         this.messenger = messenger;

@@ -7,8 +7,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import lombok.Getter;
 
-import static com.jakub.bone.utills.Constant.RUNWAY_HEIGHT;
-import static com.jakub.bone.utills.Constant.RUNWAY_WIDTH;
+import static com.jakub.bone.config.Constant.RUNWAY_HEIGHT;
+import static com.jakub.bone.config.Constant.RUNWAY_WIDTH;
 
 @Getter
 public class RunwayModel {

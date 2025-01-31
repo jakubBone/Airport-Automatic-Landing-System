@@ -1,10 +1,13 @@
-package com.jakub.bone.database;
+package com.jakub.bone.repository;
 
 import org.jooq.DSLContext;
 import com.jakub.bone.domain.plane.Plane;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import static jooq.Tables.COLLISIONS;
+import static jooq.Tables.PLANES;
 import static org.jooq.impl.DSL.*;
 
 public class PlaneRepository {
@@ -27,5 +30,18 @@ public class PlaneRepository {
                 .set(field("landing_time"), LocalDateTime.now())
                 .where(field("flight_number").eq(plane.getFlightNumber()))
                 .execute();
+    }
+
+    public List<String> getLandedPlanes() {
+        return CONTEXT.select(PLANES.FLIGHT_NUMBER)
+                .from(PLANES)
+                .where(PLANES.LANDING_TIME.isNotNull())
+                .fetchInto(String.class);
+    }
+    public List<String> getCollidedPlanes(){
+        return CONTEXT.select(COLLISIONS.INVOLVED_PLANES)
+                    .from(COLLISIONS)
+                    .where(COLLISIONS.TIME.isNotNull())
+                    .fetchInto(String.class);
     }
 }

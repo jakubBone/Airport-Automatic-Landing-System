@@ -2,10 +2,10 @@ package unit_tests.airspace;
 
 import com.jakub.bone.domain.airport.Airport;
 
-import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionRepository;
-import com.jakub.bone.database.PlaneRepository;
+import com.jakub.bone.repository.CollisionRepository;
+import com.jakub.bone.repository.PlaneRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,7 @@ import static com.jakub.bone.domain.airport.Airport.runway1;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
-import static com.jakub.bone.utills.Constant.FINAL_APPROACH_CORRIDOR_1;
+import static com.jakub.bone.config.Constant.FINAL_APPROACH_CORRIDOR_1;
 
 class RunwayTest {
     @Mock
@@ -31,7 +31,7 @@ class RunwayTest {
     @Mock
     CollisionRepository mockCollisionRepository;
     @InjectMocks
-    ControlTower controlTower;
+    ControlTowerService controlTower;
     Airport airport;
 
     @BeforeEach

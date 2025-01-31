@@ -1,4 +1,4 @@
-package com.jakub.bone.application;
+package com.jakub.bone.service;
 
 import com.jakub.bone.domain.airport.Runway;
 import com.jakub.bone.database.AirportDatabase;
@@ -8,6 +8,7 @@ import com.jakub.bone.domain.plane.Plane;
 
 import java.sql.SQLException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -15,16 +16,16 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import static com.jakub.bone.utills.Constant.*;
+import static com.jakub.bone.config.Constant.*;
 
 @Log4j2
 @Getter
-public class ControlTower {
+public class ControlTowerService {
     private List<Plane> planes;
     private Lock lock;
     private AirportDatabase database;
 
-    public ControlTower(AirportDatabase database) throws SQLException {
+    public ControlTowerService(AirportDatabase database) throws SQLException {
         this.planes = new CopyOnWriteArrayList<>();
         this.lock = new ReentrantLock();
         this.database = database;
@@ -89,6 +90,15 @@ public class ControlTower {
                 .orElse(null));
     }
 
+    public List<String> getAllFlightNumbers(){
+        return executeWithLock(() -> {
+            List<String> flightNumbers = new ArrayList<>();
+            for (Plane plane : planes) {
+                flightNumbers.add(plane.getFlightNumber());
+            }
+            return flightNumbers;
+        });
+    }
 
     // Helper methods for locks management
     private <T> T executeWithLock(Supplier<T> action){

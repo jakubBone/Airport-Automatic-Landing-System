@@ -1,6 +1,6 @@
 package unit_tests.flight;
 
-import com.jakub.bone.utills.Constant;
+import com.jakub.bone.config.Constant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.jakub.bone.domain.plane.Plane;

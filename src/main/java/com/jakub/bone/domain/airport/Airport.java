@@ -1,7 +1,7 @@
 package com.jakub.bone.domain.airport;
 
 import lombok.Getter;
-import com.jakub.bone.utills.Constant;
+import com.jakub.bone.config.Constant;
 
 @Getter
 public class Airport {

@@ -10,8 +10,8 @@ import lombok.extern.log4j.Log4j2;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static com.jakub.bone.utills.Constant.CLIENT_SPAWN_DELAY;
-import static com.jakub.bone.utills.Constant.SERVER_INIT_DELAY;
+import static com.jakub.bone.config.Constant.CLIENT_SPAWN_DELAY;
+import static com.jakub.bone.config.Constant.SERVER_INIT_DELAY;
 
 @Log4j2
 public class SimulationLauncher extends Application {

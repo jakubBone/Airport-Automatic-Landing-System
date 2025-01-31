@@ -1,9 +1,9 @@
 package unit_tests.airspace;
 
-import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionRepository;
-import com.jakub.bone.database.PlaneRepository;
+import com.jakub.bone.repository.CollisionRepository;
+import com.jakub.bone.repository.PlaneRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class ControlTowerTest {
     @Mock
     CollisionRepository mockCollisionRepository;
     @InjectMocks
-    ControlTower controlTower;
+    ControlTowerService controlTower;
     List<Plane> incomingPlanes;
     @BeforeEach
     void setUp() throws SQLException {

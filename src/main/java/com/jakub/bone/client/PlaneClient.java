@@ -1,7 +1,7 @@
 package com.jakub.bone.client;
 
 import com.jakub.bone.application.PlaneHandler;
-import com.jakub.bone.utills.Constant;
+import com.jakub.bone.config.Constant;
 import lombok.Getter;
 import com.jakub.bone.utills.Messenger;
 import lombok.extern.log4j.Log4j2;

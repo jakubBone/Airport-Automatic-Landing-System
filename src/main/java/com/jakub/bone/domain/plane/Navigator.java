@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
-import static com.jakub.bone.utills.Constant.*;
+import static com.jakub.bone.config.Constant.*;
 
 @Getter
 @Setter

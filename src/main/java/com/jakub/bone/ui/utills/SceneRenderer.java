@@ -1,7 +1,7 @@
 package com.jakub.bone.ui.utills;
 
 import com.jakub.bone.ui.model.TerminalModel;
-import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.domain.airport.Airport;
 
 import javafx.application.Application;
@@ -16,9 +16,9 @@ public class SceneRenderer extends Application {
     private Scene scene;
     private Camera camera;
     private Airport airport;
-    private final ControlTower controller;
+    private final ControlTowerService controller;
 
-    public SceneRenderer(ControlTower controller) {
+    public SceneRenderer(ControlTowerService controller) {
         this.group = new SmartGroup(0.5, 0.5, 0.5);
         this.scene = new Scene(group, 800, 600, Color.BLACK);
         this.camera = new Camera();

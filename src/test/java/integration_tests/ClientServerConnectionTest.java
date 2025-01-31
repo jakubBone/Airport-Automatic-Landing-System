@@ -1,10 +1,10 @@
 package integration_tests;
 
 import com.jakub.bone.client.PlaneClient;
-import com.jakub.bone.application.ControlTower;
+import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.database.AirportDatabase;
-import com.jakub.bone.database.CollisionRepository;
-import com.jakub.bone.database.PlaneRepository;
+import com.jakub.bone.repository.CollisionRepository;
+import com.jakub.bone.repository.PlaneRepository;
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -27,7 +27,7 @@ class ClientServerConnectionTest {
     @Mock
     CollisionRepository mockCollisionRepository;
     @InjectMocks
-    ControlTower mockControlTower;
+    ControlTowerService mockControlTower;
     AirportServer server;
 
     @BeforeEach
