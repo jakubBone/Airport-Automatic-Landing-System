@@ -14,6 +14,7 @@ public class SimulationLauncher extends Application {
     private AirportServer airportServer;
     private AirportStateService airportStateService;
     private SceneRenderer visualization;
+
     @Override
     public void init() throws Exception {
         this.airportServer = new AirportServer();

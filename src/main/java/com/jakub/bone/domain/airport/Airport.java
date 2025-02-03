@@ -7,6 +7,7 @@ import com.jakub.bone.config.Constant;
 public class Airport {
     public static Runway runway2;
     public static Runway runway1;
+
     public Airport() {
         this.runway1 = Runway.builder()
                 .id("R-1")

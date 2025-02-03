@@ -12,6 +12,7 @@ public class Location implements Serializable {
     int x;
     int y;
     int altitude;
+
     public Location(int x, int y, int altitude) {
         this.x = x;
         this.y = y;

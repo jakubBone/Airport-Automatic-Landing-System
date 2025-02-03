@@ -10,6 +10,7 @@ import static org.jooq.impl.DSL.*;
 
 public class CollisionRepository {
     private final DSLContext CONTEXT;
+
     public CollisionRepository(DSLContext CONTEXT) {
         this.CONTEXT = CONTEXT;
     }

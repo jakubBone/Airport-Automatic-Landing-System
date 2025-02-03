@@ -15,6 +15,7 @@ import java.util.Map;
 public class ResumeAirportServlet extends HttpServlet {
     private AirportServer airportServer;
     private Messenger messenger;
+
     @Override
     public void init() throws ServletException {
         this.airportServer = (AirportServer) getServletContext().getAttribute("airportServer");

@@ -13,6 +13,7 @@ import static com.jakub.bone.config.Constant.RUNWAY_WIDTH;
 @Getter
 public class RunwayModel {
     private Rectangle runwayRect;
+
     public RunwayModel(Runway runway) {
         this.runwayRect = new Rectangle(RUNWAY_WIDTH / 2.0, RUNWAY_HEIGHT/ 2.0);
 

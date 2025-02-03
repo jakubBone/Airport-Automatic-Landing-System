@@ -6,10 +6,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 
 public class Messenger {
     private Gson gson;
+
     public Messenger() {
         this.gson = new Gson();
     }

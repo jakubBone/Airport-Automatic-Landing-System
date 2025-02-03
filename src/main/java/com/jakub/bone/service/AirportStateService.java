@@ -10,6 +10,7 @@ import static com.jakub.bone.config.Constant.SERVER_INIT_DELAY;
 
 public class AirportStateService {
     private AirportServer airportServer;
+
     public AirportStateService(AirportServer airportServer) {
         this.airportServer = airportServer;
     }

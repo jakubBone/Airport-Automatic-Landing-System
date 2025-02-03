@@ -10,6 +10,7 @@ import static com.jakub.bone.config.Constant.INITIAL_FUEL_LEVEL;
 @Setter
 public class FuelManager {
     private double fuelLevel;
+
     public FuelManager() {
         this.fuelLevel = INITIAL_FUEL_LEVEL;
     }
