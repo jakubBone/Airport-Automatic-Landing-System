@@ -11,7 +11,7 @@ import static com.jakub.bone.config.Constant.SERVER_INIT_DELAY;
 
 /*
  * The class manages the startup of the AirportServer
- * Initialize of PlaneClient instances to simulate air traffic
+ * Initializes of PlaneClient instances to simulate air traffic
  * Spawns multiple client instances at defined intervals
  */
 @Getter
