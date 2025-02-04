@@ -2,12 +2,19 @@ package com.jakub.bone.service;
 
 import com.jakub.bone.client.PlaneClient;
 import com.jakub.bone.server.AirportServer;
+import lombok.Getter;
 
 import java.io.IOException;
 
 import static com.jakub.bone.config.Constant.CLIENT_SPAWN_DELAY;
 import static com.jakub.bone.config.Constant.SERVER_INIT_DELAY;
 
+/*
+ * The class manages the startup of the AirportServer
+ * Initialize of PlaneClient instances to simulate air traffic
+ * Spawns multiple client instances at defined intervals
+ */
+@Getter
 public class AirportStateService {
     private AirportServer airportServer;
 
@@ -16,18 +23,18 @@ public class AirportStateService {
     }
 
     public void startAirport() {
-        if(airportServer.isRunning()){
+        if (airportServer.isRunning()) {
             return;
         }
 
         Thread serverThread = new Thread(() -> {
             try {
                 this.airportServer.startServer(5000);
-            }  catch (IOException ex) {
+            } catch (IOException ex) {
                 throw new RuntimeException("Failed to initialize AirportServer due to I/O issues", ex);
             }
         });
-            serverThread.start();
+        serverThread.start();
 
         // Wait for the server to initialize before proceeding
         while (airportServer == null || airportServer.getControlTowerService() == null) {
@@ -50,9 +57,5 @@ public class AirportStateService {
                 }
             }
         }).start();
-    }
-
-    public AirportServer getAirportServer() {
-        return airportServer;
     }
 }
