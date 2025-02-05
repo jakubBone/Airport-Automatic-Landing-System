@@ -33,7 +33,7 @@ message UptimeResponse {
 
 message PlanesCountRequest{}
 message PlanesCountResponse{
-    string count = 1;
+    int32 count = 1;
 }
 
 
@@ -47,6 +47,11 @@ message LandedPlanesResponse{
     string landed_planes = 1;
 }
 
+message CollidedPlanesRequest{}
+message CollidedPlanesResponse{
+    string collided_planes = 1;
+}
+
 message PlaneRequest{
     string flight_number = 1;
 }
@@ -57,9 +62,6 @@ message PlaneResponse{
     string fuel_level = 4;
 }
 
-message CollidedPlanesRequest{}
-message CollidedPlanesResponse{
-    string collided_planes = 1;
-}
+
 
 

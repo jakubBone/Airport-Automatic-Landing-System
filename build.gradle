@@ -109,7 +109,6 @@ jooq {
     }
 }
 
-
 application {
     mainClass = 'simulation.SimulationApp'
 }
