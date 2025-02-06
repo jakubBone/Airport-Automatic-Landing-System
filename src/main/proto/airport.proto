@@ -33,7 +33,7 @@ message UptimeResponse {
 
 message PlanesCountRequest{}
 message PlanesCountResponse{
-    int32 count = 1;
+    string count = 1;
 }
 
 

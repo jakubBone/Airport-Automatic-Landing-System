@@ -31,8 +31,8 @@ public class UptimeAirportServlet extends HttpServlet {
             }
 
             long hours = airportServer.getUptime().toHours();
-            long minutes = airportServer.getUptime().toMinutes();
-            long seconds = airportServer.getUptime().getSeconds();
+            long minutes = airportServer.getUptime().toMinutes() % 60;
+            long seconds = airportServer.getUptime().getSeconds() % 60;
 
             messenger.send(response, Map.of("message", String.format("%02d:%02d:%02d", hours, minutes, seconds)));
         } catch (Exception ex){

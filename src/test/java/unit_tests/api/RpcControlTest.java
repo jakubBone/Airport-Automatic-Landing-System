@@ -48,8 +48,11 @@ class RpcControlTest {
     @Test
     @DisplayName("Should test StopRequest response correctness")
     void testStopRequest() {
-        AirportProto.StatusResponse response = stub.stop(AirportProto.StopRequest.newBuilder().build());
-        assertEquals("airport stopped successfully", response.getMessage());
+        AirportProto.StatusResponse response = stub.start(AirportProto.StartRequest.newBuilder().build());
+        assertEquals("airport started successfully", response.getMessage());
+
+        AirportProto.StatusResponse response2 = stub.stop(AirportProto.StopRequest.newBuilder().build());
+        assertEquals("airport stopped successfully", response2.getMessage());
     }
 
     @Test
