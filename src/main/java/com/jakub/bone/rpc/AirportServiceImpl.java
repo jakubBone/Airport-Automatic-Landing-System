@@ -7,11 +7,13 @@ import com.jakub.bone.server.AirportServer;
 import com.jakub.bone.service.AirportStateService;
 import com.jakub.bone.utills.PlaneMapper;
 import io.grpc.stub.StreamObserver;
+import lombok.Getter;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+@Getter
 public class AirportServiceImpl extends AirportServiceGrpc.AirportServiceImplBase {
     private AirportServer airportServer;
     private AirportStateService airportStateService;
@@ -38,7 +40,7 @@ public class AirportServiceImpl extends AirportServiceGrpc.AirportServiceImplBas
         airportStateService.getAirportServer().stopServer();
 
         AirportProto.StatusResponse response = AirportProto.StatusResponse.newBuilder()
-                .setMessage("Airport stopped successfully")
+                .setMessage("airport stopped successfully")
                 .build();
 
         responseObserver.onNext(response);
@@ -50,7 +52,7 @@ public class AirportServiceImpl extends AirportServiceGrpc.AirportServiceImplBas
         airportServer.pauseServer();
 
         AirportProto.StatusResponse response = AirportProto.StatusResponse.newBuilder()
-                .setMessage("Airport paused successfully")
+                .setMessage("airport paused successfully")
                 .build();
 
         responseObserver.onNext(response);
@@ -62,7 +64,7 @@ public class AirportServiceImpl extends AirportServiceGrpc.AirportServiceImplBas
         airportServer.resumeServer();
 
         AirportProto.StatusResponse response = AirportProto.StatusResponse.newBuilder()
-                .setMessage("Airport paused successfully")
+                .setMessage("airport resumed successfully")
                 .build();
 
         responseObserver.onNext(response);
@@ -72,8 +74,8 @@ public class AirportServiceImpl extends AirportServiceGrpc.AirportServiceImplBas
     @Override
     public void getUptime(AirportProto.UptimeRequest request, StreamObserver<AirportProto.UptimeResponse> responseObserver) {
         long hours = airportServer.getUptime().toHours();
-        long minutes = airportServer.getUptime().toMinutes();
-        long seconds = airportServer.getUptime().getSeconds();
+        long minutes = airportServer.getUptime().toMinutes() % 60;
+        long seconds = airportServer.getUptime().getSeconds() % 60;
 
         AirportProto.UptimeResponse response = AirportProto.UptimeResponse.newBuilder()
                 .setUptime(String.format("%02d:%02d:%02d", hours, minutes, seconds))

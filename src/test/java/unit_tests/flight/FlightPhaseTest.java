@@ -53,7 +53,6 @@ class FlightPhaseTest {
         this.airport = new Airport();
         this.messenger = mock(Messenger.class);
         this.phaseCoordinator = new FlightPhaseService(controlTower, airport, messenger);
-
     }
 
     @Test
