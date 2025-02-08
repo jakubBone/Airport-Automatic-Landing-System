@@ -159,11 +159,12 @@ public class AirportServiceImpl extends AirportServiceGrpc.AirportServiceImplBas
         String message = "no planes landed";
         try {
             List<String> landedPlanes = airportServer.getDatabase().getPLANE_REPOSITORY().getLandedPlanes();
-            if (landedPlanes != null) {
+            if (!landedPlanes.isEmpty()) {
                 message = String.valueOf(landedPlanes);
             }
         } catch (Exception ex) {
             message = "internal server error";
+            message = ex.getMessage();
             System.err.println("Error handling request: " + ex.getMessage());
         }
         AirportProto.LandedPlanesResponse response = AirportProto.LandedPlanesResponse.newBuilder()
@@ -177,7 +178,7 @@ public class AirportServiceImpl extends AirportServiceGrpc.AirportServiceImplBas
         String message = "no planes collided";
         try {
             List<String> collidedPlanes = airportServer.getDatabase().getCOLLISION_REPOSITORY().getCollidedPlanes();
-            if (collidedPlanes != null) {
+            if (!collidedPlanes.isEmpty()) {
                 message = String.valueOf(collidedPlanes);
             }
         } catch (Exception ex) {
