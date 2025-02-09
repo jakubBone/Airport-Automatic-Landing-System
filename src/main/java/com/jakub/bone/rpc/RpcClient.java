@@ -14,7 +14,7 @@ public class RpcClient {
         AirportServiceGrpc.AirportServiceBlockingStub stub
                 = AirportServiceGrpc.newBlockingStub(channel);
 
-        AirportProto.StatusResponse response = stub.start(AirportProto.StartRequest.newBuilder().build());
-        System.out.println("Response: " + response.getMessage());
+        AirportProto.LandedPlanesResponse response = stub.getLandedPlanes(AirportProto.LandedPlanesRequest.newBuilder().build());
+        System.out.println("Response: " + response.getLandedPlanes());
     }
 }

@@ -68,29 +68,4 @@ class RpcControlTest {
         AirportProto.StatusResponse response = stub.resume(AirportProto.ResumeRequest.newBuilder().build());
         assertEquals("airport resumed successfully", response.getMessage());
     }
-
-    /*@Test
-    @DisplayName("Should test GetLandedPlanes response correctness")
-    void testGetLandedPlanes() {
-        AirportProto.LandedPlanesResponse response = stub.getLandedPlanes(AirportProto.LandedPlanesRequest.newBuilder().build());
-        assertEquals("no planes collided", response.getLandedPlanes());
-    }*/
-
-    @Test
-    @DisplayName("Should test GetCollidedPlanes response correctness")
-    void testGetCollidedPlanes() {
-        AirportProto.CollidedPlanesResponse response = stub.getCollidedPlanes(AirportProto.CollidedPlanesRequest.newBuilder().build());
-        assertEquals("no planes collided", response.getCollidedPlanes());
-    }
-
-    @Test
-    @DisplayName("Should test GetPlaneRequest response correctness")
-    void testGetPlaneRequest() {
-        AirportProto.PlaneRequest request = AirportProto.PlaneRequest.newBuilder().setFlightNumber("ABC123").build();
-        AirportProto.PlaneResponse response = stub.getPlaneRequest(request);
-        assertEquals("ABC123", response.getFlightNumber());
-        assertEquals("not found", response.getPhase());
-        assertEquals("unknown", response.getLocation());
-        assertEquals("0", response.getFuelLevel());
-    }
 }

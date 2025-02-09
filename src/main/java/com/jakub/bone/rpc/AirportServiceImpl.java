@@ -140,7 +140,7 @@ public class AirportServiceImpl extends AirportServiceGrpc.AirportServiceImplBas
         String message = "airspace is empty";
         try {
             List<String> flightNumbers = airportServer.getControlTowerService().getAllFlightNumbers();
-            if (flightNumbers != null) {
+            if (!flightNumbers.isEmpty()) {
                 message = String.valueOf(flightNumbers);
             }
         } catch (Exception ex){
@@ -164,7 +164,6 @@ public class AirportServiceImpl extends AirportServiceGrpc.AirportServiceImplBas
             }
         } catch (Exception ex) {
             message = "internal server error";
-            message = ex.getMessage();
             System.err.println("Error handling request: " + ex.getMessage());
         }
         AirportProto.LandedPlanesResponse response = AirportProto.LandedPlanesResponse.newBuilder()
