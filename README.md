@@ -21,7 +21,7 @@ prevent collisions, and ensure efficient usage of runways.
 
 - **Visualization**: A 3D interface using JavaFX for visualizing airplane movements
 
-- **REST API **: Exposes endpoints for controlling the airport and retrieving real-time data
+- **REST API**: Exposes endpoints for controlling the airport and retrieving real-time data
 
 
 ## 🚀 Technologies Used
