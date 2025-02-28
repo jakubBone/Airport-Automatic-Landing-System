@@ -47,18 +47,18 @@ prevent collisions, and ensure efficient usage of runways.
 
 ```
 src
-├── com.jakub.bone.api            # REST API endpoints
-├── com.jakub.bone.application    # Application processes management
-├── com.jakub.bone.client         # Client-side logic 
-├── com.jakub.bone.config         # Configuration and constants 
-├── com.jakub.bone.core           # Simulation entry point
-├── com.jakub.bone.database       # Database connection
-├── com.jakub.bone.domain         # Domain models for airport and airplane
-├── com.jakub.bone.repository     # Data persistence layer
-├── com.jakub.bone.server         # Server-side logic 
-├── com.jakub.bone.service        # Business logic and processes 
-├── com.jakub.bone.ui             # Visualization components
-└── com.jakub.bone.utills         # Utilities and constants  
+├── java/com/jakub/bone/api            # REST API endpoints
+├── java/com/jakub/bone/application    # Application processes management
+├── java/com/jakub/bone/client         # Client-side logic 
+├── java/com/jakub/bone/config         # Configuration and constants 
+├── java/com/jakub/bone/core           # Simulation entry point
+├── java/com/jakub/bone/database       # Database connection
+├── java/com/jakub/bone/domain         # Domain models for airport and airplane
+├── java/com/jakub/bone/repository     # Data persistence layer
+├── java/com/jakub/bone/server         # Server-side logic 
+├── cjava/com/jakub/bone/service        # Business logic and processes 
+├── java/com/jakub/bone/ui             # Visualization components
+└── java/com/jakub/bone/utills         # Utilities and constants  
 ``` 
 
 
