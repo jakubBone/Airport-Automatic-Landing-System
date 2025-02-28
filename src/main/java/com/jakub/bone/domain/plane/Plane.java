@@ -2,7 +2,7 @@ package com.jakub.bone.domain.plane;
 
 import com.jakub.bone.domain.airport.Runway;
 import com.jakub.bone.domain.airport.Location;
-import com.jakub.bone.utills.WaypointGenerator;
+import com.jakub.bone.utils.WaypointGenerator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;

@@ -2,8 +2,8 @@ package com.jakub.bone.api.monitoring;
 
 import com.jakub.bone.domain.plane.Plane;
 import com.jakub.bone.server.AirportServer;
-import com.jakub.bone.utills.Messenger;
-import com.jakub.bone.utills.PlaneMapper;
+import com.jakub.bone.utils.Messenger;
+import com.jakub.bone.utils.PlaneMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

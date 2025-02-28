@@ -3,7 +3,7 @@ package com.jakub.bone.application;
 import com.jakub.bone.domain.airport.Airport;
 import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.service.FlightPhaseService;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import com.jakub.bone.domain.airport.Location;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.domain.plane.Plane;

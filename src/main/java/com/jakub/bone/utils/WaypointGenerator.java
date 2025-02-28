@@ -1,4 +1,4 @@
-package com.jakub.bone.utills;
+package com.jakub.bone.utils;
 
 import com.jakub.bone.domain.airport.Location;
 import com.jakub.bone.domain.airport.Runway;

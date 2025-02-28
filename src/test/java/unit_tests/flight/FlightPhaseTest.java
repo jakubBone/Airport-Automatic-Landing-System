@@ -8,7 +8,7 @@ import com.jakub.bone.database.AirportDatabase;
 import com.jakub.bone.repository.CollisionRepository;
 import com.jakub.bone.repository.PlaneRepository;
 import com.jakub.bone.domain.airport.Location;
-import com.jakub.bone.utills.WaypointGenerator;
+import com.jakub.bone.utils.WaypointGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import com.jakub.bone.domain.plane.Plane;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 
 import java.io.IOException;
 import java.sql.SQLException;

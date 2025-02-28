@@ -63,7 +63,7 @@ FILE: PauseAirportServlet.java
 package com.jakub.bone.api.control;
 
 import com.jakub.bone.server.AirportServer;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -105,7 +105,7 @@ FILE: ResumeAirportServlet.java
 package com.jakub.bone.api.control;
 
 import com.jakub.bone.server.AirportServer;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -146,7 +146,7 @@ package com.jakub.bone.api.control;
 
 import com.jakub.bone.server.AirportServer;
 import com.jakub.bone.service.AirportStateService;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -190,7 +190,7 @@ FILE: StopAirportServlet.java
 package com.jakub.bone.api.control;
 
 import com.jakub.bone.server.AirportServer;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -233,7 +233,7 @@ FILE: CollisionsAirportServlet.java
 package com.jakub.bone.api.monitoring;
 
 import com.jakub.bone.server.AirportServer;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -269,8 +269,8 @@ package com.jakub.bone.api.monitoring;
 
 import com.jakub.bone.domain.plane.Plane;
 import com.jakub.bone.server.AirportServer;
-import com.jakub.bone.utills.Messenger;
-import com.jakub.bone.utills.PlaneMapper;
+import com.jakub.bone.utils.Messenger;
+import com.jakub.bone.utils.PlaneMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -326,7 +326,7 @@ FILE: UptimeAirportServlet.java
 package com.jakub.bone.api.monitoring;
 
 import com.jakub.bone.server.AirportServer;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -375,7 +375,7 @@ package com.jakub.bone.application;
 import com.jakub.bone.domain.airport.Airport;
 import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.service.FlightPhaseService;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import com.jakub.bone.domain.airport.Location;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.domain.plane.Plane;
@@ -601,7 +601,7 @@ package com.jakub.bone.client;
 import com.jakub.bone.application.PlaneHandler;
 import com.jakub.bone.config.Constant;
 import lombok.Getter;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.domain.plane.Plane;
 import org.apache.logging.log4j.ThreadContext;
@@ -712,7 +712,7 @@ package com.jakub.bone.client;
 
 import com.jakub.bone.domain.airport.Location;
 import com.jakub.bone.domain.plane.Plane;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
@@ -772,7 +772,7 @@ import com.jakub.bone.domain.airport.Runway;
 import com.jakub.bone.application.PlaneHandler;
 import lombok.Getter;
 import com.jakub.bone.domain.plane.Plane;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
@@ -1254,7 +1254,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import com.jakub.bone.utills.WaypointGenerator;
+import com.jakub.bone.utils.WaypointGenerator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -1334,7 +1334,7 @@ package com.jakub.bone.domain.plane;
 
 import com.jakub.bone.domain.airport.Runway;
 import com.jakub.bone.domain.airport.Location;
-import com.jakub.bone.utills.WaypointGenerator;
+import com.jakub.bone.utils.WaypointGenerator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -1471,7 +1471,7 @@ import com.jakub.bone.grpc.AirportProto;
 import com.jakub.bone.grpc.AirportServiceGrpc;
 import com.jakub.bone.server.AirportServer;
 import com.jakub.bone.service.AirportStateService;
-import com.jakub.bone.utills.PlaneMapper;
+import com.jakub.bone.utils.PlaneMapper;
 import io.grpc.stub.StreamObserver;
 import lombok.Getter;
 
@@ -2136,7 +2136,7 @@ import com.jakub.bone.domain.airport.Runway;
 import com.jakub.bone.domain.airport.Location;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.domain.plane.Plane;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -2730,7 +2730,7 @@ public class SmartGroup extends Group {
 ====================
 FILE: Messenger.java
 
-package com.jakub.bone.utills;
+package com.jakub.bone.utils;
 
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletResponse;
@@ -2777,7 +2777,7 @@ public class Messenger {
 ====================
 FILE: PlaneMapper.java
 
-package com.jakub.bone.utills;
+package com.jakub.bone.utils;
 
 import com.jakub.bone.domain.plane.Plane;
 
@@ -2805,7 +2805,7 @@ public class PlaneMapper {
 ====================
 FILE: WaypointGenerator.java
 
-package com.jakub.bone.utills;
+package com.jakub.bone.utils;
 
 import com.jakub.bone.domain.airport.Location;
 import com.jakub.bone.domain.airport.Runway;
@@ -3790,7 +3790,7 @@ import com.jakub.bone.database.AirportDatabase;
 import com.jakub.bone.repository.CollisionRepository;
 import com.jakub.bone.repository.PlaneRepository;
 import com.jakub.bone.domain.airport.Location;
-import com.jakub.bone.utills.WaypointGenerator;
+import com.jakub.bone.utils.WaypointGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -3798,7 +3798,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import com.jakub.bone.domain.plane.Plane;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 
 import java.io.IOException;
 import java.sql.SQLException;

@@ -2,7 +2,7 @@ package com.jakub.bone.api.control;
 
 import com.jakub.bone.server.AirportServer;
 import com.jakub.bone.service.AirportStateService;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

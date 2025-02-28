@@ -3,7 +3,7 @@ package com.jakub.bone.client;
 import com.jakub.bone.application.PlaneHandler;
 import com.jakub.bone.config.Constant;
 import lombok.Getter;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import lombok.extern.log4j.Log4j2;
 import com.jakub.bone.domain.plane.Plane;
 import org.apache.logging.log4j.ThreadContext;

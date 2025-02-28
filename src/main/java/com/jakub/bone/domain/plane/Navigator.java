@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import com.jakub.bone.utills.WaypointGenerator;
+import com.jakub.bone.utils.WaypointGenerator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;

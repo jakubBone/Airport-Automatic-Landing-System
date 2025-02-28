@@ -2,7 +2,7 @@ package com.jakub.bone.client;
 
 import com.jakub.bone.domain.airport.Location;
 import com.jakub.bone.domain.plane.Plane;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;

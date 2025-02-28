@@ -4,7 +4,7 @@ import com.jakub.bone.domain.airport.Runway;
 import com.jakub.bone.application.PlaneHandler;
 import lombok.Getter;
 import com.jakub.bone.domain.plane.Plane;
-import com.jakub.bone.utills.Messenger;
+import com.jakub.bone.utils.Messenger;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
