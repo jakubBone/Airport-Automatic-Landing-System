@@ -108,12 +108,7 @@ Before you begin, ensure you have the following tools installed:
    Start the server to manage plane communications:
    ```bash
    java -cp build/classes/java/main com.jakub.bone.core.AirportServer
-   
-   5. **Run the API Server**   
-   The API will be available at: http://localhost:8080
-   Start the REST API for managing and monitoring the system:
-   ```bash
-   java -cp build/classes/java/main com.jakub.bone.api.ApiServer
+   ```
 
 6. **Run the Clients**  
    Simulate planes connecting to the server:
@@ -125,6 +120,12 @@ Before you begin, ensure you have the following tools installed:
    ```bash
    java -cp build/classes/java/main com.jakub.bone.core.SimulationLauncher
    
+8. **Run the API** 
+
+   The API will be available at: http://localhost:8080:
+   ```bash
+   java -cp build/classes/java/main com.jakub.bone.api.ApiServer
+   ```
    
 ## 🌐 API Overview
 
