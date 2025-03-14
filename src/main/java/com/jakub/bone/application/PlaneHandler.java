@@ -22,6 +22,7 @@ public class PlaneHandler extends Thread {
     public enum AirportInstruction {
         DESCENT, HOLD_PATTERN, LAND, FULL, COLLISION, RISK_ZONE
     }
+
     private final Socket clientSocket;
     private final ControlTowerService controlTowerService;
     private final Airport airport;

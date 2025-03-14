@@ -3,13 +3,12 @@ package com.jakub.bone.utils;
 import com.jakub.bone.domain.airport.Location;
 import com.jakub.bone.domain.airport.Runway;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.jakub.bone.config.Constant.*;
 
-public class WaypointGenerator implements Serializable {
+public class WaypointGenerator  {
     public static List<Location> getDescentWaypoints() {
         List<Location> waypoints = new ArrayList<>();
         int radius = 5000;
