@@ -3,7 +3,7 @@
 [![Watch the video](src/main/resources/images/logo.png)](https://www.youtube.com/watch?v=eqqYM1RD8ZI)
 
 Welcome to the Airport Automatic Landing System! This project showcases a robust and safe solution for automating airplane landings, 
-utilizing client-server architecture, collision detection, and real-time monitoring. The system is designed to handle multiple planes, 
+utilizing client-server architecture, collision detection, and real-time monitoring. The system uses multithreading to handle multiple planes, 
 prevent collisions, and ensure efficient usage of runways.
 
 
@@ -13,7 +13,7 @@ prevent collisions, and ensure efficient usage of runways.
 
 - **Runway Assignment**: Dynamically allocates available runways for landing
 
-- **Fuel Monitoring**: Ensures planes are directed appropriately based on fuel levels
+- **Fuel Monitoring**: Real-time fuel level monitoring
 
 - **Client-Server Communication**: Planes (clients) communicate with the control tower (server) via sockets
 
