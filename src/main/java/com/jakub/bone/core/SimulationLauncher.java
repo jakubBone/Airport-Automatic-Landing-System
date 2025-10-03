@@ -32,7 +32,8 @@ public class SimulationLauncher extends Application {
     public void stop() {
         try {
             airportServer.getDatabase().getSCHEMA().clearTables();
-            System.out.println("Database cleared during application shutdown");
+            log.info("Database {} cleared during application shutdown", airportServer.getDatabase());
+            System.out.println(
         } catch (Exception ex) {
             log.error("Error occurred while clearing the database: {}", ex.getMessage(), ex);
         }
