@@ -9,6 +9,7 @@
 *.nar
 hs_err_pid*
 replay_pid*
+*.log
 
 ##############################
 ## Maven
@@ -31,6 +32,7 @@ buildNumber.properties
 bin/
 build/
 .gradle
+
 .gradletasknamecache
 gradle-app.setting
 !gradle-wrapper.jar
@@ -61,6 +63,7 @@ tmp/
 local.properties
 .loadpath
 .factorypath
+
 
 ##############################
 ## NetBeans
