@@ -1,6 +1,6 @@
 # ✈️ Airport Automatic Landing System
 
-[![Watch the video](src/main/resources/images/logo.png)](https://www.youtube.com/watch?v=eqqYM1RD8ZI)
+[![Watch the video](src/main/resources/images/logo.png)](https://www.youtube.com/watch?v=NvXRgYPO4gE)
 
 Welcome to the Airport Automatic Landing System! This project showcases a robust and safe solution for automating airplane landings, 
 utilizing client-server architecture, collision detection, and real-time monitoring. The system uses multithreading to handle multiple planes, 
