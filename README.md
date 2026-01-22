@@ -2,9 +2,29 @@
 
 [![Watch the video](src/main/resources/images/logo.png)](https://www.youtube.com/watch?v=eqqYM1RD8ZI)
 
-Welcome to the Airport Automatic Landing System! This project showcases a robust and safe solution for automating airplane landings, 
-utilizing client-server architecture, collision detection, and real-time monitoring. The system uses multithreading to handle multiple planes, 
-prevent collisions, and ensure efficient usage of runways.
+
+## 🧪 Project Purpose & Status
+
+This project was created **about a year ago** as an educational and experimental project.
+
+- It was intentionally written **without Spring** to understand low-level mechanisms (threading, sockets, HTTP).
+
+- At that time, **separation of concerns and architectural boundaries were not a priority**, as the focus was on learning through experimentation.
+
+- The REST API and several system components exist mainly for **learning purposes** and are not strictly required for the simulation.
+
+- The setup is manual, as the project was created **before I started using Docker**.
+
+Overall, many parts of this project exist **primarily for learning and experimentation**, rather than production readiness.
+
+
+## ✈️ Project Overview
+
+This project simulates an **automated airport landing control system** using a client–server architecture, collision detection, and real-time monitoring.
+
+The system uses **multithreading** to handle multiple airplanes concurrently, prevent collisions, and manage runway allocation.
+Airplanes act as clients and communicate with the control tower server using raw socket connections.
+
 
 
 ## 🎯 Features
