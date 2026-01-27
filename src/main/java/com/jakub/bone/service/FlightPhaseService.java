@@ -97,12 +97,11 @@ public class FlightPhaseService {
     }
 
     private Runway getRunwayIfPlaneAtCorridor(Plane plane) {
-        Runway runway;
         if (plane.getNavigator().getLocation().equals(ENTRY_POINT_CORRIDOR_1)){
-            return runway = Airport.runway1;
+            return airport.getRunway1();
         }
         else if (plane.getNavigator().getLocation().equals(ENTRY_POINT_CORRIDOR_2)) {
-            return runway = Airport.runway2;
+            return airport.getRunway2();
         }
         return null;
     }

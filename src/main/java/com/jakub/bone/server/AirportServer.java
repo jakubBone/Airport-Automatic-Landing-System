@@ -16,6 +16,9 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.jakub.bone.config.ConfigLoader;
 
@@ -23,10 +26,15 @@ import com.jakub.bone.config.ConfigLoader;
 @Getter
 @Setter
 public class AirportServer  {
+    private static final int CONNECTION_POOL_SIZE = 20;
+    private static final int EXECUTOR_SHUTDOWN_TIMEOUT_SECONDS = 30;
+
     private ServerSocket serverSocket;
     private AirportDatabase database;
     private ControlTowerService controlTowerService;
     private Airport airport;
+    private CollisionService collisionService;
+    private ExecutorService connectionPool;
     private boolean running;
     private boolean paused;
     private Instant startTime;
@@ -45,13 +53,14 @@ public class AirportServer  {
         try {
             this.serverSocket = new ServerSocket(port);
             this.startTime = Instant.now();
-            log.info("Server started");
+            this.connectionPool = Executors.newFixedThreadPool(CONNECTION_POOL_SIZE);
+            log.info("Server started with connection pool size: {}", CONNECTION_POOL_SIZE);
 
-            new CollisionService(controlTowerService).start();
-
+            this.collisionService = new CollisionService(controlTowerService);
+            collisionService.start();
             log.info("Collision detector started");
 
-            while (true) {
+            while (running) {
                 if(paused) {
                     Thread.sleep(2000);
                     log.info("Airport paused. Waiting...");
@@ -62,8 +71,7 @@ public class AirportServer  {
                     Socket clientSocket = serverSocket.accept();
                     if (clientSocket != null) {
                         log.debug("Server connected with client at port: {}", port);
-                        running = true;
-                        new PlaneHandler(clientSocket, controlTowerService, airport).start();
+                        connectionPool.submit(new PlaneHandler(clientSocket, controlTowerService, airport));
                     }
                 } catch (Exception ex) {
                     if(serverSocket.isClosed()){
@@ -75,7 +83,8 @@ public class AirportServer  {
         } catch (IOException ex) {
             log.error("Failed to start AirportServer on port {}: {}", port, ex.getMessage(), ex);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
+            log.warn("Server interrupted while paused");
         } finally {
             stopServer();
         }
@@ -84,6 +93,25 @@ public class AirportServer  {
     public void stopServer() {
         running = false;
         try {
+            if (collisionService != null) {
+                collisionService.shutdown();
+                log.info("Collision service stopped");
+            }
+
+            if (connectionPool != null) {
+                connectionPool.shutdown();
+                try {
+                    if (!connectionPool.awaitTermination(EXECUTOR_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                        connectionPool.shutdownNow();
+                        log.warn("Connection pool forced shutdown after timeout");
+                    }
+                } catch (InterruptedException e) {
+                    connectionPool.shutdownNow();
+                    Thread.currentThread().interrupt();
+                }
+                log.info("Connection pool closed successfully");
+            }
+
             if(database != null){
                 database.closeConnection();
                 log.info("Database closed successfully");

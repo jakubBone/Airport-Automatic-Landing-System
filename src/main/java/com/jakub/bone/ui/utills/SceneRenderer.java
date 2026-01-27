@@ -43,8 +43,8 @@ public class SceneRenderer extends Application {
     }
 
     private void setupStaticElements(){
-        RunwayModel runway1Model = new RunwayModel(Airport.runway1);
-        RunwayModel runway2Model = new RunwayModel(Airport.runway2);
+        RunwayModel runway1Model = new RunwayModel(airport.getRunway1());
+        RunwayModel runway2Model = new RunwayModel(airport.getRunway2());
         AirspaceModel airspaceModel = new AirspaceModel();
         TerminalModel terminal1Model = new TerminalModel(-1000, 50, 2000);
         TerminalModel terminal2Model = new TerminalModel(1000, 50, 2000);

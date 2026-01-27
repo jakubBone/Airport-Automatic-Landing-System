@@ -21,7 +21,6 @@ import com.jakub.bone.utils.Messenger;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static com.jakub.bone.domain.airport.Airport.runway1;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -91,7 +90,7 @@ class FlightPhaseTest {
         plane.setPhase(HOLDING);
 
         // Corridor entry triggers the switch to LANDING
-        Location corridorEntry = runway1.getCorridor().getEntryPoint();
+        Location corridorEntry = airport.getRunway1().getCorridor().getEntryPoint();
         phaseCoordinator.processFlightPhase(plane, corridorEntry, null);
 
         assertEquals(LANDING, plane.getPhase(), "Flight phase should be switched to LANDING");
@@ -102,9 +101,9 @@ class FlightPhaseTest {
     void testMarkingAsLanded(){
         // Plane is at the runway landing point
         Plane plane = new Plane("TEST_PLANE");
-        plane.getNavigator().setLocation(runway1.getLandingPoint());
+        plane.getNavigator().setLocation(airport.getRunway1().getLandingPoint());
 
-        assertTrue(controlTower.hasLandedOnRunway(plane, runway1), "TEST_PLANE should be marked as landed");
+        assertTrue(controlTower.hasLandedOnRunway(plane, airport.getRunway1()), "TEST_PLANE should be marked as landed");
     }
 
     @Test
@@ -115,11 +114,11 @@ class FlightPhaseTest {
         plane.getNavigator().setLocation(FINAL_APPROACH_CORRIDOR_1);
 
         // Initially mark runway as unavailable
-        runway1.setAvailable(false);
+        airport.getRunway1().setAvailable(false);
 
         // The plane crossing final approach triggers runway release
-        controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, runway1);
+        controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, airport.getRunway1());
 
-        assertTrue(runway1.isAvailable(), "Runway should be set as available");
+        assertTrue(airport.getRunway1().isAvailable(), "Runway should be set as available");
     }
 }

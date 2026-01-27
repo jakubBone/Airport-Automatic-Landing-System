@@ -17,7 +17,6 @@ import com.jakub.bone.domain.plane.Plane;
 
 import java.sql.SQLException;
 
-import static com.jakub.bone.domain.airport.Airport.runway1;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -46,15 +45,15 @@ class RunwayTest {
     @DisplayName("Runway should initially be available")
     void testIsRunwayAvailableInitially(){
         // By default, the runway is assumed available
-        assertTrue(controlTower.isRunwayAvailable(runway1),
+        assertTrue(controlTower.isRunwayAvailable(airport.getRunway1()),
                 "Runway should be set as available at the beginning");
     }
 
     @Test
     @DisplayName("Runway can be set to unavailable")
     void testSetRunwayAsUnavailable(){
-        runway1.setAvailable(false);
-        assertFalse(controlTower.isRunwayAvailable(runway1),
+        airport.getRunway1().setAvailable(false);
+        assertFalse(controlTower.isRunwayAvailable(airport.getRunway1()),
                 "Runway should be set as unavailable" );
     }
 
@@ -62,9 +61,9 @@ class RunwayTest {
     @DisplayName("Assigning a runway makes it unavailable")
     void testAssignRunwayMakesItOccupied(){
         // Once assigned, the runway is not available anymore
-        controlTower.assignRunway(runway1);
+        controlTower.assignRunway(airport.getRunway1());
 
-        assertFalse(runway1.isAvailable(),
+        assertFalse(airport.getRunway1().isAvailable(),
                 "Runway should be unavailable (occupied) after assignment");
     }
 
@@ -72,9 +71,9 @@ class RunwayTest {
     @DisplayName("Releasing a runway makes it available again")
     void testReleaseRunway(){
         // Once released, the runway is available
-        controlTower.releaseRunway(runway1);
+        controlTower.releaseRunway(airport.getRunway1());
 
-        assertTrue(runway1.isAvailable(), "Runway should be available after being released");
+        assertTrue(airport.getRunway1().isAvailable(), "Runway should be available after being released");
     }
 
     @Test
@@ -83,9 +82,9 @@ class RunwayTest {
         Plane plane = new Plane("TEST_PLANE");
         plane.getNavigator().setLocation(FINAL_APPROACH_CORRIDOR_1);
 
-        controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, runway1);
+        controlTower.releaseRunwayIfPlaneAtFinalApproach(plane, airport.getRunway1());
 
-        assertTrue(runway1.isAvailable(),
+        assertTrue(airport.getRunway1().isAvailable(),
                 "Runway should be released after the plane reaches the final approach point");
     }
 }

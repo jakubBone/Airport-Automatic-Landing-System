@@ -5,8 +5,8 @@ import com.jakub.bone.config.Constant;
 
 @Getter
 public class Airport {
-    public static Runway runway2;
-    public static Runway runway1;
+    private final Runway runway1;
+    private final Runway runway2;
 
     public Airport() {
         this.runway1 = Runway.builder()

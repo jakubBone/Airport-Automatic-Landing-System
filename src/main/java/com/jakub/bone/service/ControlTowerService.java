@@ -100,6 +100,10 @@ public class ControlTowerService {
         });
     }
 
+    public List<Plane> getPlanesSnapshot() {
+        return executeWithLock(() -> new ArrayList<>(planes));
+    }
+
     // Helper methods for locks management
     private <T> T executeWithLock(Supplier<T> action){
         lock.lock();

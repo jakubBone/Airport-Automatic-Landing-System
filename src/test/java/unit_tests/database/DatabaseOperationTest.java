@@ -16,7 +16,6 @@ import com.jakub.bone.domain.plane.Plane;
 
 import java.sql.SQLException;
 
-import static com.jakub.bone.domain.airport.Airport.runway1;
 import static org.mockito.Mockito.*;
 import static com.jakub.bone.config.Constant.ENTRY_POINT_CORRIDOR_1;
 
@@ -57,9 +56,9 @@ class DatabaseOperationTest {
         Plane plane = new Plane("TEST_PLANE");
 
         // Place the plane on the runway's landing point
-        plane.getNavigator().setLocation(runway1.getLandingPoint());
+        plane.getNavigator().setLocation(airport.getRunway1().getLandingPoint());
         // Inform control tower that plane has landed
-        controlTower.hasLandedOnRunway(plane, runway1);
+        controlTower.hasLandedOnRunway(plane, airport.getRunway1());
 
         verify(mockPlaneRepository, times(1)).registerLandingInDB(plane);
     }
