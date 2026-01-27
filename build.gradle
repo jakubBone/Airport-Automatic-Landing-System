@@ -58,6 +58,15 @@ dependencies {
 
 }
 
+// Add generated sources to main source set
+sourceSets {
+    main {
+        java {
+            srcDir 'src/generated/java'
+        }
+    }
+}
+
 jooq {
     version = '3.19.15'
     configurations {
@@ -79,7 +88,7 @@ jooq {
                     }
                     target {
                         packageName = 'jooq'
-                        directory = 'src/main/java'
+                        directory = 'src/generated/java'
                     }
                 }
             }
