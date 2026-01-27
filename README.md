@@ -90,6 +90,9 @@ Control the camera with keyboard:
 - **JUnit 5** - Testing
 - **Log4j2** - Logging
 
+**Note:** The project includes `libs/jim3dsModelImporterJFX/` for 3D model import (.obj files).
+This library is not available in Maven Central and must be included locally.
+
 
 ## Project Structure
 

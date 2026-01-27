@@ -93,9 +93,14 @@ nb-configuration.xml
 *.log
 
 ##############################
-## JavaFX SDK
+## Libs
 ##############################
-libs/javafx-sdk-21.0.5/legal
+# Ignore JavaFX SDK (available via Gradle)
+libs/javafx-sdk*/
+
+# Keep 3D model importer (not available in Maven Central)
+!libs/jim3dsModelImporterJFX/
+!libs/jim3dsModelImporterJFX/*.jar
 
 ##############################
 ## JOOQ
