@@ -105,7 +105,8 @@ libs/javafx-sdk*/
 ##############################
 ## JOOQ
 ##############################
-src/main/java/com/jakub/bone/generated/
+# Generated code is committed to avoid chicken-egg problem
+# (compilation needs generated classes, generation needs running database)
 
 ##############################
 ## Docker
