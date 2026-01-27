@@ -1,189 +1,114 @@
-# ✈️ Airport Automatic Landing System
+# Airport Automatic Landing System
 
 [![Watch the video](src/main/resources/images/logo.png)](https://www.youtube.com/watch?v=NvXRgYPO4gE)
 
 
-## 🧪 Project Purpose & Status
+## Project Overview
 
-This project was created **about a year ago** as an educational and experimental project.
-
-- It was intentionally written **without Spring** to understand low-level mechanisms (threading, sockets, HTTP).
-
-- At that time, **separation of concerns and architectural boundaries were not a priority**, as the focus was on learning through experimentation.
-
-- The REST API and several system components exist mainly for **learning purposes** and are not strictly required for the simulation.
-
-- The setup is manual, as the project was created **before I started using Docker**.
-
-Overall, many parts of this project exist **primarily for learning and experimentation**, rather than production readiness.
-
-
-## ✈️ Project Overview
-
-This project simulates an **automated airport landing control system** using a client–server architecture, collision detection, and real-time monitoring.
+This project simulates an **automated airport landing control system** using a client-server architecture, collision detection, and real-time 3D visualization.
 
 The system uses **multithreading** to handle multiple airplanes concurrently, prevent collisions, and manage runway allocation.
 Airplanes act as clients and communicate with the control tower server using raw socket connections.
 
 
-
-## 🎯 Features
+## Features
 
 - **Collision Detection**: Prevents crashes by continuously monitoring airplane positions
-
 - **Runway Assignment**: Dynamically allocates available runways for landing
-
-- **Fuel Monitoring**: Real-time fuel level monitoring
-
+- **Fuel Monitoring**: Real-time fuel level tracking
 - **Client-Server Communication**: Planes (clients) communicate with the control tower (server) via sockets
-
-- **Database Integration**: Logs airspace registrations, landings, collisions, and plane details for analysis
-
-- **Visualization**: A 3D interface using JavaFX for visualizing airplane movements
-
-- **REST API**: Exposes endpoints for controlling the airport and retrieving real-time data
+- **Database Integration**: Logs registrations, landings, and collisions
+- **3D Visualization**: JavaFX interface for visualizing airplane movements in real-time
 
 
-## 🚀 Technologies Used
-
-- **Java 21**: Core programming language for client-server logic
-
-- **PostgreSQL**: Backend database for logging data
-
-- **JOOQ**: SQL builder for database interactions
-
-- **JavaFX**: 3D visualization of the airport and planes
-
-- **JUnit**: Unit and integration testing
-
-- **Log4j2**: Logging system for debugging and information tracking
-
-- **Gradle**: Build automation and dependency management
-
-- **Jetty**: Embedded HTTP server for API
-
-
-## 📂 Project Structure
-
-```
-.
-├── src
-│   ├── main
-│   │   ├── java
-│   │   │   ├── com/jakub/bone/api            # REST API endpoints
-│   │   │   ├── com/jakub/bone/application    # Application processes management
-│   │   │   ├── com/jakub/bone/client         # Client-side logic 
-│   │   │   ├── com/jakub/bone/config         # Configuration and constants 
-│   │   │   ├── com/jakub/bone/core           # Simulation entry point
-│   │   │   ├── com/jakub/bone/database       # Database connection
-│   │   │   ├── com/jakub/bone/domain         # Domain models for airport and airplane
-│   │   │   ├── com/jakub/bone/repository     # Data persistence layer
-│   │   │   ├── com/jakub/bone/server         # Server-side logic 
-│   │   │   ├── com/jakub/bone/service        # Business logic and processes 
-│   │   │   ├── com/jakub/bone/ui             # Visualization components
-│   │   │   └── com/jakub/bone/utils         # Utilities and constants  
-│   │   └── resources                        # Resources 
-│   └── test                                 # Unit & integration tests
-├── build.gradle                             # Build configuration
-└── ...                                    
-``` 
-
-
-## 🚀 Getting Started
-
-Follow these steps to set up and run the project:
+## Quick Start
 
 ### Prerequisites
+- **Java 21** or higher
+- **Docker** (for PostgreSQL database)
 
-Before you begin, ensure you have the following tools installed:
-- **Java Development Kit (JDK)** 21 or higher
-- **Gradle** for dependency management
-- **PostgreSQL** database
-- **JavaFX** library for visualization
+### Run in 3 steps
 
-### Setup Instructions
-
-1. **Clone the Repository**  
-   Download the project files to your local machine:
+1. **Clone the repository**
    ```bash
    git clone https://github.com/jakubBone/Airport-Automatic-Landing-System.git
    cd Airport-Automatic-Landing-System
-
-2. **Configure the Database**  
-   Set up a PostgreSQL database:
-   - Create a database named airport_system
-   - Update the database credentials in the `AirportDatabase.java` file located at:
-     `src/com/jakub/bone/database/AirportDatabase.java`
-     Replace the placeholders with your database credentials:
-     ```java
-     private final String USER = "your_user";
-     private final String PASSWORD = "your_password";
-
-3. **Build the Project**   
-   Use Gradle to build the project:
-   ```bash
-   ./gradlew build
-
-5. **Run the Server**   
-   Start the server to manage plane communications:
-   ```bash
-   java -cp build/classes/java/main com.jakub.bone.core.AirportServer
    ```
 
-6. **Run the Clients**  
-   Simulate planes connecting to the server:
+2. **Start database**
    ```bash
-   java -cp build/classes/java/main com.jakub.bone.core.PlaneClient
-
-7. **Launch Visualization** (Optional)  
-   Start the 3D visualization tool for real-time airplane monitoring:
-   ```bash
-   java -cp build/classes/java/main com.jakub.bone.core.SimulationLauncher
-   
-8. **Run the API** 
-
-   The API will be available at: http://localhost:8080:
-   ```bash
-   java -cp build/classes/java/main com.jakub.bone.api.ApiServer
+   docker-compose up -d
    ```
-   
-## 🌐 API Overview
 
-The system provides a REST API for monitoring and controlling the airport. The available endpoints include:
+3. **Run simulation**
+   ```bash
+   ./gradlew run
+   ```
 
-### Control Endpoints
-
-- `POST /airport/start` – Start the airport system
-- `POST /airport/pause` – Pause the system
-- `POST /airport/resume` – Resume the system
-- `POST /airport/stop` – Stop the system
-
-### Monitoring Endpoints
-
-- `GET /airport/uptime` – Get the current uptime of the airport system
-- `GET /airport/planes/count` – Get the number of planes in the air
-- `GET /airport/planes/flightNumbers` – Get the flight numbers list of planes in the air
-- `GET /airport/planes/landed` – Get a list of landed planes
-- `GET /airport/collisions` – Get information about past collisions
-
-For a detailed API specification, see [API Documentation](https://github.com/jakubBone/Airport-Automatic-Landing-System/blob/master/docs/API.md)   .
+The 3D visualization window will open automatically with the simulation running.
 
 
-## 🎨 Interactive Visualization
+## Configuration
 
-Experience the airport operations in 3D! Planes move dynamically, and collisions or landings are visually represented.
-Control the camera with keyboard inputs:
-  
+Default configuration works out of the box with Docker.
+
+To customize, you can set environment variables (see `.env.example`):
+- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` - database settings
+- `SERVER_PORT` - server port (default: 5000)
+- `MAX_CLIENTS` - maximum number of planes (default: 100)
+
+Or modify `src/main/resources/config.properties` directly.
+
+
+## Visualization Controls
+
+Control the camera with keyboard:
 - **Z/X**: Zoom in/out
-  
 - **Arrow Keys**: Rotate the camera
 
-## 📧 Contact
 
-If you have any questions, feedback, or suggestions, feel free to reach out to me:
+## Technologies
 
-- **Email**: [jakub.bone1990@gmail.com](mailto:jakub.bone1990@gmail,com)
-- **Blog**: [javamPokaze.pl](https://javampokaze.pl)  
-- **LinkedIn**: [Jakub Bone](https://www.linkedin.com/in/jakub-bone)  
+- **Java 21** - Core language
+- **PostgreSQL** - Database
+- **JOOQ** - Type-safe SQL
+- **JavaFX** - 3D visualization
+- **Docker** - Database containerization
+- **Gradle** - Build tool
+- **JUnit 5** - Testing
+- **Log4j2** - Logging
 
-Let's connect and discuss this project further! 🚀
+
+## Project Structure
+
+```
+src/main/java/com/jakub/bone/
+├── application/    # Connection handlers
+├── client/         # Plane client logic
+├── config/         # Configuration
+├── core/           # Entry point (SimulationLauncher)
+├── database/       # Database connection
+├── domain/         # Domain models (Plane, Runway, Airport)
+├── repository/     # Data persistence
+├── server/         # Airport server
+├── service/        # Business logic (CollisionService, ControlTower)
+├── ui/             # 3D visualization components
+└── utils/          # Utilities
+```
+
+
+## Project Status
+
+This project was created as an **educational project** to learn:
+- Low-level threading and socket programming (without Spring)
+- Client-server architecture
+- Real-time 3D visualization with JavaFX
+
+It is actively being refactored to improve code quality and architecture.
+
+
+## Contact
+
+- **Email**: [jakub.bone1990@gmail.com](mailto:jakub.bone1990@gmail.com)
+- **Blog**: [javamPokaze.pl](https://javampokaze.pl)
+- **LinkedIn**: [Jakub Bone](https://www.linkedin.com/in/jakub-bone)
