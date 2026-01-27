@@ -29,35 +29,47 @@ Airplanes act as clients and communicate with the control tower server using raw
 
 ### Run in 3 steps
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/jakubBone/Airport-Automatic-Landing-System.git
-   cd Airport-Automatic-Landing-System
-   ```
+```bash
+# 1. Clone
+git clone https://github.com/jakubBone/Airport-Automatic-Landing-System.git
+cd Airport-Automatic-Landing-System
 
-2. **Start database**
-   ```bash
-   docker-compose up -d
-   ```
+# 2. Start database
+docker-compose up -d
 
-3. **Run simulation**
-   ```bash
-   ./gradlew run
-   ```
+# 3. Run simulation
+./gradlew run
+```
 
-The 3D visualization window will open automatically with the simulation running.
+The 3D visualization window will open automatically.
 
 
 ## Configuration
 
-Default configuration works out of the box with Docker.
+The project uses **default development credentials** for quick start.
 
-To customize, you can set environment variables (see `.env.example`):
-- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` - database settings
-- `SERVER_PORT` - server port (default: 5000)
-- `MAX_CLIENTS` - maximum number of planes (default: 100)
+To customize, create a `.env` file (see `.env.example`):
+```
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=airport_system
+DB_USER=airport
+DB_PASSWORD=your_password
+```
 
-Or modify `src/main/resources/config.properties` directly.
+Other settings: `src/main/resources/config.properties`
+
+
+## Security Note
+
+This project includes **default credentials for development purposes only**.
+
+For production or shared environments:
+1. Copy `.env.example` to `.env`
+2. Set secure credentials in `.env`
+3. The `.env` file is gitignored and won't be committed
+
+Environment variables override default values in `docker-compose.yml` and `config.properties`.
 
 
 ## Visualization Controls
