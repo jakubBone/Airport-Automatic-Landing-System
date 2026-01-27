@@ -17,6 +17,8 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 
+import com.jakub.bone.config.ConfigLoader;
+
 @Log4j2
 @Getter
 @Setter
@@ -110,6 +112,7 @@ public class AirportServer  {
 
     public static void main(String[] args) throws IOException, SQLException {
         AirportServer airportServer = new AirportServer();
-        airportServer.startServer(5000);
+        int port = ConfigLoader.getInt("server.port");
+        airportServer.startServer(port);
     }
 }

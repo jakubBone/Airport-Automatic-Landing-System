@@ -1,5 +1,6 @@
 package com.jakub.bone.database;
 
+import com.jakub.bone.config.ConfigLoader;
 import com.jakub.bone.repository.DatabaseSchema;
 import com.jakub.bone.repository.PlaneRepository;
 import lombok.Getter;
@@ -15,10 +16,13 @@ import java.sql.SQLException;
 @Getter
 @Log4j2
 public class AirportDatabase {
-    private final String USER = "airport";
-    private final String PASSWORD = "plane123";
-    private final String DATABASE = "airport_system";
-    private final String URL = String.format("jdbc:postgresql://localhost:%d/%s", 5432, DATABASE);;
+    private final String host = ConfigLoader.get("database.host");
+    private final int port = ConfigLoader.getInt("database.port");
+    private final String database = ConfigLoader.get("database.name");
+    private final String user = ConfigLoader.get("database.user");
+    private final String password = ConfigLoader.get("database.password");
+    private final String url = String.format("jdbc:postgresql://%s:%d/%s", host, port, database);
+
     private final DSLContext CONTEXT;
     private final DatabaseSchema SCHEMA;
     private final PlaneRepository PLANE_REPOSITORY;
@@ -38,10 +42,10 @@ public class AirportDatabase {
             return connection;
         }
         try {
-            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            log.info("Connection established successfully with database '{}' on port {}", DATABASE, 5432);
+            this.connection = DriverManager.getConnection(url, user, password);
+            log.info("Connection established successfully with database '{}' on {}:{}", database, host, port);
         } catch (SQLException ex) {
-            log.error("Failed to establish connection to the database '{}'. Error: {}", DATABASE, ex.getMessage(), ex);
+            log.error("Failed to establish connection to the database '{}'. Error: {}", database, ex.getMessage(), ex);
         }
         return connection;
     }
@@ -50,7 +54,7 @@ public class AirportDatabase {
         if (connection != null) {
             try {
                 connection.close();
-                log.info("Connection to database '{}' closed successfully.", DATABASE);
+                log.info("Connection to database '{}' closed successfully.", database);
             } catch (SQLException ex) {
                 log.error("Failed to close connection. Error: {}", ex.getMessage(), ex);
             }

@@ -1,6 +1,7 @@
 package com.jakub.bone.client;
 
 import com.jakub.bone.application.PlaneHandler;
+import com.jakub.bone.config.ConfigLoader;
 import com.jakub.bone.config.Constant;
 import lombok.Getter;
 import com.jakub.bone.utils.Messenger;
@@ -90,11 +91,12 @@ public class PlaneClient extends Client implements Runnable {
     }
 
     public static void main(String[] args) throws IOException {
-        int numberOfClients = 100;
+        int numberOfClients = ConfigLoader.getInt("server.max-clients");
+        int serverPort = ConfigLoader.getInt("server.port");
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfClients);
 
         for (int i = 0; i < numberOfClients; i++) {
-            PlaneClient client = new PlaneClient("localhost", 5000);
+            PlaneClient client = new PlaneClient("localhost", serverPort);
             try{
                 Thread.sleep(Constant.CLIENT_SPAWN_DELAY);
             } catch (InterruptedException ex){

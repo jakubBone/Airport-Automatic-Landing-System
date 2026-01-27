@@ -1,6 +1,7 @@
 package com.jakub.bone.service;
 
 import com.jakub.bone.client.PlaneClient;
+import com.jakub.bone.config.ConfigLoader;
 import com.jakub.bone.server.AirportServer;
 import lombok.Getter;
 
@@ -27,9 +28,13 @@ public class AirportStateService {
             return;
         }
 
+        int serverPort = ConfigLoader.getInt("server.port");
+        int maxClients = ConfigLoader.getInt("server.max-clients");
+        String serverHost = ConfigLoader.get("database.host"); // localhost for local connections
+
         Thread serverThread = new Thread(() -> {
             try {
-                this.airportServer.startServer(5000);
+                this.airportServer.startServer(serverPort);
             } catch (IOException ex) {
                 throw new RuntimeException("Failed to initialize AirportServer due to I/O issues", ex);
             }
@@ -46,8 +51,8 @@ public class AirportStateService {
         }
 
         new Thread(() -> {
-            for (int i = 0; i < 100; i++) {
-                PlaneClient client = new PlaneClient("localhost", 5000);
+            for (int i = 0; i < maxClients; i++) {
+                PlaneClient client = new PlaneClient("localhost", serverPort);
                 new Thread(client).start();
 
                 try {

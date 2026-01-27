@@ -65,9 +65,9 @@ jooq {
             generationTool {
                 jdbc {
                     driver = 'org.postgresql.Driver'
-                    url = 'jdbc:postgresql://localhost:5432/airport_system'
-                    user = 'airport'
-                    password = 'plane123'
+                    url = "jdbc:postgresql://${System.getenv('DB_HOST') ?: 'localhost'}:${System.getenv('DB_PORT') ?: '5432'}/${System.getenv('DB_NAME') ?: 'airport_system'}"
+                    user = System.getenv('DB_USER') ?: 'airport'
+                    password = System.getenv('DB_PASSWORD') ?: 'plane123'
                 }
                 generator {
                     name = 'org.jooq.codegen.DefaultGenerator'
@@ -88,7 +88,7 @@ jooq {
 }
 
 application {
-    mainClass = 'simulation.SimulationApp'
+    mainClass = 'com.jakub.bone.core.SimulationLauncher'
 }
 
 test {
