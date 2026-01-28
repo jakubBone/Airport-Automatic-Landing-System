@@ -18,6 +18,8 @@ import java.util.function.Supplier;
 
 import static com.jakub.bone.config.Constant.*;
 
+import java.time.LocalDateTime;
+
 @Log4j2
 @Getter
 public class ControlTowerService {
@@ -34,7 +36,7 @@ public class ControlTowerService {
     public void registerPlane(Plane plane) {
         executeWithLock(() -> {
             planes.add(plane);
-            database.getPLANE_REPOSITORY().registerPlaneInDB(plane);
+            database.getPlaneRepository().insertPlane(plane.getFlightNumber());
         });
     }
 
@@ -78,7 +80,7 @@ public class ControlTowerService {
     public boolean hasLandedOnRunway(Plane plane, Runway runway){
         boolean hasLanded = plane.getNavigator().getLocation().equals(runway.getLandingPoint());
         if (hasLanded) {
-            database.getPLANE_REPOSITORY().registerLandingInDB(plane);
+            database.getPlaneRepository().updateLandingTime(plane.getFlightNumber(), LocalDateTime.now());
         }
         return hasLanded;
     }

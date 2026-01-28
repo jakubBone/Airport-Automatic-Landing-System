@@ -5,11 +5,9 @@ import com.jakub.bone.ui.utills.SceneRenderer;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import com.jakub.bone.server.AirportServer;
-import lombok.extern.log4j.Log4j2;
 
 import java.sql.SQLException;
 
-@Log4j2
 public class SimulationLauncher extends Application {
     private AirportServer airportServer;
     private AirportStateService airportStateService;
@@ -30,12 +28,7 @@ public class SimulationLauncher extends Application {
 
     @Override
     public void stop() {
-        try {
-            airportServer.getDatabase().getSCHEMA().clearTables();
-            log.info("Database {} cleared during application shutdown", airportServer.getDatabase());
-        } catch (Exception ex) {
-            log.error("Error occurred while clearing the database: {}", ex.getMessage(), ex);
-        }
+        airportServer.stopServer();
     }
 
     public static void main(String[] args) {

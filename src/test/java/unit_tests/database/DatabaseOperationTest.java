@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import com.jakub.bone.domain.plane.Plane;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 import static org.mockito.Mockito.*;
 import static com.jakub.bone.config.Constant.ENTRY_POINT_CORRIDOR_1;
@@ -33,8 +34,8 @@ class DatabaseOperationTest {
     @BeforeEach
     void setUp() throws SQLException {
         MockitoAnnotations.openMocks(this);
-        when(mockDatabase.getPLANE_REPOSITORY()).thenReturn(mockPlaneRepository);
-        when(mockDatabase.getCOLLISION_REPOSITORY()).thenReturn(mockCollisionRepository);
+        when(mockDatabase.getPlaneRepository()).thenReturn(mockPlaneRepository);
+        when(mockDatabase.getCollisionRepository()).thenReturn(mockCollisionRepository);
         collisionDetector = new CollisionService(controlTower);
     }
 
@@ -46,7 +47,7 @@ class DatabaseOperationTest {
         // Registration should trigger a DB operation
         controlTower.registerPlane(plane);
 
-        verify(mockPlaneRepository, times(1)).registerPlaneInDB(plane);
+        verify(mockPlaneRepository, times(1)).insertPlane(plane.getFlightNumber());
     }
 
     @Test
@@ -60,7 +61,7 @@ class DatabaseOperationTest {
         // Inform control tower that plane has landed
         controlTower.hasLandedOnRunway(plane, airport.getRunway1());
 
-        verify(mockPlaneRepository, times(1)).registerLandingInDB(plane);
+        verify(mockPlaneRepository, times(1)).updateLandingTime(eq(plane.getFlightNumber()), any(LocalDateTime.class));
     }
 
     @Test

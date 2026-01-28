@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static jooq.Tables.COLLISIONS;
-import static org.jooq.impl.DSL.*;
 
 public class CollisionRepository {
     private final DSLContext CONTEXT;
@@ -15,16 +14,16 @@ public class CollisionRepository {
         this.CONTEXT = CONTEXT;
     }
 
-    public void registerCollisionToDB(String [] planesIds){
-        CONTEXT.insertInto(table("collisions"),
-                    field("involved_planes"),
-                    field("time"))
+    public void registerCollisionToDB(String[] planesIds) {
+        CONTEXT.insertInto(COLLISIONS,
+                    COLLISIONS.INVOLVED_PLANES,
+                    COLLISIONS.TIME)
                 .values(planesIds,
                         LocalDateTime.now())
                 .execute();
     }
 
-    public List<String> getCollidedPlanes(){
+    public List<String> getCollidedPlanes() {
         return CONTEXT.select(COLLISIONS.INVOLVED_PLANES)
                 .from(COLLISIONS)
                 .where(COLLISIONS.TIME.isNotNull())

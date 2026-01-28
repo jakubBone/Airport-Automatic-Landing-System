@@ -1,5 +1,6 @@
 package com.jakub.bone.server;
 
+import com.jakub.bone.config.DbConstants;
 import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.domain.airport.Airport;
 import com.jakub.bone.service.CollisionService;
@@ -13,6 +14,8 @@ import org.apache.logging.log4j.ThreadContext;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
@@ -30,6 +33,7 @@ public class AirportServer  {
     private static final int EXECUTOR_SHUTDOWN_TIMEOUT_SECONDS = 30;
 
     private ServerSocket serverSocket;
+    private Connection connection;
     private AirportDatabase database;
     private ControlTowerService controlTowerService;
     private Airport airport;
@@ -40,7 +44,8 @@ public class AirportServer  {
     private Instant startTime;
 
     public AirportServer() throws SQLException {
-        this.database = new AirportDatabase();
+        this.connection = DriverManager.getConnection(DbConstants.URL, DbConstants.USER, DbConstants.PASSWORD);
+        this.database = new AirportDatabase(connection);
         this.controlTowerService = new ControlTowerService(database);
         this.airport = new Airport();
         this.running = false;
@@ -112,9 +117,13 @@ public class AirportServer  {
                 log.info("Connection pool closed successfully");
             }
 
-            if(database != null){
-                database.closeConnection();
-                log.info("Database closed successfully");
+            if(connection != null){
+                try {
+                    connection.close();
+                    log.info("Database connection closed successfully");
+                } catch (SQLException ex) {
+                    log.error("Error closing database connection: {}", ex.getMessage(), ex);
+                }
             }
 
             if (serverSocket != null && !serverSocket.isClosed()) {

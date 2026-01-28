@@ -1,33 +1,44 @@
 package unit_tests.database;
 
+import com.jakub.bone.config.DbConstants;
 import com.jakub.bone.database.AirportDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DatabaseConnectionTest {
-    AirportDatabase database;
+    Connection connection;
 
     @BeforeEach
     void setUp() throws SQLException {
-        this.database = new AirportDatabase();
+        this.connection = DriverManager.getConnection(DbConstants.URL, DbConstants.USER, DbConstants.PASSWORD);
     }
 
     @Test
-    @DisplayName("Database connection should not return be null")
+    @DisplayName("Database connection should not be null")
     void testGetConnection() throws SQLException {
-        assertNotNull(database.getDatabaseConnection(), "Database connection should not return null");
+        assertNotNull(connection, "Database connection should not return null");
     }
 
     @Test
     @DisplayName("Database connection should close properly")
     void testCloseConnection() throws SQLException {
-        database.closeConnection();
-        assertTrue(database.getConnection().isClosed(), "Database connection should be closed");
+        connection.close();
+        assertTrue(connection.isClosed(), "Database connection should be closed");
+    }
+
+    @Test
+    @DisplayName("AirportDatabase should be created with valid connection")
+    void testAirportDatabaseCreation() throws SQLException {
+        AirportDatabase database = new AirportDatabase(connection);
+        assertNotNull(database.getPlaneRepository(), "PlaneRepository should not be null");
+        assertNotNull(database.getCollisionRepository(), "CollisionRepository should not be null");
     }
 }
