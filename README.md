@@ -38,7 +38,7 @@ cd Airport-Automatic-Landing-System
 docker-compose up -d
 
 # 3. Initialize database schema (first time only)
-./gradlew :db-init:run
+./gradlew :db-init:initDB
 
 # 4. Run simulation
 ./gradlew run

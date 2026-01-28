@@ -34,8 +34,6 @@ test {
     useJUnitPlatform()
 }
 
-
-
 tasks.register('initDB', JavaExec) {
     group = 'application'
     description = 'Initialize database schema'
