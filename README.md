@@ -27,7 +27,7 @@ Airplanes act as clients and communicate with the control tower server using raw
 - **Java 21** or higher
 - **Docker** (for PostgreSQL database)
 
-### Run in 3 steps
+### Run
 
 ```bash
 # 1. Clone
@@ -37,7 +37,10 @@ cd Airport-Automatic-Landing-System
 # 2. Start database
 docker-compose up -d
 
-# 3. Run simulation
+# 3. Initialize database schema (first time only)
+./gradlew :db-init:run
+
+# 4. Run simulation
 ./gradlew run
 ```
 
@@ -46,37 +49,7 @@ The 3D visualization window will open automatically.
 
 ## Configuration
 
-The project uses **default development credentials** for quick start.
-
-To customize, create a `.env` file (see `.env.example`):
-```
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=airport_system
-DB_USER=airport
-DB_PASSWORD=your_password
-```
-
-Other settings: `src/main/resources/config.properties`
-
-
-## Security Note
-
-This project includes **default credentials for development purposes only**.
-
-For production or shared environments:
-1. Copy `.env.example` to `.env`
-2. Set secure credentials in `.env`
-3. The `.env` file is gitignored and won't be committed
-
-Environment variables override default values in `docker-compose.yml` and `config.properties`.
-
-
-## Visualization Controls
-
-Control the camera with keyboard:
-- **Z/X**: Zoom in/out
-- **Arrow Keys**: Rotate the camera
+All settings are in `src/main/resources/config.properties`.
 
 
 ## Technologies

@@ -1,6 +1,6 @@
 package unit_tests.database;
 
-import com.jakub.bone.config.DbConstants;
+import com.jakub.bone.config.ConfigLoader;
 import com.jakub.bone.database.AirportDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +18,13 @@ class DatabaseConnectionTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        this.connection = DriverManager.getConnection(DbConstants.URL, DbConstants.USER, DbConstants.PASSWORD);
+        String url = String.format("jdbc:postgresql://%s:%d/%s",
+                ConfigLoader.get("database.host"),
+                ConfigLoader.getInt("database.port"),
+                ConfigLoader.get("database.name"));
+        this.connection = DriverManager.getConnection(url,
+                ConfigLoader.get("database.user"),
+                ConfigLoader.get("database.password"));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.jakub.bone.server;
 
-import com.jakub.bone.config.DbConstants;
+import com.jakub.bone.config.ConfigLoader;
+import com.jakub.bone.config.ServerConstants;
 import com.jakub.bone.service.ControlTowerService;
 import com.jakub.bone.domain.airport.Airport;
 import com.jakub.bone.service.CollisionService;
@@ -23,8 +24,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.jakub.bone.config.ConfigLoader;
-
 @Log4j2
 @Getter
 @Setter
@@ -44,7 +43,13 @@ public class AirportServer  {
     private Instant startTime;
 
     public AirportServer() throws SQLException {
-        this.connection = DriverManager.getConnection(DbConstants.URL, DbConstants.USER, DbConstants.PASSWORD);
+        String url = String.format("jdbc:postgresql://%s:%d/%s",
+                ConfigLoader.get("database.host"),
+                ConfigLoader.getInt("database.port"),
+                ConfigLoader.get("database.name"));
+        this.connection = DriverManager.getConnection(url,
+                ConfigLoader.get("database.user"),
+                ConfigLoader.get("database.password"));
         this.database = new AirportDatabase(connection);
         this.controlTowerService = new ControlTowerService(database);
         this.airport = new Airport();
@@ -149,7 +154,6 @@ public class AirportServer  {
 
     public static void main(String[] args) throws IOException, SQLException {
         AirportServer airportServer = new AirportServer();
-        int port = ConfigLoader.getInt("server.port");
-        airportServer.startServer(port);
+        airportServer.startServer(ServerConstants.PORT);
     }
 }
