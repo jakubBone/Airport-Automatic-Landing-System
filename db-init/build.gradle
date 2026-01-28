@@ -34,11 +34,9 @@ test {
     useJUnitPlatform()
 }
 
-application {
-    mainClass = 'com.jakub.bone.dbinit.InitDatabaseRunner'
-}
 
-tasks.register('run', JavaExec) {
+
+tasks.register('initDB', JavaExec) {
     group = 'application'
     description = 'Initialize database schema'
     classpath = sourceSets.main.runtimeClasspath
