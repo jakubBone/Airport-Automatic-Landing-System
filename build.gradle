@@ -56,7 +56,7 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDir 'src/generated/java'
+            srcDir 'build/generated-src/jooq/main'
         }
     }
 }
@@ -82,12 +82,17 @@ jooq {
                     }
                     target {
                         packageName = 'jooq'
-                        directory = 'src/generated/java'
+                        directory = 'build/generated-src/jooq/main'
                     }
                 }
             }
         }
     }
+}
+
+// Ensure jOOQ classes are generated before compilation
+tasks.named('compileJava') {
+    dependsOn tasks.named('generateJooq')
 }
 
 javafx {
