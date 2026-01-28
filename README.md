@@ -3,7 +3,7 @@
 [![Watch the video](src/main/resources/images/logo.png)](https://www.youtube.com/watch?v=NvXRgYPO4gE)
 
 
-## Project Overview
+## 🛬 Project Overview
 
 This project simulates an **automated airport landing control system** using a client-server architecture, collision detection, and real-time 3D visualization.
 
@@ -11,7 +11,7 @@ The system uses **multithreading** to handle multiple airplanes concurrently, pr
 Airplanes act as clients and communicate with the control tower server using raw socket connections.
 
 
-## Features
+## ✨ Features
 
 - **Collision Detection**: Prevents crashes by continuously monitoring airplane positions
 - **Runway Assignment**: Dynamically allocates available runways for landing
@@ -21,7 +21,7 @@ Airplanes act as clients and communicate with the control tower server using raw
 - **3D Visualization**: JavaFX interface for visualizing airplane movements in real-time
 
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 - **Java 21** or higher
@@ -47,12 +47,12 @@ docker-compose up -d
 The 3D visualization window will open automatically.
 
 
-## Configuration
+## ⚙️ Configuration
 
 All settings are in `src/main/resources/config.properties`.
 
 
-## Technologies
+## 🧰 Technologies
 
 - **Java 21** - Core language
 - **PostgreSQL** - Database
@@ -67,7 +67,7 @@ All settings are in `src/main/resources/config.properties`.
 This library is not available in Maven Central and must be included locally.
 
 
-## Project Structure
+## 🗂️ Project Structure
 
 ```
 ├── db-init/                        # Database schema initialization module
@@ -86,7 +86,7 @@ This library is not available in Maven Central and must be included locally.
 ```
 
 
-## Project Status
+## 📌 Project Status
 
 This project was created as an **educational project** to learn:
 - Low-level threading and socket programming (without Spring)
@@ -96,7 +96,7 @@ This project was created as an **educational project** to learn:
 It is actively being refactored to improve code quality and architecture.
 
 
-## Contact
+## 📬 Contact
 
 - **Email**: [jakub.bone1990@gmail.com](mailto:jakub.bone1990@gmail.com)
 - **Blog**: [javamPokaze.pl](https://javampokaze.pl)
