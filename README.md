@@ -5,7 +5,7 @@
 
 ## 🛬 Project Overview
 
-This project simulates an **automated airport landing control system** using a client-server architecture, collision detection, and real-time 3D visualization.
+This project simulates an **automated airport control system** using a client-server architecture, collision detection, and real-time 3D visualization.
 
 The system uses **multithreading** to handle multiple airplanes concurrently, prevent collisions, and manage runway allocation.
 Airplanes act as clients and communicate with the control tower server using raw socket connections.
