@@ -70,18 +70,19 @@ This library is not available in Maven Central and must be included locally.
 ## Project Structure
 
 ```
-src/main/java/com/jakub/bone/
-├── application/    # Connection handlers
-├── client/         # Plane client logic
-├── config/         # Configuration
-├── core/           # Entry point (SimulationLauncher)
-├── database/       # Database connection
-├── domain/         # Domain models (Plane, Runway, Airport)
-├── repository/     # Data persistence
-├── server/         # Airport server
-├── service/        # Business logic (CollisionService, ControlTower)
-├── ui/             # 3D visualization components
-└── utils/          # Utilities
+├── db-init/                        # Database schema initialization module
+└── src/main/java/com/jakub/bone/
+    ├── application/    # Connection handlers
+    ├── client/         # Plane client logic
+    ├── config/         # Configuration
+    ├── core/           # Entry point (SimulationLauncher)
+    ├── database/       # Database connection
+    ├── domain/         # Domain models (Plane, Runway, Airport)
+    ├── repository/     # Data persistence
+    ├── server/         # Airport server
+    ├── service/        # Business logic (CollisionService, ControlTower)
+    ├── ui/             # 3D visualization components
+    └── utils/          # Utilities
 ```
 
 
